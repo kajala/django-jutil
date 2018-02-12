@@ -1,8 +1,10 @@
-# django-jutil
+django-jutil
+============
 
 Collection of small utilities for Django and Django REST framework projects.
 
-## Features
+Features
+========
 
 * Simplified admin changes history logging (admin_log)
 * ModelAdmin with read/write permissions separated (ModelAdminBase)
@@ -32,7 +34,8 @@ Collection of small utilities for Django and Django REST framework projects.
 * Validators and filters for various types (validators.py)
 * XML Element to/from dict conversions (dict_to_element, xml_to_dict)
 
-## Install
+Install
+=======
 
 pip install django-jutil
 
