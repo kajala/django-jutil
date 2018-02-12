@@ -32,9 +32,7 @@ Collection of small utilities for Django and Django REST framework projects.
 * Validators and filters for various types (validators.py)
 * XML Element to/from dict conversions (dict_to_element, xml_to_dict)
 
-## Changes
+## Install
 
-### 1.0.0
-
-* Initial release
+pip install django-jutil
 
