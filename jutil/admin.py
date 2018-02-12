@@ -1,0 +1,206 @@
+import mimetypes
+import os
+from django.conf import settings
+from django.conf.urls import url
+from django.contrib import admin
+from django.contrib.auth.models import User
+from django.http import HttpRequest, Http404, FileResponse
+from django.utils.timezone import now
+from jutil.format import format_timedelta
+from jutil.model import get_model_field_label_and_value
+from django.utils.translation import ugettext_lazy as _
+
+
+def admin_log(instances, msg: str, who: User=None, **kw):
+    """
+    Logs an entry to admin logs of model(s).
+    :param instances: Model instance or list of instances
+    :param msg: Message to log
+    :param who: Who did the change
+    :param kw: Optional key-value attributes to append to message
+    :return: None
+    """
+
+    from django.contrib.admin.models import LogEntry, CHANGE
+    from django.contrib.admin.options import get_content_type_for_model
+    from django.utils.encoding import force_text
+
+    # default to first user in the system if 'who' is missing
+    if not who:
+        who = User.objects.all().order_by('id')[:1][0]
+
+    # append extra keyword attributes if any
+    att_str = ''
+    for k, v in kw.items():
+        if hasattr(v, 'pk'):  # log only primary key for model instances, not whole str representation
+            v = v.pk
+        att_str += '{}={}'.format(k, v) if not att_str else ', {}={}'.format(k, v)
+    if att_str:
+        att_str = ' [{}]'.format(att_str)
+    msg = str(msg) + att_str
+
+    if not isinstance(instances, list) and not isinstance(instances, tuple):
+        instances = [instances]
+    for instance in instances:
+        if instance:
+            LogEntry.objects.log_action(
+                user_id=who.pk,
+                content_type_id=get_content_type_for_model(instance).pk,
+                object_id=instance.pk,
+                object_repr=force_text(instance),
+                action_flag=CHANGE,
+                change_message=msg,
+            )
+
+
+class ModelAdminBase(admin.ModelAdmin):
+    """
+    ModelAdmin with separated write- and read permission checking methods,
+    save-on-top default enabled and customized (length-limited) history view.
+    """
+    save_on_top = True
+    max_history_length = 1000
+
+    def has_write_permission(self, request, obj=None):
+        return super().has_change_permission(request, obj)
+
+    def has_read_permission(self, request, obj=None):
+        return super().has_change_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        """
+        Calls has_read_permission() for read-requests and has_write_permission() for write requests.
+        :param request: HttpRequest
+        :param obj: Selected object
+        :return: bool
+        """
+        if request.method == 'GET':
+            return self.has_read_permission(request, obj)
+        return self.has_write_permission(request, obj)
+
+    def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kw):
+        """
+        Changelist view which allow key-value arguments.
+        :param request: HttpRequest
+        :param extra_context: Extra context dict
+        :param kw: Key-value dict
+        :return: See changelist_view()
+        """
+        return self.changelist_view(request, extra_context)
+
+    def history_view(self, request, object_id, extra_context=None):
+        from django.template.response import TemplateResponse
+        from django.contrib.admin.options import get_content_type_for_model
+        from django.contrib.admin.utils import unquote
+        from django.core.exceptions import PermissionDenied
+        from django.utils.text import capfirst
+        from django.utils.encoding import force_text
+        from django.utils.translation import ugettext as _
+
+        "The 'history' admin view for this model."
+        from django.contrib.admin.models import LogEntry
+        # First check if the user can see this history.
+        model = self.model
+        obj = self.get_object(request, unquote(object_id))
+        if obj is None:
+            return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
+
+        if not self.has_change_permission(request, obj):
+            raise PermissionDenied
+
+        # Then get the history for this object.
+        opts = model._meta
+        app_label = opts.app_label
+        action_list = LogEntry.objects.filter(
+            object_id=unquote(object_id),
+            content_type=get_content_type_for_model(model)
+        ).select_related().order_by('-action_time')[:self.max_history_length]
+
+        context = dict(
+            self.admin_site.each_context(request),
+            title=_('Change history: %s') % force_text(obj),
+            action_list=action_list,
+            module_name=capfirst(force_text(opts.verbose_name_plural)),
+            object=obj,
+            opts=opts,
+            preserved_filters=self.get_preserved_filters(request),
+        )
+        context.update(extra_context or {})
+
+        request.current_app = self.admin_site.name
+
+        return TemplateResponse(request, self.object_history_template or [
+            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
+            "admin/%s/object_history.html" % app_label,
+            "admin/object_history.html"
+        ], context)
+
+
+class AdminLogEntryMixin(object):
+    """
+    Mixin for logging Django admin changes of models.
+    Call fields_changed() on change events.
+    """
+
+    def fields_changed(self, field_names: list, who: User, **kw):
+        from django.utils.translation import ugettext as _
+
+        fv_str = ''
+        for k in field_names:
+            label, value = get_model_field_label_and_value(self, k)
+            fv_str += '{}={}'.format(label, value) if not fv_str else ', {}={}'.format(label, value)
+
+        msg = "{class_name} id={id}: {fv_str}".format(class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)
+        admin_log([who, self], msg, who, **kw)
+
+
+class AdminFileDownloadMixin(object):
+    """
+    Model Admin mixin for downloading uploaded files. Checks object permission before allowing download.
+    """
+    upload_to = 'uploads'
+    file_field = 'file'
+
+    def get_object_file(self, request, object_id, filename):
+        """
+        Simple access implementation which assumes object has property called 'file'
+        :param request:
+        :param object_id:
+        :param filename:
+        :return:
+        """
+        obj = self.get_object(request, object_id)
+        if not hasattr(obj, self.file_field):
+            raise Exception("Object {} does not have member variable 'file'. AdminFileDownloadMixin.get_object_file override needed?".format(obj))
+        file = getattr(obj, self.file_field)
+        upload_path = os.path.join(self.upload_to, filename)
+        if file.name != upload_path:
+            raise Http404(_("File {} not found").format(filename))
+        return file
+
+    def get_full_path(self, filename: str):
+        return os.path.join(os.path.join(settings.MEDIA_ROOT, self.upload_to), filename)
+
+    def change_download_view(self, request, object_id, filename, form_url='', extra_context=None):
+        self.get_object_file(request, object_id, filename)  # make sure we have access rights
+        full_path = self.get_full_path(filename)
+        if not filename or not os.path.isfile(full_path):
+            raise Http404(_("File {} not found").format(filename))
+        content_type = mimetypes.guess_type(filename)[0]
+        response = FileResponse(open(full_path, 'rb'))
+        response['Content-Type'] = content_type
+        response['Content-Length'] = os.path.getsize(full_path)
+        response['Content-Disposition'] = "attachment; filename={}".format(filename)
+        return response
+
+    def get_download_urls(self):
+        """
+        Use like this:
+            def get_urls(self):
+                return self.get_download_urls() + super().get_urls()
+
+        Returns: File download URLs for this model.
+        """
+        info = self.model._meta.app_label, self.model._meta.model_name
+        dl_url = url(r'^(.+)/change/' + self.upload_to + r'/(.+)/$', self.change_download_view, name='%s_%s_change_download' % info)
+        return [dl_url]

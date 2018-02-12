@@ -1,0 +1,14 @@
+/venv
+__pycache__
+/.idea
+*.log
+*.tmp
+*.pyc
+/dist
+/uploads
+/dowloads
+/logs
+/django_jutil.egg-info
+/db.sqlite3
+/project/settings.py
+

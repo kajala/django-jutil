@@ -1,0 +1,86 @@
+import re
+from decimal import Decimal
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
+
+
+FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
+FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
+FI_COMPANY_REG_ID_FILTER = re.compile(r'[^-0-9]')
+
+
+def fi_payment_reference_number(num: str):
+    """
+    Appends Finland reference number checksum to existing number.
+    :param num: At least 3 digits
+    :return: Number plus checksum
+    """
+    assert isinstance(num, str)
+    num = re.sub(r'^0+', '', num)
+    assert len(num) >= 3
+    weights = [7, 3, 1]
+    weighed_sum = 0
+    numlen = len(num)
+    for j in range(numlen):
+        weighed_sum += int(num[numlen - 1 - j]) * weights[j % 3]
+    return num + str((10 - (weighed_sum % 10)) % 10)
+
+
+def fi_iban_validator(v: str):
+    from jutil.validators import validate_country_iban
+    validate_country_iban(v, 'FI', 18)
+
+
+def fi_iban_bank_info(v: str) -> (str, str):
+    """
+    Returns BIC code and bank name from FI IBAN number.
+    :param v: IBAN account number
+    :return: (BIC code, bank name) or None if not found
+    """
+    from jutil.fi.fi_bank_const import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
+    v = iban_filter(v)
+    bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
+    return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else None
+
+
+def fi_ssn_filter(v: str) -> str:
+    return FI_SSN_FILTER.sub('', v.upper())
+
+
+def fi_company_reg_id_filter(v: str) -> str:
+    return FI_COMPANY_REG_ID_FILTER.sub('', v.upper())
+
+
+def fi_company_reg_id_validator(v: str) -> str:
+    v = fi_company_reg_id_filter(v)
+    if v[-2:-1] != '-':
+        raise ValidationError(_('Invalid company registration ID')+' (FI.1): {}'.format(v), code='invalid_company_reg_id')
+    if len(v) != 9:
+        raise ValidationError(_('Invalid company registration ID')+' (FI.2): {}'.format(v), code='invalid_company_reg_id')
+    multipliers = (7, 9, 10, 5, 8, 4, 2)
+    x = 0
+    for i, m in enumerate(multipliers):
+        x += int(v[i]) * m
+    quotient, remainder = divmod(x, 11)
+    if remainder == 1:
+        raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v), code='invalid_company_reg_id')
+    check_digit = str(11 - remainder)
+    if check_digit != v[-1:]:
+        raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v), code='invalid_company_reg_id')
+
+
+def fi_ssn_validator(v: str):
+    v = fi_ssn_filter(v)
+    if not FI_SSN_VALIDATOR.fullmatch(v):
+        raise ValidationError(_('Invalid personal identification number')+' (FI.1): {}'.format(v), code='invalid_ssn')
+    d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
+    digits = {
+        10: 'A', 	11: 'B', 	12: 'C', 	13: 'D', 	14: 'E', 	15: 'F', 	16: 'H',
+        17: 'J', 	18: 'K', 	19: 'L', 	20: 'M', 	21: 'N', 	22: 'P', 	23: 'R',
+        24: 'S', 	25: 'T', 	26: 'U', 	27: 'V', 	28: 'W', 	29: 'X', 	30: 'Y',
+    }
+    ch = str(d)
+    if d in digits:
+        ch = digits[d]
+    if ch != v[-1:]:
+        raise ValidationError(_('Invalid personal identification number')+' (FI.2): {}'.format(v), code='invalid_ssn')

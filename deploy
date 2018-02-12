@@ -1,0 +1,29 @@
+DIR=`pwd`
+PROJECT=`basename $DIR`
+REL=`parse-setup-version.py`
+echo "Making release $REL of $PROJECT"
+
+rm -rf dist
+python3 setup.py sdist
+
+# clean venv/ directory from the dist
+# TODO: cleaner way to do this (using setup.py/MANIFEST.in)
+cd dist
+FILE="$PROJECT-$REL"
+echo $FILE
+cd dist
+tar xvf "$FILE.tar.gz"
+rm -rf "$FILE/venv"
+rm "$FILE.tar.gz"
+tar zcvf "$FILE.tar.gz" $FILE
+rm -rf $FILE
+cd ..
+
+# upload to pypi.kajala.com
+scp dist/*.gz pypi.kajala.com:pypi/$PROJECT/
+ssh pypi.kajala.com './pypi-sync'
+ssh pypi.kajala.com "rm pypi/$PROJECT/*.gz"
+
+# test
+# source venv/bin/activate
+# python manage.py test_email kajala@gmail.com --attach data/attachment.jpg

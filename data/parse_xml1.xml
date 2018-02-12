@@ -1,0 +1,10 @@
+<Doc version="1.2">
+  <A class="x">
+    <B class="x2">hello</B>
+  </A>
+  <A class="y">
+    <B class="y2">world</B>
+  </A>
+  <C>value node</C>
+</Doc>
+
