@@ -16,7 +16,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
 from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
-    se_iban_validator, iban_filter_readable, email_filter,iban_validator
+    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info
 
 
 class Tests(TestCase):
@@ -178,3 +178,9 @@ class Tests(TestCase):
         b, e = next_week(t)
         self.assertEqual(b, pytz.utc.localize(datetime(2018, 2, 5)))
         self.assertEqual(e, pytz.utc.localize(datetime(2018, 2, 12)))
+
+    def test_bank_info(self):
+        ac = 'FI8847304720017517'
+        inf = iban_bank_info(ac)
+        self.assertEqual(inf[0], 'POPFFI22')
+        self.assertEqual(inf[1], 'POP BANK')
