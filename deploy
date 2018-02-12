@@ -18,3 +18,5 @@ rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
 cd ..
+
+twine upload dist/$FILE.tar.gz
