@@ -13,7 +13,7 @@ setup(
     author_email='kajala@gmail.com',
     packages=find_packages(exclude=['project', 'venv']),
     include_package_data=True,
-    url='https://bitbucket.org/kajala/django-jutil',
+    url='https://github.com/kajala/django-jutil',
     license='MIT licence, see LICENCE.txt',
     description='Simple utilities for Django and Django REST framework projects',
     long_description=open('README.md').read(),
