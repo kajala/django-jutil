@@ -18,12 +18,3 @@ rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
 cd ..
-
-# upload to pypi.kajala.com
-scp dist/*.gz pypi.kajala.com:pypi/$PROJECT/
-ssh pypi.kajala.com './pypi-sync'
-ssh pypi.kajala.com "rm pypi/$PROJECT/*.gz"
-
-# test
-# source venv/bin/activate
-# python manage.py test_email kajala@gmail.com --attach data/attachment.jpg
