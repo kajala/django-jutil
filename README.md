@@ -24,7 +24,7 @@ Collection of small utilities for Django and Django REST framework projects.
 * Simple user field based permission checking for REST APIs (permissions.py)
 * Geo IP / IP info functions (request.py)
 * CSV download response (CsvFileResponse)
-* Simple SMS sending via Kajala Group SMS API (send_sms)
+* Simple SMS sending (send_sms)
 * SOAP debugging utilities (soap.py, using suds)
 * Mixin for basic test user setup (DefaultTestSetupMixin)
 * Unit tests for bunch of stuff (tests.py)
@@ -36,5 +36,5 @@ Collection of small utilities for Django and Django REST framework projects.
 
 ### 1.0.0
 
-* Initial open source release
+* Initial release
 
