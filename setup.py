@@ -15,7 +15,7 @@ setup(
     include_package_data=True,
     url='https://github.com/kajala/django-jutil',
     license='MIT licence, see LICENCE.txt',
-    description='Simple utilities for Django and Django REST framework projects',
+    description='Collection of small utilities for Django and Django REST framework projects',
     long_description=open('README.md').read(),
     zip_safe=True,
     install_requires=install_requires
