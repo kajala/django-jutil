@@ -183,4 +183,4 @@ class Tests(TestCase):
         ac = 'FI8847304720017517'
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'POPFFI22')
-        self.assertEqual(inf[1], 'POP BANK')
+        self.assertEqual(inf[1], 'POP-Pankki')
