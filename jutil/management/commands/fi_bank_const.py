@@ -2,6 +2,8 @@ from pprint import pprint
 from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
+from jutil.dict import sorted_dict
+from jutil.fi_bank_const import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 
 
 def fi_iban_load_map(filename: str) -> dict:
@@ -37,12 +39,15 @@ class Command(SafeCommand):
 
     def do(self, *args, **kw):
         iban_map = fi_iban_load_map(kw['filename'])
-        bic_by_acc = {}
+        bic_by_acc = FI_BIC_BY_ACCOUNT_NUMBER
         for acc, bank in iban_map.items():
             bic_by_acc[acc] = bank[0]
-        bic_map = {}
+        bic_map = FI_BANK_NAME_BY_BIC
         for acc, bank in iban_map.items():
-            bic_map[bank[0]] = bank[1]
+            if bank[0] not in bic_map:
+                bic_map[bank[0]] = bank[1]
+        bic_by_acc = sorted_dict(bic_by_acc)
+        bic_map = sorted_dict(bic_map)
 
         if kw['php']:
             print('<?php')
