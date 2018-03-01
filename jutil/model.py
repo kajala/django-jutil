@@ -40,6 +40,7 @@ def clone_model(instance, cls, commit: bool=True, exclude_fields: tuple=('id',),
     Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')
     :param instance: Instance to copy
+    :param cls: Class name
     :param commit: Save or not
     :param exclude_fields: List of fields to exclude
     :param base_class_suffix: End of name for base class pointers, e.g. model Car(Vehicle) has implicit vehicle_ptr

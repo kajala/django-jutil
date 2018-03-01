@@ -106,7 +106,7 @@ def last_week(today: datetime=None, tz=None):
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def last_month(today: datetime=None):
+def last_month(today: datetime=None, tz=None):
     """
     Returns last month begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -118,7 +118,7 @@ def last_month(today: datetime=None):
     end = datetime(day=1, month=today.month, year=today.year)
     end_incl = end - timedelta(seconds=1)
     begin = datetime(day=1, month=end_incl.month, year=end_incl.year)
-    return localize_time_range(begin, end)
+    return localize_time_range(begin, end, tz)
 
 
 def last_year(today: datetime=None, tz=None):

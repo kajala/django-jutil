@@ -27,7 +27,6 @@ Features
 * Geo IP / IP info functions (request.py)
 * CSV download response (CsvFileResponse)
 * Simple SMS sending (send_sms)
-* SOAP debugging utilities (soap.py, using suds)
 * Mixin for basic test user setup (DefaultTestSetupMixin)
 * Unit tests for bunch of stuff (tests.py)
 * URL modifying/comparison functions (urls.py)

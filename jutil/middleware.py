@@ -46,6 +46,8 @@ class LogExceptionMiddleware(object):
     def process_exception(self, request, e):
         """
         Logs exception error message and sends email to ADMINS if hostname is not testserver and DEBUG=False.
+        :param request: HttpRequest
+        :param e: Exception
         """
         from jutil.email import send_email
 

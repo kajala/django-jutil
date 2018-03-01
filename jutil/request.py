@@ -35,6 +35,7 @@ def get_ip_info(ip: str, exceptions: bool=False, timeout: int=10) -> tuple:
     """
     Returns (ip, country_code, host) tuple of the IP address.
     :param ip: IP address
+    :param exceptions: Raise Exception or not
     :param timeout: Timeout in seconds. Note that timeout only affects geo IP part, not getting host name.
     :return: (ip, country_code, host)
     """
