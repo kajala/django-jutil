@@ -174,9 +174,10 @@ def fi_company_reg_id_validator(v: str) -> str:
     quotient, remainder = divmod(x, 11)
     if remainder == 1:
         raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v), code='invalid_company_reg_id')
-    check_digit = str(11 - remainder)
-    if check_digit != v[-1:]:
-        raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v), code='invalid_company_reg_id')
+    if remainder >= 2:
+        check_digit = str(11 - remainder)
+        if check_digit != v[-1:]:
+            raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v), code='invalid_company_reg_id')
 
 
 def fi_ssn_validator(v: str):

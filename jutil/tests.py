@@ -16,7 +16,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
 from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
-    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info
+    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info, fi_company_reg_id_validator
 
 
 class Tests(TestCase):
@@ -184,3 +184,12 @@ class Tests(TestCase):
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'POPFFI22')
         self.assertEqual(inf[1], 'POP-Pankki')
+
+    def test_reg_id_fi(self):
+        fi_company_reg_id_validator('0109823-0')
+        fi_company_reg_id_validator('2084069-9')
+        try:
+            fi_company_reg_id_validator('2084069-1')
+            self.assertTrue(False)
+        except ValidationError:
+            pass
