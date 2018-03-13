@@ -188,7 +188,7 @@ class AdminFileDownloadMixin(object):
             raise Http404(_("File {} not found").format(filename))
         content_type = mimetypes.guess_type(filename)[0]
         response = FileResponse(open(full_path, 'rb'))
-        response['Content-Type'] = content_type
+        response['Content-Type'] = 'application/pdf'
         response['Content-Length'] = os.path.getsize(full_path)
         response['Content-Disposition'] = "attachment; filename={}".format(filename)
         return response
