@@ -186,10 +186,23 @@ class Tests(TestCase):
         self.assertEqual(inf[1], 'POP-Pankki')
 
     def test_reg_id_fi(self):
-        fi_company_reg_id_validator('0109823-0')
-        fi_company_reg_id_validator('2084069-9')
-        try:
-            fi_company_reg_id_validator('2084069-1')
-            self.assertTrue(False)
-        except ValidationError:
-            pass
+        valids = [
+            'FI01098230',
+            'FI-01098230',
+            '0109823-0',
+            '2084069-9',
+        ]
+        invalids = [
+            '2084069-1',
+        ]
+        for valid in valids:
+            print('test_reg_id_fi:', valid, 'should be valid...', end=' ')
+            fi_company_reg_id_validator(valid)
+            print('ok')
+        for invalid in invalids:
+            try:
+                print('test_reg_id_fi:', invalid, 'should be invalid', end=' ')
+                fi_company_reg_id_validator(invalid)
+                self.assertTrue(False)
+            except ValidationError:
+                print('ok')

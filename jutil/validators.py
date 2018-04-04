@@ -116,7 +116,7 @@ def iban_bic(v: str) -> str:
 
 FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
 FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
-FI_COMPANY_REG_ID_FILTER = re.compile(r'[^-0-9]')
+FI_COMPANY_REG_ID_FILTER = re.compile(r'[^-0-9A-Za-z]')
 
 
 def fi_payment_reference_number(num: str):
@@ -163,9 +163,13 @@ def fi_company_reg_id_filter(v: str) -> str:
 
 def fi_company_reg_id_validator(v: str) -> str:
     v = fi_company_reg_id_filter(v)
-    if v[-2:-1] != '-':
+    prefix = v[:2]
+    if v[-2:-1] != '-' and prefix != 'FI':
         raise ValidationError(_('Invalid company registration ID')+' (FI.1): {}'.format(v), code='invalid_company_reg_id')
-    if len(v) != 9:
+    if prefix == 'FI':
+        v = v[2:]
+    v = v.replace('-', '', 1)
+    if len(v) != 8:
         raise ValidationError(_('Invalid company registration ID')+' (FI.2): {}'.format(v), code='invalid_company_reg_id')
     multipliers = (7, 9, 10, 5, 8, 4, 2)
     x = 0
