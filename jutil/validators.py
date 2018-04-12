@@ -116,7 +116,7 @@ def iban_bic(v: str) -> str:
 
 FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
 FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
-FI_COMPANY_REG_ID_FILTER = re.compile(r'[^-0-9A-Za-z]')
+FI_COMPANY_REG_ID_FILTER = re.compile(r'[^0-9]')
 
 
 def fi_payment_reference_number(num: str):
@@ -158,30 +158,29 @@ def fi_ssn_filter(v: str) -> str:
 
 
 def fi_company_reg_id_filter(v: str) -> str:
-    return FI_COMPANY_REG_ID_FILTER.sub('', v.upper())
+    v = FI_COMPANY_REG_ID_FILTER.sub('', v)
+    return v[:-1] + '-' + v[-1:]
 
 
-def fi_company_reg_id_validator(v: str) -> str:
-    v = fi_company_reg_id_filter(v)
+def fi_company_reg_id_validator(v0: str) -> str:
+    v = fi_company_reg_id_filter(v0)
     prefix = v[:2]
     if v[-2:-1] != '-' and prefix != 'FI':
-        raise ValidationError(_('Invalid company registration ID')+' (FI.1): {}'.format(v), code='invalid_company_reg_id')
-    if prefix == 'FI':
-        v = v[2:]
+        raise ValidationError(_('Invalid company registration ID')+' (FI.1): {}'.format(v0), code='invalid_company_reg_id')
     v = v.replace('-', '', 1)
     if len(v) != 8:
-        raise ValidationError(_('Invalid company registration ID')+' (FI.2): {}'.format(v), code='invalid_company_reg_id')
+        raise ValidationError(_('Invalid company registration ID')+' (FI.2): {}'.format(v0), code='invalid_company_reg_id')
     multipliers = (7, 9, 10, 5, 8, 4, 2)
     x = 0
     for i, m in enumerate(multipliers):
         x += int(v[i]) * m
     quotient, remainder = divmod(x, 11)
     if remainder == 1:
-        raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v), code='invalid_company_reg_id')
+        raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v0), code='invalid_company_reg_id')
     if remainder >= 2:
         check_digit = str(11 - remainder)
         if check_digit != v[-1:]:
-            raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v), code='invalid_company_reg_id')
+            raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v0), code='invalid_company_reg_id')
 
 
 def fi_ssn_validator(v: str):
