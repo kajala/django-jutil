@@ -14,7 +14,7 @@ install_requires = [str(ir.req) for ir in reqs if str(ir.req) != 'None']
 
 setup(
     name='django-jutil',
-    version='1.1.6',
+    version='1.1.7',
     author=u'Jani Kajala',
     author_email='kajala@gmail.com',
     packages=find_packages(exclude=['project', 'venv']),
