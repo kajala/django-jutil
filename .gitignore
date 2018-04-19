@@ -11,4 +11,4 @@ __pycache__
 /django_jutil.egg-info
 /db.sqlite3
 /project/settings.py
-
+/*.gz
