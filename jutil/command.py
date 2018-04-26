@@ -20,13 +20,14 @@ class SafeCommand(BaseCommand):
     """
     BaseCommand which catches, logs and emails errors.
     Uses list of emails from settings.ADMINS.
+    Implement do() in derived classes.
     """
 
     def handle(self, *args, **options):
         try:
             if hasattr(settings, 'LANGUAGE_CODE'):
                 translation.activate(settings.LANGUAGE_CODE)
-            self.do(*args, **options)
+            return self.do(*args, **options)
         except Exception as e:
             msg = "ERROR: {} {}".format(str(e), traceback.format_exc())
             logger.error(msg)
