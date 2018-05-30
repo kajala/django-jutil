@@ -162,14 +162,24 @@ class AdminFileDownloadMixin(object):
     upload_to = 'uploads'
     file_field = 'file'
 
-    def file_download_view(self, request, filename, form_url='', extra_context=None):
-        full_path = os.path.join(settings.MEDIA_ROOT, filename)
-        kw = {}
+    def get_object_by_filename(self, request, filename):
+        """
+        Returns owner object by filename (to be downloaded).
+        This can be used to implement custom permission checks.
+        :param request: HttpRequest
+        :param filename: File name of the downloaded object.
+        :return: owner object
+        """
+        kw = dict()
         kw[self.file_field] = filename
         obj = self.get_queryset(request).filter(**kw).first()
+        return self.get_object(request, obj.id)  # for permission check
+
+    def file_download_view(self, request, filename, form_url='', extra_context=None):
+        full_path = os.path.join(settings.MEDIA_ROOT, filename)
+        obj = self.get_object_by_filename(request, filename)
         if not obj:
             raise Http404(_('File {} not found').format(filename))
-        self.get_object(request, obj.id)  # for permission check
         return FileSystemFileResponse(full_path)
 
     def get_download_urls(self):
