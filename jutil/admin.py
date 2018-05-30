@@ -173,6 +173,8 @@ class AdminFileDownloadMixin(object):
         kw = dict()
         kw[self.file_field] = filename
         obj = self.get_queryset(request).filter(**kw).first()
+        if not obj:
+            raise Http404(_('File {} not found').format(filename))
         return self.get_object(request, obj.id)  # for permission check
 
     def file_download_view(self, request, filename, form_url='', extra_context=None):
