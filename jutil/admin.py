@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from jutil.format import format_timedelta
 from jutil.model import get_model_field_label_and_value
 from django.utils.translation import ugettext_lazy as _
+from jutil.responses import FileSystemFileResponse
 
 
 def admin_log(instances, msg: str, who: User=None, **kw):
@@ -162,13 +163,6 @@ class AdminFileDownloadMixin(object):
     file_field = 'file'
 
     def get_object_file(self, request, object_id, filename):
-        """
-        Simple access implementation which assumes object has property called 'file'
-        :param request:
-        :param object_id:
-        :param filename:
-        :return:
-        """
         obj = self.get_object(request, object_id)
         if not hasattr(obj, self.file_field):
             raise Exception("Object {} does not have member variable 'file'. AdminFileDownloadMixin.get_object_file override needed?".format(obj))
@@ -184,14 +178,16 @@ class AdminFileDownloadMixin(object):
     def change_download_view(self, request, object_id, filename, form_url='', extra_context=None):
         self.get_object_file(request, object_id, filename)  # make sure we have access rights
         full_path = self.get_full_path(filename)
-        if not filename or not os.path.isfile(full_path):
+        return FileSystemFileResponse(full_path)
+
+    def changelist_download_view(self, request, filename, form_url='', extra_context=None):
+        upload_path = os.path.join(self.upload_to, filename)
+        kw = {}
+        kw[self.file_field] = upload_path
+        obj = self.get_queryset(request).filter(**kw).first()
+        if not obj:
             raise Http404(_("File {} not found").format(filename))
-        content_type = mimetypes.guess_type(filename)[0]
-        response = FileResponse(open(full_path, 'rb'))
-        response['Content-Type'] = 'application/pdf'
-        response['Content-Length'] = os.path.getsize(full_path)
-        response['Content-Disposition'] = "attachment; filename={}".format(filename)
-        return response
+        return self.change_download_view(request, obj.id, filename, form_url, extra_context)
 
     def get_download_urls(self):
         """
@@ -202,5 +198,7 @@ class AdminFileDownloadMixin(object):
         Returns: File download URLs for this model.
         """
         info = self.model._meta.app_label, self.model._meta.model_name
-        dl_url = url(r'^(.+)/change/' + self.upload_to + r'/(.+)/$', self.change_download_view, name='%s_%s_change_download' % info)
-        return [dl_url]
+        return [
+            url(r'^(.+)/change/' + self.upload_to + r'/(.+)/$', self.change_download_view, name='%s_%s_change_download' % info),
+            url(r'^' + self.upload_to + r'/(.+)/$', self.changelist_download_view, name='%s_%s_changelist_download' % info),
+        ]
