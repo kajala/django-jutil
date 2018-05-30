@@ -162,32 +162,15 @@ class AdminFileDownloadMixin(object):
     upload_to = 'uploads'
     file_field = 'file'
 
-    def get_object_file(self, request, object_id, filename):
-        obj = self.get_object(request, object_id)
-        if not hasattr(obj, self.file_field):
-            raise Exception("Object {} does not have member variable 'file'. AdminFileDownloadMixin.get_object_file override needed?".format(obj))
-        file = getattr(obj, self.file_field)
-        upload_path = os.path.join(self.upload_to, filename)
-        if file.name != upload_path:
-            raise Http404(_("File {} not found").format(filename))
-        return file
-
-    def get_full_path(self, filename: str):
-        return os.path.join(os.path.join(settings.MEDIA_ROOT, self.upload_to), filename)
-
-    def change_download_view(self, request, object_id, filename, form_url='', extra_context=None):
-        self.get_object_file(request, object_id, filename)  # make sure we have access rights
-        full_path = self.get_full_path(filename)
-        return FileSystemFileResponse(full_path)
-
-    def changelist_download_view(self, request, filename, form_url='', extra_context=None):
-        upload_path = os.path.join(self.upload_to, filename)
+    def file_download_view(self, request, filename, form_url='', extra_context=None):
+        full_path = os.path.join(settings.MEDIA_ROOT, filename)
         kw = {}
-        kw[self.file_field] = upload_path
+        kw[self.file_field] = filename
         obj = self.get_queryset(request).filter(**kw).first()
         if not obj:
-            raise Http404(_("File {} not found").format(filename))
-        return self.change_download_view(request, obj.id, filename, form_url, extra_context)
+            raise Http404(_('File {} not found').format(filename))
+        self.get_object(request, obj.id)  # for permission check
+        return FileSystemFileResponse(full_path)
 
     def get_download_urls(self):
         """
@@ -199,6 +182,5 @@ class AdminFileDownloadMixin(object):
         """
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            url(r'^(.+)/change/' + self.upload_to + r'/(.+)/$', self.change_download_view, name='%s_%s_change_download' % info),
-            url(r'^' + self.upload_to + r'/(.+)/$', self.changelist_download_view, name='%s_%s_changelist_download' % info),
+            url(r'^.+(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download' % info),
         ]
