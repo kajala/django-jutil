@@ -74,6 +74,12 @@ def get_date_range_by_name(name: str) -> (datetime, datetime):
         return now() - timedelta(days=90), now() + timedelta(days=90)
     elif name == 'next_90d':
         return now(), now() + timedelta(days=90)
+    elif name == 'prev_90d':
+        return now() - timedelta(days=90), now()
+    elif name == 'prev_60d':
+        return now() - timedelta(days=60), now()
+    elif name == 'prev_30d':
+        return now() - timedelta(days=30), now()
     raise ValueError('Invalid date range name: {}'.format(name))
 
 

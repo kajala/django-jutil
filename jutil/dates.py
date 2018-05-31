@@ -3,8 +3,28 @@ import pytz
 from calendar import monthrange
 
 
-TIME_RANGE_NAMES = ['last_month', 'last_year', 'this_month', 'last_week', 'yesterday', 'plus_minus_90d', 'next_90d', 'plus_minus_30d', 'next_30d', 'plus_minus_60d', 'next_60d']
-TIME_STEP_NAMES = ['daily', 'weekly', 'monthly']
+TIME_RANGE_NAMES = [
+    'last_month',
+    'last_year',
+    'this_month',
+    'last_week',
+    'yesterday',
+    'prev_90d',
+    'plus_minus_90d',
+    'next_90d',
+    'prev_60d',
+    'plus_minus_60d',
+    'next_60d',
+    'prev_30d',
+    'plus_minus_30d',
+    'next_30d',
+]
+
+TIME_STEP_NAMES = [
+    'daily',
+    'weekly',
+    'monthly'
+]
 
 
 def get_last_day_of_month(t: datetime) -> int:
