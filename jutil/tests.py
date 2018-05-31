@@ -8,11 +8,13 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.timezone import now
+from jutil.command import get_date_range_by_name
 from jutil.request import get_ip_info
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element
 from rest_framework.test import APIClient
-from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month
+from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
+    last_year, last_week, yesterday
 from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
@@ -93,8 +95,8 @@ class Tests(TestCase):
 
     def test_parse_xml(self):
         # finvoice_201_example1.xml
-        xml_str = open(join(settings.BASE_DIR, 'data/finvoice_201_example1.xml'), 'rt', encoding='ISO-8859-15').read()
-        data = xml_to_dict(xml_str, value_key='value', attribute_prefix='_')
+        xml_bytes = open(join(settings.BASE_DIR, 'data/finvoice_201_example1.xml'), 'rb').read()
+        data = xml_to_dict(xml_bytes, value_key='value', attribute_prefix='_')
         # pprint(data)
         self.assertEqual(data['_Version'], '2.01')
         self.assertEqual(data['InvoiceRow'][0]['ArticleIdentifier'], '12345')
@@ -119,11 +121,10 @@ class Tests(TestCase):
         ref_data = {'A': [{'B': 'hello'}, {'B': 'world'}], 'C': 'value node'}
         self.assertEqual(ref_data, data)
 
-
         # parse_xml2.xml / no attributes
         xml_str = open(join(settings.BASE_DIR, 'data/parse_xml2.xml'), 'rt').read()
         data = xml_to_dict(xml_str, ['VastausLoki', 'LuottoTietoMerkinnat'], parse_attributes=False)
-        pprint(data)
+        # pprint(data)
         ref_data = {'VastausLoki': {'KysyttyHenkiloTunnus': '020685-1234',
                     'PaluuKoodi': 'Palveluvastaus onnistui',
                     'SyyKoodi': '1'}}
@@ -179,6 +180,26 @@ class Tests(TestCase):
         self.assertEqual(b, pytz.utc.localize(datetime(2018, 2, 5)))
         self.assertEqual(e, pytz.utc.localize(datetime(2018, 2, 12)))
 
+    def test_named_date_ranges(self):
+        t = datetime(2018, 5, 31)
+        t_tz = pytz.utc.localize(t)
+        named_ranges = [
+            ('last_month', last_month(t)),
+            ('last_year', last_year(t)),
+            ('this_month', this_month(t)),
+            ('last_week', last_week(t)),
+            ('yesterday', yesterday(t)),
+            ('today', yesterday(t + timedelta(hours=24))),
+        ]
+        day_ranges = [7, 15, 30, 60, 90]
+        for days in day_ranges:
+            named_ranges.append(('plus_minus_{}d'.format(days), (t_tz - timedelta(days=days), t_tz + timedelta(days=days))))
+            named_ranges.append(('prev_{}d'.format(days), (t_tz - timedelta(days=days), t_tz)))
+            named_ranges.append(('next_{}d'.format(days), (t_tz, t_tz + timedelta(days=days))))
+        for name, res in named_ranges:
+            # print('testing', name)
+            self.assertEqual(get_date_range_by_name(name, t), res)
+
     def test_bank_info(self):
         ac = 'FI8847304720017517'
         inf = iban_bank_info(ac)
@@ -196,13 +217,14 @@ class Tests(TestCase):
             '2084069-1',
         ]
         for valid in valids:
-            print('test_reg_id_fi:', valid, 'should be valid...', end=' ')
+            # print('test_reg_id_fi:', valid, 'should be valid...', end=' ')
             fi_company_reg_id_validator(valid)
-            print('ok')
+            # print('ok')
         for invalid in invalids:
             try:
-                print('test_reg_id_fi:', invalid, 'should be invalid', end=' ')
+                # print('test_reg_id_fi:', invalid, 'should be invalid', end=' ')
                 fi_company_reg_id_validator(invalid)
                 self.assertTrue(False)
             except ValidationError:
-                print('ok')
+                # print('ok')
+                pass

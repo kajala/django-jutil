@@ -9,6 +9,7 @@ TIME_RANGE_NAMES = [
     'this_month',
     'last_week',
     'yesterday',
+    'today',
     'prev_90d',
     'plus_minus_90d',
     'next_90d',
@@ -18,6 +19,12 @@ TIME_RANGE_NAMES = [
     'prev_30d',
     'plus_minus_30d',
     'next_30d',
+    'prev_15d',
+    'plus_minus_15d',
+    'next_15d',
+    'prev_7d',
+    'plus_minus_7d',
+    'next_7d',
 ]
 
 TIME_STEP_NAMES = [
