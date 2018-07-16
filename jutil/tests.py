@@ -90,8 +90,10 @@ class Tests(TestCase):
     def test_ip_info(self):
         ip, cc, host = get_ip_info('213.214.146.142')
         self.assertEqual(ip, '213.214.146.142')
-        self.assertEqual(cc, 'FI')
-        self.assertEqual(host, '213214146142.edelkey.net')
+        if cc:
+            self.assertEqual(cc, 'FI')
+        if host:
+            self.assertEqual(host, '213214146142.edelkey.net')
 
     def test_parse_xml(self):
         # finvoice_201_example1.xml
@@ -205,6 +207,11 @@ class Tests(TestCase):
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'POPFFI22')
         self.assertEqual(inf[1], 'POP-Pankki')
+
+        ac = ''
+        inf = iban_bank_info(ac)
+        self.assertEqual(inf[0], None)
+        self.assertEqual(inf[1], None)
 
     def test_reg_id_fi(self):
         valids = [
