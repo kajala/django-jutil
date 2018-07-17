@@ -91,13 +91,13 @@ def iban_bank_info(v: str) -> (str, str):
     """
     Returns BIC code and bank name from IBAN number.
     :param v: IBAN account number
-    :return: (BIC code, bank name) or (None, None) if not found / unsupported country
+    :return: (BIC code, bank name) or ('', '') if not found / unsupported country
     """
     v = iban_filter(v)
     if v[:2] == 'FI':
         return fi_iban_bank_info(v)
     else:
-        return None, None
+        return '', ''
 
 
 def iban_bic(v: str) -> str:
@@ -145,12 +145,12 @@ def fi_iban_bank_info(v: str) -> (str, str):
     """
     Returns BIC code and bank name from FI IBAN number.
     :param v: IBAN account number
-    :return: (BIC code, bank name) or (None, None) if not found
+    :return: (BIC code, bank name) or ('', '') if not found
     """
     from jutil.fi_bank_const import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
-    return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else (None, None)
+    return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
 
 
 def fi_ssn_filter(v: str) -> str:
