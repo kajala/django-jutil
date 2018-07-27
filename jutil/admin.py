@@ -26,9 +26,10 @@ def admin_log(instances, msg: str, who: User=None, **kw):
     from django.contrib.admin.options import get_content_type_for_model
     from django.utils.encoding import force_text
 
-    # default to first user in the system if 'who' is missing
+    # use system user if 'who' is missing
     if not who:
-        who = User.objects.all().order_by('id')[:1][0]
+        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, 'DJANGO_SYSTEM_USER') else 'system'
+        who, created = User.objects.get_or_create(username=username)
 
     # append extra keyword attributes if any
     att_str = ''
