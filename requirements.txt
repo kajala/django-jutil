@@ -1,9 +1,9 @@
 Django>=2.1
-django-ipware>=1.1.6
-djangorestframework>=3.7.7
-psycopg2-binary>=2.7.4
-python-dateutil>=2.6.1
-pytz>=2017.3
-requests>=2.18.4
-setuptools>=36.6.0
+django-ipware>=2.1.0
+djangorestframework>=3.8.2
+psycopg2-binary>=2.7.5
+python-dateutil>=2.7.3
+pytz>=2017.5
+requests>=2.19.1
+setuptools>=40.0.0
 sendgrid==5.4.1
