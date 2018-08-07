@@ -57,28 +57,10 @@ def admin_log(instances, msg: str, who: User=None, **kw):
 
 class ModelAdminBase(admin.ModelAdmin):
     """
-    ModelAdmin with separated write- and read permission checking methods,
-    save-on-top default enabled and customized (length-limited) history view.
+    ModelAdmin with save-on-top default enabled and customized (length-limited) history view.
     """
     save_on_top = True
     max_history_length = 1000
-
-    def has_write_permission(self, request, obj=None):
-        return super().has_change_permission(request, obj)
-
-    def has_read_permission(self, request, obj=None):
-        return super().has_change_permission(request, obj)
-
-    def has_change_permission(self, request, obj=None):
-        """
-        Calls has_read_permission() for read-requests and has_write_permission() for write requests.
-        :param request: HttpRequest
-        :param obj: Selected object
-        :return: bool
-        """
-        if request.method == 'GET':
-            return self.has_read_permission(request, obj)
-        return self.has_write_permission(request, obj)
 
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kw):
         """
