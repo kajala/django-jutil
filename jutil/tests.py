@@ -210,8 +210,8 @@ class Tests(TestCase):
 
         ac = ''
         inf = iban_bank_info(ac)
-        self.assertEqual(inf[0], None)
-        self.assertEqual(inf[1], None)
+        self.assertEqual(inf[0], '')
+        self.assertEqual(inf[1], '')
 
     def test_reg_id_fi(self):
         valids = [
