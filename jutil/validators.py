@@ -159,7 +159,7 @@ def fi_ssn_filter(v: str) -> str:
 
 def fi_company_reg_id_filter(v: str) -> str:
     v = FI_COMPANY_REG_ID_FILTER.sub('', v)
-    return v[:-1] + '-' + v[-1:]
+    return v[:-1] + '-' + v[-1:] if len(v) >= 2 else ''
 
 
 def fi_company_reg_id_validator(v0: str) -> str:
