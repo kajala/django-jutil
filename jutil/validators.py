@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 
 
 EMAIL_FILTER = re.compile(r'[^a-z0-9.@-]')
+EMAIL_VALIDATOR = re.compile(r'[^@]+@[^@]+\.[^@]+')
 PHONE_FILTER = re.compile(r'[^+0-9]')
 PHONE_VALIDATOR = re.compile(r'\+?\d{6,}')
 PASSPORT_FILTER = re.compile(r'[^-A-Z0-9]')
@@ -18,6 +19,12 @@ def phone_filter(v: str) -> str:
 
 def email_filter(v: str) -> str:
     return EMAIL_FILTER.sub('', str(v).lower()) if v else ''
+
+
+def email_validator(v: str) -> str:
+    v = email_filter(v)
+    if not EMAIL_VALIDATOR.fullmatch(v):
+        raise ValidationError(_('Invalid email')+': {}'.format(v), code='invalid_email')
 
 
 def phone_validator(v: str):
@@ -159,7 +166,7 @@ def fi_ssn_filter(v: str) -> str:
 
 def fi_company_reg_id_filter(v: str) -> str:
     v = FI_COMPANY_REG_ID_FILTER.sub('', v)
-    return v[:-1] + '-' + v[-1:]
+    return v[:-1] + '-' + v[-1:] if len(v) >= 2 else ''
 
 
 def fi_company_reg_id_validator(v0: str) -> str:

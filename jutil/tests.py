@@ -18,7 +18,8 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
 from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
-    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info, fi_company_reg_id_validator
+    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info, fi_company_reg_id_validator, \
+    email_validator
 
 
 class Tests(TestCase):
@@ -78,14 +79,26 @@ class Tests(TestCase):
         self.assertTrue(url_equals('http://yle.fi/uutiset/3-8045550?a=123&b=456', 'http://yle.fi/uutiset/3-8045550?b=456&a=123'))
         self.assertTrue(url_equals(url_mod('http://yle.fi/uutiset/3-8045550?a=123&b=456', {'b': '123', 'a': '456'}), 'http://yle.fi/uutiset/3-8045550?b=123&a=456'))
 
-    def test_email_filter(self):
+    def test_email_filter_and_validation(self):
         emails = [
-            (' Asdsa@a-a.com ', 'asdsa@a-a.com'),
-            ('1asdsa@a-a2.com', '1asdsa@a-a2.com'),
+            (' Asdsa@a-a.com ', 'asdsa@a-a.com', True),
+            ('1asdsa@a-a2.com', '1asdsa@a-a2.com', True),
+            (' Asdsa@a-a ', 'asdsa@a-a', False),
+            (' @a-a2.com', '@a-a2.com', False),
+            (' a-a2.com', 'a-a2.com', False),
         ]
-        for i, o in emails:
+        for i, o, is_valid in emails:
             # print('email_filter({}) -> {}'.format(i, email_filter(i)))
             self.assertEqual(email_filter(i), o)
+            if is_valid:
+                email_validator(o)
+            else:
+                fail = False
+                try:
+                    email_validator(o)
+                except ValidationError:
+                    fail = True
+                self.assertTrue(fail, '{} is not valid email but passed validation'.format(o))
 
     def test_ip_info(self):
         ip, cc, host = get_ip_info('213.214.146.142')
