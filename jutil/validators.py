@@ -23,14 +23,16 @@ def email_filter(v: str) -> str:
 
 def email_validator(v: str) -> str:
     v = email_filter(v)
-    if not EMAIL_VALIDATOR.fullmatch(v):
-        raise ValidationError(_('Invalid email')+': {}'.format(v), code='invalid_email')
+    if not v or not EMAIL_VALIDATOR.fullmatch(v):
+        v_str = _('Missing value') if not v else str(v)
+        raise ValidationError(_('Invalid email') + ': {}'.format(v_str), code='invalid_email')
 
 
 def phone_validator(v: str):
     v = phone_filter(v)
-    if not PHONE_VALIDATOR.fullmatch(v):
-        raise ValidationError(_('Invalid phone number')+': {}'.format(v), code='invalid_phone')
+    if not v or not PHONE_VALIDATOR.fullmatch(v):
+        v_str = _('Missing value') if v is None else str(v)
+        raise ValidationError(_('Invalid phone number') + ': {}'.format(v_str), code='invalid_phone')
 
 
 def passport_filter(v: str) -> str:
@@ -39,8 +41,9 @@ def passport_filter(v: str) -> str:
 
 def passport_validator(v: str):
     v = passport_filter(v)
-    if len(v) < 5:
-        raise ValidationError(_('Invalid passport number')+': {}'.format(v), code='invalid_passport')
+    if not v or len(v) < 5:
+        v_str = _('Missing value') if v is None else str(v)
+        raise ValidationError(_('Invalid passport number') + ': {}'.format(v_str), code='invalid_passport')
 
 
 def iban_filter(v: str) -> str:
@@ -66,6 +69,8 @@ def iban_filter_readable(acct) -> str:
 
 def iban_validator(v: str):
     v = iban_filter(v)
+    if not v:
+        raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(_('Missing value')), code='invalid_iban')
     digits = '0123456789'
     num = ''
     for ch in v[4:] + v[0:4]:
@@ -144,7 +149,6 @@ def fi_payment_reference_number(num: str):
 
 
 def fi_iban_validator(v: str):
-    from jutil.validators import validate_country_iban
     validate_country_iban(v, 'FI', 18)
 
 
@@ -216,7 +220,6 @@ SE_SSN_VALIDATOR = re.compile(r'^\d{6}[-]\d{3}[\d]$')
 
 
 def se_iban_validator(v: str):
-    from jutil.validators import validate_country_iban
     validate_country_iban(v, 'SE', 24)
 
 

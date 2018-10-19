@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-21 17:28+0000\n"
+"POT-Creation-Date: 2018-10-19 13:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,16 +18,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: jutil/admin.py:137
+#: jutil/admin.py:105
 #, python-format
 msgid "Change history: %s"
 msgstr "Muutoshistoria: %s"
 
-#: jutil/admin.py:199 jutil/admin.py:209
+#: jutil/admin.py:160 jutil/admin.py:167 jutil/responses.py:16
 msgid "File {} not found"
 msgstr "Tiedostoa {} ei löydy"
 
-#: jutil/validators.py:36
+#: jutil/validators.py:27 jutil/validators.py:34 jutil/validators.py:45
+#: jutil/validators.py:73
+msgid "Missing value"
+msgstr "Puuttuva arvo"
+
+#: jutil/validators.py:28
+msgid "Invalid email"
+msgstr "Epäkelpo sähköposti"
+
+#: jutil/validators.py:35
 msgid "Invalid phone number"
 msgstr "Epäkelpo puhelinnumero"
 
@@ -35,26 +44,17 @@ msgstr "Epäkelpo puhelinnumero"
 msgid "Invalid passport number"
 msgstr "Epäkelpo passin numero"
 
-#: jutil/validators.py:73 jutil/validators.py:75 jutil/validators.py:84
+#: jutil/validators.py:73 jutil/validators.py:82 jutil/validators.py:88
+#: jutil/validators.py:90 jutil/validators.py:99
 msgid "Invalid IBAN account number"
 msgstr "Epäkelpo IBAN-tilinumero"
 
-#: jutil/validators.py:136 jutil/validators.py:138 jutil/validators.py:145
-#: jutil/validators.py:148
+#: jutil/validators.py:180 jutil/validators.py:183 jutil/validators.py:190
+#: jutil/validators.py:194
 msgid "Invalid company registration ID"
 msgstr "Epäkelpo yrityksen tunnus"
 
-#: jutil/validators.py:154 jutil/validators.py:165 jutil/validators.py:184
-#: jutil/validators.py:203
+#: jutil/validators.py:200 jutil/validators.py:211 jutil/validators.py:233
+#: jutil/validators.py:252
 msgid "Invalid personal identification number"
 msgstr "Epäkelpo henkilötunnus"
-
-#, fuzzy
-#~| msgid "Invalid phone number"
-#~ msgid "Floating point number"
-#~ msgstr "Epäkelpo puhelinnumero"
-
-#, fuzzy
-#~| msgid "Invalid phone number"
-#~ msgid "Enter a whole number."
-#~ msgstr "Epäkelpo puhelinnumero"
