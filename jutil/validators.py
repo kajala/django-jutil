@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 
 
 EMAIL_FILTER = re.compile(r'[^a-z0-9.@-]')
-EMAIL_VALIDATOR = re.compile(r'[^@]+@[^@]+\.[^@]+')
+EMAIL_VALIDATOR = re.compile(r'[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+')
 PHONE_FILTER = re.compile(r'[^+0-9]')
 PHONE_VALIDATOR = re.compile(r'\+?\d{6,}')
 PASSPORT_FILTER = re.compile(r'[^-A-Z0-9]')
