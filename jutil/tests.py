@@ -86,7 +86,7 @@ class Tests(TestCase):
             (' Asdsa@a-a ', 'asdsa@a-a', False),
             (' @a-a2.com', '@a-a2.com', False),
             (' a-a2.com', 'a-a2.com', False),
-            ('ää-a2.com', '-a2.com', False),
+            ('ää-a2@ää-a2.com', 'ää-a2@ää-a2.com', False),
         ]
         for i, o, is_valid in emails:
             # print('email_filter({}) -> {}'.format(i, email_filter(i)))

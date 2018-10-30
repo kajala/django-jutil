@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
 
-EMAIL_FILTER = re.compile(r'[^a-z0-9.@-]')
 EMAIL_VALIDATOR = re.compile(r'[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+')
 PHONE_FILTER = re.compile(r'[^+0-9]')
 PHONE_VALIDATOR = re.compile(r'\+?\d{6,}')
@@ -18,7 +17,7 @@ def phone_filter(v: str) -> str:
 
 
 def email_filter(v: str) -> str:
-    return EMAIL_FILTER.sub('', str(v).lower()) if v else ''
+    return str(v).lower().strip() if v else ''
 
 
 def email_validator(v: str) -> str:
