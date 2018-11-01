@@ -18,8 +18,8 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
 from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
-    se_iban_validator, iban_filter_readable, email_filter,iban_validator, iban_bank_info, fi_company_reg_id_validator, \
-    email_validator
+    se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
+    email_validator, fi_payment_reference_validator, iso_payment_reference_validator
 
 
 class Tests(TestCase):
@@ -249,3 +249,32 @@ class Tests(TestCase):
             except ValidationError:
                 # print('ok')
                 pass
+
+    def test_reference_number_validators(self):
+        valid_fi_refs = [
+            '302300',
+            '202196',
+            '302290',
+        ]
+        for ref_no in valid_fi_refs:
+            fi_payment_reference_validator(ref_no)
+
+        invalid_fi_refs = [
+            '302301',
+            '202195',
+            '302291',
+        ]
+        for ref_no in invalid_fi_refs:
+            try:
+                fi_payment_reference_validator(ref_no)
+                self.assertFalse(True, '{} should have failed validation'.format(ref_no))
+            except ValidationError:
+                pass
+
+        valid_iso_refs = [
+            'RF92 1229',
+            'RF11 1232',
+            'RF48 1245',
+        ]
+        for ref_no in valid_iso_refs:
+            iso_payment_reference_validator(ref_no)

@@ -9,6 +9,8 @@ PHONE_FILTER = re.compile(r'[^+0-9]')
 PHONE_VALIDATOR = re.compile(r'\+?\d{6,}')
 PASSPORT_FILTER = re.compile(r'[^-A-Z0-9]')
 STRIP_NON_NUMBERS = re.compile(r'[^0-9]')
+STRIP_NON_ALPHANUMERIC = re.compile(r'[^0-9A-Za-z]')
+STRIP_WHITESPACE = re.compile(r'\s+')
 IBAN_FILTER = re.compile(r'[^A-Z0-9]')
 
 
@@ -137,6 +139,7 @@ def fi_payment_reference_number(num: str):
     :return: Number plus checksum
     """
     assert isinstance(num, str)
+    num = STRIP_WHITESPACE.sub('', num)
     num = re.sub(r'^0+', '', num)
     assert len(num) >= 3
     weights = [7, 3, 1]
@@ -145,6 +148,33 @@ def fi_payment_reference_number(num: str):
     for j in range(numlen):
         weighed_sum += int(num[numlen - 1 - j]) * weights[j % 3]
     return num + str((10 - (weighed_sum % 10)) % 10)
+
+
+def fi_payment_reference_validator(v: str):
+    v = STRIP_WHITESPACE.sub('', v)
+    if fi_payment_reference_number(v[:-1]) != v:
+        raise ValidationError(_('Invalid payment reference: {}').format(v))
+
+
+def iso_payment_reference_validator(v: str):
+    """
+    Validates ISO reference number checksum.
+    :param v: Reference number
+    """
+    num = ''
+    v = STRIP_WHITESPACE.sub('', v)
+    for ch in v[4:] + v[0:4]:
+        x = ord(ch)
+        if ord('0') <= x <= ord('9'):
+            num += ch
+        else:
+            x -= 55
+            if x < 10 or x > 35:
+                raise ValidationError(_('Invalid payment reference: {}').format(v))
+            num += str(x)
+    res = Decimal(num) % Decimal('97')
+    if res != Decimal('1'):
+        raise ValidationError(_('Invalid payment reference: {}').format(v))
 
 
 def fi_iban_validator(v: str):
