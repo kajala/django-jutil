@@ -1,6 +1,8 @@
 import re
+from datetime import date
 from decimal import Decimal
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 
 
@@ -123,6 +125,12 @@ def iban_bic(v: str) -> str:
     return info[0] if info else ''
 
 
+def calculate_age(born: date, today: date or None=None) -> int:
+    if not today:
+        today = now().date()
+    return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+
+
 # -----------------------------------------------
 # Finland
 # -----------------------------------------------
@@ -238,6 +246,26 @@ def fi_ssn_validator(v: str):
         ch = digits[d]
     if ch != v[-1:]:
         raise ValidationError(_('Invalid personal identification number')+' (FI.2): {}'.format(v), code='invalid_ssn')
+
+
+def fi_ssn_birthday(v: str) -> date:
+    v = fi_ssn_filter(v)
+    fi_ssn_validator(v)
+    sep = v[6]  # 231298-965X
+    year = int(v[4:6])
+    month = int(v[2:4])
+    day = int(v[0:2])
+    if sep == '+':  # 1800
+        year += 1800
+    elif sep == '-':
+        year += 1900
+    elif sep == 'A':
+        year += 2000
+    return date(year, month, day)
+
+
+def fi_ssn_age(ssn: str, today: date or None=None) -> int:
+    return calculate_age(fi_ssn_birthday(ssn), today)
 
 
 # -----------------------------------------------

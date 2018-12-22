@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from os.path import join
 from pprint import pprint
 import pytz
@@ -19,7 +19,7 @@ from jutil.format import format_full_name, format_xml
 from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
-    email_validator, fi_payment_reference_validator, iso_payment_reference_validator
+    email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age
 
 
 class Tests(TestCase):
@@ -278,3 +278,13 @@ class Tests(TestCase):
         ]
         for ref_no in valid_iso_refs:
             iso_payment_reference_validator(ref_no)
+
+    def test_fi_ssn_age(self):
+        samples = [
+            (date(2018, 12, 20), '231298-965X', 19),
+            (date(2018, 12, 22), '231298-965X', 19),
+            (date(2018, 12, 23), '231298-965X', 20),
+            (date(2018, 12, 24), '231298-965X', 20),
+        ]
+        for date_now, ssn, age in samples:
+            self.assertEqual(fi_ssn_age(ssn, date_now), age, msg='{} age is {} on {} but fi_ssn_age result was {}'.format(ssn, age, date_now, fi_ssn_age(ssn, date_now)))
