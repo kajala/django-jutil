@@ -3,7 +3,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 
-def format_full_name(first_name: str, last_name: str, max_length: int=20):
+def format_full_name(first_name: str, last_name: str, max_length: int = 20):
     """
     Limits name length to specified length. Tries to keep name as human-readable an natural as possible.
     :param first_name: First name
@@ -14,25 +14,30 @@ def format_full_name(first_name: str, last_name: str, max_length: int=20):
     # dont allow commas in limited names
     first_name = first_name.replace(',', ' ')
     last_name = last_name.replace(',', ' ')
+
     # accept short full names as is
     original_full_name = first_name + ' ' + last_name
     if len(original_full_name) <= max_length:
         return original_full_name
+
     # drop middle names
     first_name = first_name.split(' ')[0]
     full_name = first_name + ' ' + last_name
     if len(full_name) <= max_length:
         return full_name
+
     # drop latter parts of combined first names
     first_name = re.split(r'[\s\-]', first_name)[0]
     full_name = first_name + ' ' + last_name
     if len(full_name) <= max_length:
         return full_name
+
     # drop latter parts of multi part last names
     last_name = re.split(r'[\s\-]', last_name)[0]
     full_name = first_name + ' ' + last_name
     if len(full_name) <= max_length:
         return full_name
+
     # shorten last name to one letter
     last_name = last_name[:1]
 
@@ -49,9 +54,12 @@ def format_timedelta(dt: timedelta) -> str:
     :return: str
     """
     seconds = int(dt.total_seconds())
-    hours, remainder = divmod(seconds, 3600)
+    days, remainder = divmod(seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
     minutes, seconds = divmod(remainder, 60)
     s = ""
+    if days > 0:
+        s += str(days) + "d"
     if hours > 0:
         s += str(hours) + "h"
     if minutes > 0:
