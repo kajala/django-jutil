@@ -2,6 +2,7 @@ import logging
 import traceback
 from django.conf import settings
 from django.http import HttpRequest
+from django.utils import timezone
 from ipware.ip import get_real_ip
 
 
@@ -86,3 +87,25 @@ class EnsureLanguageCookieMiddleware(object):
         if request.COOKIES[lang_cookie_name] != lang_cookie:
             res.set_cookie(lang_cookie_name, lang)
         return res
+
+
+class ActivateUserProfileTimezone(object):
+    """
+    Uses 'timezone' string in request.user.profile to activate user-specific timezone.
+    """
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        if request.user.is_authenticated:
+            timezone.activate(request.user.profile.timezone)
+
+        # get response
+        response = self.get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+        timezone.deactivate()
+        return response
