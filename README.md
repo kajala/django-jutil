@@ -18,7 +18,6 @@ Features
 * Simplified email sending via SendGrid API (send_email)
 * Various formatting utilities (e.g. XML, timedelta, Decimal)
 * Decimal encoder for encoding JSON objects/dictionaries containing Decimal instances (SimpleDecimalEncoder)
-* Event logging with systematic format for easy parsing/grepping (log_event)
 * Django middleware for exception logging/emailing (LogExceptionMiddleware)
 * Django middleware for language cookie handling (EnsureLanguageCookieMiddleware)
 * Utilities or Django Model handling (e.g. clone_model, get_object_or_none)

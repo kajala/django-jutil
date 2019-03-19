@@ -65,11 +65,12 @@ class Command(SafeCommand):
             print(');')
             print('')
         else:
-            print('FI_BIC_BY_ACCOUNT_NUMBER = {')
+            print('FI_BIC_BY_ACCOUNT_NUMBER = {  # ' + str(len(bic_by_acc.items())))
             for acc, bic in bic_by_acc.items():
                 print("    '{}': '{}',".format(acc, bic))
             print('}\n')
-            print('FI_BANK_NAME_BY_BIC = {')
+            print('FI_BANK_NAME_BY_BIC = {  # ' + str(len(bic_map.items())))
             for bic, name in bic_map.items():
                 print("    '{}': '{}',".format(bic, name))
             print('}')
+            print('')
