@@ -23,6 +23,7 @@ def se_iban_load_map(filename: str) -> list:
         'Nordax Bank AB (deltar endast i Dataclearingen)': 'Nordax Bank AB',
         'Swedbank och fristående Sparbanker, t ex Leksands Sparbank och Roslagsbanken.': 'Swedbank',
         'Ålandsbanken Abp (Finland),svensk filial': 'Ålandsbanken Abp',
+        'SBAB deltar endast i Dataclearingen': 'SBAB',
     }
     with open(filename) as fp:
         for row in csv.reader(fp):
