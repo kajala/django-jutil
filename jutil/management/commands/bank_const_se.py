@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
 from jutil.dict import sorted_dict
-from jutil.fi_bank_const import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
+from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 
 
 def se_iban_load_map(filename: str) -> list:

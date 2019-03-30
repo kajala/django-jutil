@@ -195,7 +195,7 @@ def fi_iban_bank_info(v: str) -> (str, str):
     :param v: IBAN account number
     :return: (BIC code, bank name) or ('', '') if not found
     """
-    from jutil.fi_bank_const import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
+    from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
     return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
@@ -315,7 +315,7 @@ def se_clearing_code_bank_info(clearing: str) -> (str, int):
     :param clearing: 4-digit clearing code
     :return: (Bank name, account digit count) or ('', None) if not found
     """
-    from jutil.se_bank_const import SE_BANK_CLEARING_LIST
+    from jutil.bank_const_se import SE_BANK_CLEARING_LIST
     for name, begin, end, acc_digits in SE_BANK_CLEARING_LIST:
         if begin <= clearing <= end:
             return name, acc_digits
