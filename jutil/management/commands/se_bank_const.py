@@ -73,19 +73,36 @@ class Command(SafeCommand):
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument('filename', type=str)
+        parser.add_argument('--php', action='store_true')
 
     def do(self, *args, **kw):
         bank_list = se_iban_load_map(kw['filename'])
         # pprint(bank_list)
 
-        print('SE_BANK_CLEARING_LIST = (  # ' + str(len(bank_list)))
-        errors = False
-        for name, begin, end, acc_digits in bank_list:
-            print("    ('{}', '{}', '{}', {}),".format(name, begin, end, acc_digits))
-            if acc_digits == '?':
-                errors = True
-        print(')')
-        if errors:
+        if kw['php']:
+            print('<?php')
             print('')
-            print('# TODO: fix errors from above marked with "?"')
-        print('')
+            print('global $SE_BANK_CLEARING_LIST;')
+            print('$SE_BANK_CLEARING_LIST = array(')
+            errors = False
+            for name, begin, end, acc_digits in bank_list:
+                print("    ['{}', '{}', '{}', {}],".format(name, begin, end, acc_digits))
+                if acc_digits == '?':
+                    errors = True
+            print(');')
+            if errors:
+                print('')
+                print('// TODO: fix errors from above marked with "?"')
+            print('')
+        else:
+            print('SE_BANK_CLEARING_LIST = (  # ' + str(len(bank_list)))
+            errors = False
+            for name, begin, end, acc_digits in bank_list:
+                print("    ('{}', '{}', '{}', {}),".format(name, begin, end, acc_digits))
+                if acc_digits == '?':
+                    errors = True
+            print(')')
+            if errors:
+                print('')
+                print('# TODO: fix errors from above marked with "?"')
+            print('')
