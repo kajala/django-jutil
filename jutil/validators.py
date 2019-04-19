@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from datetime import date
 from decimal import Decimal
 from django.core.exceptions import ValidationError
@@ -47,6 +48,16 @@ def passport_validator(v: str):
     if not v or len(v) < 5:
         v_str = _('Missing value') if v is None else str(v)
         raise ValidationError(_('Invalid passport number') + ': {}'.format(v_str), code='invalid_passport')
+
+
+def ascii_filter(v: str) -> str:
+    """
+    Replaces Unicode accent characters with plain ASCII.
+    For example remove_accents('HELÉN') == 'HELEN'.
+    :param v: str
+    :return: str
+    """
+    return unicodedata.normalize('NFKD', v).encode('ASCII', 'ignore').decode()
 
 
 def iban_filter(v: str) -> str:
