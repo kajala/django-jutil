@@ -1,5 +1,6 @@
 import csv
 import re
+from copy import copy
 from pprint import pprint
 from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser
@@ -80,8 +81,19 @@ class Command(SafeCommand):
         parser.add_argument('--php', action='store_true')
 
     def do(self, *args, **kw):
-        bank_list = se_iban_load_map(kw['filename'])
+        new_bank_list = se_iban_load_map(kw['filename'])
         # pprint(bank_list)
+
+        from jutil.bank_const_se import SE_BANK_CLEARING_LIST
+        bank_list = list(copy(SE_BANK_CLEARING_LIST))
+        for name, begin, end, acc_digits in new_bank_list:
+            exists = False
+            for name0, begin0, end0, acc_digits0 in bank_list:
+                if begin0 == begin and end0 == end:
+                    exists = True
+                    break
+            if not exists:
+                bank_list.append((name, begin, end, acc_digits))
 
         if kw['php']:
             print('<?php')
