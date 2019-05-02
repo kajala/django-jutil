@@ -22,7 +22,7 @@ SE_BANK_CLEARING_LIST = (  # 46
     ('Länsförsäkringar Bank AB', '3400', '3409', 7),
     ('Länsförsäkringar Bank AB', '9060', '9069', 7),
     ('Lån og Spar Bank Sverige', '9630', '9639', 7),
-    ('​Marginalen Bank', '​9230', '9239', 7),
+    ('Marginalen Bank', '9230', '9239', 7),
     ('Med Mera Bank AB', '9650', '9659', 7),
     ('Nordax Bank AB', '9640', '9649', 7),
     ('Nordea AB', '1100', '1199', 7),
