@@ -63,7 +63,7 @@ def se_iban_load_map(filename: str) -> list:
                             except IndexError:
                                 digits = '?'
 
-                        out.append([name, begin, end, digits])
+                        out.append([name.strip(), begin.strip(), end.strip(), digits])
                         # print('OK!')
     return out
 

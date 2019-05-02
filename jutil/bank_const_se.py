@@ -30,7 +30,7 @@ SE_BANK_CLEARING_LIST = (  # 46
     ('Nordea AB', '2000', '2099', 7),
     ('Nordea AB', '9500', '9549', 7),
     ('Nordea AB', '9960', '9969', 10),
-    ('Nordea AB Personkonto ', '3300', '3300', 10),
+    ('Nordea AB Personkonto', '3300', '3300', 10),
     ('Nordnet Bank', '9100', '9109', 7),
     ('Resurs Bank AB', '9280', '9289', 7),
     ('Riksgälden', '9880', '9889', 7),
