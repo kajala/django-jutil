@@ -18,12 +18,16 @@ def se_iban_load_map(filename: str) -> list:
     out = []
     name_repl = {
         'BNP Paribas Fortis SA/NV, Bankfilial Sverige': 'BNP Paribas Fortis SA/NV',
-        'Citibank International Plc, Sweden Branch': 'Citibank International Plc',
+        'Citibank International Plc, Sweden Branch': 'Citibank',
         'Santander Consumer Bank AS (deltar endast i Dataclearingen)': 'Santander Consumer Bank AS',
         'Nordax Bank AB (deltar endast i Dataclearingen)': 'Nordax Bank AB',
         'Swedbank och fristående Sparbanker, t ex Leksands Sparbank och Roslagsbanken.': 'Swedbank',
         'Ålandsbanken Abp (Finland),svensk filial': 'Ålandsbanken Abp',
-        'SBAB deltar endast i Dataclearingen': 'SBAB',
+        'SBAB (deltar endast i Dataclearingen)': 'SBAB Bank AB',
+        'SBAB deltar endast i Dataclearingen': 'SBAB Bank AB',
+        'DNB Bank ASA, filial Sverige': 'Den Norske Bank',
+        'Länsförsäkringar Bank Aktiebolag': 'Länsförsäkringar Bank AB',
+        'MedMera Bank AB': 'Med Mera Bank AB',
     }
     with open(filename) as fp:
         for row in csv.reader(fp):

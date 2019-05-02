@@ -112,7 +112,7 @@ class Tests(TestCase):
 
     def test_parse_xml(self):
         # finvoice_201_example1.xml
-        xml_bytes = open(join(settings.BASE_DIR, 'data/finvoice_201_example1.xml'), 'rb').read()
+        xml_bytes = open(join(settings.BASE_DIR, 'data/fi/finvoice_201_example1.xml'), 'rb').read()
         data = xml_to_dict(xml_bytes, value_key='value', attribute_prefix='_')
         # pprint(data)
         self.assertEqual(data['_Version'], '2.01')
