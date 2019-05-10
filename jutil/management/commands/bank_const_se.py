@@ -77,11 +77,11 @@ class Command(SafeCommand):
     help = 'Generates Python file with Swedish bank info as constants'
 
     def add_arguments(self, parser: CommandParser):
-        parser.add_argument('filename', type=str)
+        parser.add_argument('--filename', type=str)
         parser.add_argument('--php', action='store_true')
 
     def do(self, *args, **kw):
-        new_bank_list = se_iban_load_map(kw['filename'])
+        new_bank_list = se_iban_load_map(kw['filename']) if kw['filename'] else []
         # pprint(bank_list)
 
         from jutil.bank_const_se import SE_BANK_CLEARING_LIST

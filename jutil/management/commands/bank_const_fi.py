@@ -34,11 +34,11 @@ class Command(SafeCommand):
     help = 'Generates Python file with Finnish bank info as constants'
 
     def add_arguments(self, parser: CommandParser):
-        parser.add_argument('filename', type=str)
+        parser.add_argument('--filename', type=str)
         parser.add_argument('--php', action='store_true')
 
     def do(self, *args, **kw):
-        iban_map = fi_iban_load_map(kw['filename'])
+        iban_map = fi_iban_load_map(kw['filename']) if kw['filename'] else {}
         bic_by_acc = FI_BIC_BY_ACCOUNT_NUMBER
         for acc, bank in iban_map.items():
             bic_by_acc[acc] = bank[0]
