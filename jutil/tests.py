@@ -228,6 +228,19 @@ class Tests(TestCase):
         self.assertEqual(inf[0], '')
         self.assertEqual(inf[1], '')
 
+        ac= 'BE75270187592710'
+        inf = iban_bank_info(ac)
+        self.assertEqual(inf[0], 'GEBABEBB')
+        self.assertEqual(inf[1], 'BNP Paribas Fortis')
+        ac= 'BE58465045170210'
+        inf = iban_bank_info(ac)
+        self.assertEqual(inf[0], 'KREDBEBB')
+        self.assertEqual(inf[1], 'KBC Bank')
+        ac= 'BE11000123456748'
+        inf = iban_bank_info(ac)
+        self.assertEqual(inf[0], 'BPOTBEB1')
+        self.assertEqual(inf[1], 'bpost bank')
+
     def test_reg_id_fi(self):
         valids = [
             'FI01098230',
