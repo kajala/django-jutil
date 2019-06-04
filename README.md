@@ -37,3 +37,10 @@ Install
 
 pip install django-jutil
 
+
+Changes
+=======
+
+2.2.0:
++ Belgium IBAN validation support (from https://github.com/kutera)
+
