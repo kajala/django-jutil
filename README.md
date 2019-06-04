@@ -42,5 +42,4 @@ Changes
 =======
 
 2.2.0:
-+ Belgium IBAN validation support (from https://github.com/kutera)
-
++ Belgium IBAN validation support (thanks to https://github.com/kutera)
