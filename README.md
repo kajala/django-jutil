@@ -41,5 +41,8 @@ pip install django-jutil
 Changes
 =======
 
+2.2.4:
++ ElementTree import cleanup (thanks to https://github.com/kutera)
+
 2.2.0:
 + Belgium IBAN validation support (thanks to https://github.com/kutera)
