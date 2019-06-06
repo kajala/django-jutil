@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import Element
+from xml.etree import ElementTree
 
 from decimal import Decimal
 
@@ -122,9 +123,8 @@ def xml_to_dict(xml_bytes: bytes, tags: list=[], array_tags: list=[], int_tags: 
 
     Returns: dict
     """
-    from xml.etree import ElementTree as ET
 
-    root = ET.fromstring(xml_bytes)
+    root = ElementTree.fromstring(xml_bytes)
     if tags:
         if document_tag:
             raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list since selective tag list finds tags from the whole document, not only directly under root document tag')
@@ -149,7 +149,6 @@ def xml_to_dict(xml_bytes: bytes, tags: list=[], array_tags: list=[], int_tags: 
 
 
 def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_prefix: str):
-    from xml.etree import ElementTree as ET
 
     # print('_xml_element_set_data_r({}): {}'.format(el.tag, data))
     for k, v in data.items():
@@ -159,15 +158,15 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
             el.set(k[1:], str(v))
         elif isinstance(v, list) or isinstance(v, tuple):
             for v2 in v:
-                el2 = ET.SubElement(el, k)
+                el2 = ElementTree.SubElement(el, k)
                 assert isinstance(el2, Element)
                 _xml_element_set_data_r(el2, v2, value_key, attribute_prefix)
         elif isinstance(v, dict):
-            el2 = ET.SubElement(el, k)
+            el2 = ElementTree.SubElement(el, k)
             assert isinstance(el2, Element)
             _xml_element_set_data_r(el2, v, value_key, attribute_prefix)
         else:
-            el2 = ET.SubElement(el, k)
+            el2 = ElementTree.SubElement(el, k)
             assert isinstance(el2, Element)
             el2.text = str(v)
 
@@ -206,13 +205,12 @@ def dict_to_element(doc: dict, value_key: str='@', attribute_prefix: str='@') ->
 
     Returns: xml.etree.ElementTree.Element
     """
-    from xml.etree import ElementTree as ET
 
     if len(doc) != 1:
         raise Exception('Invalid data dict for XML generation, document root must have single element')
 
     for tag, data in doc.items():
-        el = ET.Element(tag)
+        el = Element(tag)
         assert isinstance(el, Element)
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
         return el
