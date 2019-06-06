@@ -41,7 +41,7 @@ pip install django-jutil
 Changes
 =======
 
-2.2.4:
+2.2.3:
 + ElementTree import cleanup (thanks to https://github.com/kutera)
 
 2.2.0:
