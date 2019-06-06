@@ -1,5 +1,4 @@
 from xml.etree.ElementTree import Element
-
 from decimal import Decimal
 
 
@@ -206,13 +205,11 @@ def dict_to_element(doc: dict, value_key: str='@', attribute_prefix: str='@') ->
 
     Returns: xml.etree.ElementTree.Element
     """
-    from xml.etree import ElementTree as ET
-
     if len(doc) != 1:
         raise Exception('Invalid data dict for XML generation, document root must have single element')
 
     for tag, data in doc.items():
-        el = ET.Element(tag)
+        el = Element(tag)
         assert isinstance(el, Element)
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
         return el
