@@ -20,7 +20,7 @@ from jutil.parse import parse_datetime
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
-    se_clearing_code_bank_info, ascii_filter
+    se_clearing_code_bank_info, ascii_filter, ee_iban_validator, be_iban_validator
 
 
 class Tests(TestCase):
@@ -67,6 +67,8 @@ class Tests(TestCase):
         iban_validator('SE4550000000058398257466')
         fi_iban_validator('FI2112345600000785')
         se_iban_validator('SE4550000000058398257466')
+        ee_iban_validator('EE38 2200 2210 2014 5685')
+        be_iban_validator('BE68 5390 0754 7034')
         with self.assertRaises(ValidationError):
             fi_iban_validator('FI2112345600000784')
         with self.assertRaises(ValidationError):

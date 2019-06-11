@@ -120,10 +120,11 @@ def iban_bank_info(v: str) -> (str, str):
     :return: (BIC code, bank name) or ('', '') if not found / unsupported country
     """
     v = iban_filter(v)
-    if v[:2] == 'FI':
-        return fi_iban_bank_info(v)
-    elif v[:2] == 'BE':
-        return be_iban_bank_info(v)
+    prefix = v[:2]
+    func_name = prefix.lower() + '_iban_bank_info'  # e.g. fi_iban_bank_info, be_iban_bank_info
+    func = globals().get(func_name)
+    if func is not None:
+        return func(v)
     else:
         return '', ''
 
@@ -144,9 +145,42 @@ def calculate_age(born: date, today: date or None=None) -> int:
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-# -----------------------------------------------
+# ============================================================================
+# Country specific functions (countries in alphabetical order)
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+# Belgium
+# ----------------------------------------------------------------------------
+
+def be_iban_validator(v: str):
+    validate_country_iban(v, 'BE', 16)
+
+
+def be_iban_bank_info(v: str) -> (str, str):
+    """
+    Returns BIC code and bank name from BE IBAN number.
+    :param v: IBAN account number
+    :return: (BIC code, bank name) or ('', '') if not found
+    """
+    from jutil.bank_const_be import BE_BIC_BY_ACCOUNT_NUMBER, BE_BANK_NAME_BY_BIC
+    v = iban_filter(v)
+    bic = BE_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
+    return (bic, BE_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
+
+
+# ----------------------------------------------------------------------------
+# Estonia
+# ----------------------------------------------------------------------------
+
+def ee_iban_validator(v: str):
+    validate_country_iban(v, 'EE', 20)
+
+
+# ----------------------------------------------------------------------------
 # Finland
-# -----------------------------------------------
+# ----------------------------------------------------------------------------
 
 FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
 FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
@@ -212,17 +246,6 @@ def fi_iban_bank_info(v: str) -> (str, str):
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
     return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
-
-def be_iban_bank_info(v: str) -> (str, str):
-    """
-    Returns BIC code and bank name from BE IBAN number.
-    :param v: IBAN account number
-    :return: (BIC code, bank name) or ('', '') if not found
-    """
-    from jutil.bank_const_be import BE_BIC_BY_ACCOUNT_NUMBER, BE_BANK_NAME_BY_BIC
-    v = iban_filter(v)
-    bic = BE_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
-    return (bic, BE_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
 
 
 def fi_ssn_filter(v: str) -> str:
@@ -292,9 +315,9 @@ def fi_ssn_age(ssn: str, today: date or None=None) -> int:
     return calculate_age(fi_ssn_birthday(ssn), today)
 
 
-# -----------------------------------------------
+# ----------------------------------------------------------------------------
 # Sweden
-# -----------------------------------------------
+# ----------------------------------------------------------------------------
 
 SE_SSN_FILTER = re.compile(r'[^-0-9]')
 SE_SSN_VALIDATOR = re.compile(r'^\d{6}[-]\d{3}[\d]$')
