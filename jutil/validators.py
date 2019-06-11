@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
+from jutil.bank_const_iban import IBAN_LENGTH_BY_COUNTRY
 
 
 EMAIL_VALIDATOR = re.compile(r'[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+')
@@ -82,6 +83,7 @@ def iban_filter_readable(acct) -> str:
 
 
 def iban_validator(v: str):
+    # validate IBAN numeric part
     v = iban_filter(v)
     if not v:
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(_('Missing value')), code='invalid_iban')
@@ -95,22 +97,18 @@ def iban_validator(v: str):
     if x != Decimal(1):
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
 
+    # validate prefix and length
+    country = v[:2]
+    iban_len = IBAN_LENGTH_BY_COUNTRY.get(country, 0)
+    if iban_len != len(v):
+        raise ValidationError(_('Invalid IBAN account number') + ' ({}.1): {}'.format(country, v), code='invalid_iban')
+
 
 def validate_country_iban(v: str, country: str, length: int):
     v = iban_filter(v)
-    if len(v) != length:
-        raise ValidationError(_('Invalid IBAN account number') + ' ({}.1): {}'.format(country, v), code='invalid_iban')
     if v[0:2] != country:
         raise ValidationError(_('Invalid IBAN account number') + ' ({}.2): {}'.format(country, v), code='invalid_iban')
-    digits = '0123456789'
-    num = ''
-    for ch in v[4:] + v[0:4]:
-        if ch not in digits:
-            ch = str(ord(ch) - ord('A') + 10)
-        num += ch
-    x = Decimal(num) % Decimal(97)
-    if x != Decimal(1):
-        raise ValidationError(_('Invalid IBAN account number') + ' ({}.3): {}'.format(country, v), code='invalid_iban')
+    iban_validator(v)
 
 
 def iban_bank_info(v: str) -> (str, str):
@@ -155,7 +153,7 @@ def calculate_age(born: date, today: date or None=None) -> int:
 # ----------------------------------------------------------------------------
 
 def be_iban_validator(v: str):
-    validate_country_iban(v, 'BE', 16)
+    validate_country_iban(v, 'BE', IBAN_LENGTH_BY_COUNTRY.get('BE'))
 
 
 def be_iban_bank_info(v: str) -> (str, str):
@@ -175,7 +173,7 @@ def be_iban_bank_info(v: str) -> (str, str):
 # ----------------------------------------------------------------------------
 
 def ee_iban_validator(v: str):
-    validate_country_iban(v, 'EE', 20)
+    validate_country_iban(v, 'EE', IBAN_LENGTH_BY_COUNTRY.get('EE'))
 
 
 # ----------------------------------------------------------------------------
@@ -233,7 +231,7 @@ def iso_payment_reference_validator(v: str):
 
 
 def fi_iban_validator(v: str):
-    validate_country_iban(v, 'FI', 18)
+    validate_country_iban(v, 'FI', IBAN_LENGTH_BY_COUNTRY.get('FI'))
 
 
 def fi_iban_bank_info(v: str) -> (str, str):
@@ -324,7 +322,7 @@ SE_SSN_VALIDATOR = re.compile(r'^\d{6}[-]\d{3}[\d]$')
 
 
 def se_iban_validator(v: str):
-    validate_country_iban(v, 'SE', 24)
+    validate_country_iban(v, 'SE', IBAN_LENGTH_BY_COUNTRY.get('SE'))
 
 
 def se_ssn_filter(v: str) -> str:
