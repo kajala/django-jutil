@@ -6,3 +6,6 @@ Source: https://www-2.danskebank.se/link/Bankernaskontonummer
 Also for reference:
 https://www.bankgirot.se/globalassets/dokument/anvandarmanualer/bankernaskontonummeruppbyggnad_anvandarmanual_sv.pdf
 
+danish-bank-codes.csv
+https://github.com/x2q/danish-bank-codes
+
