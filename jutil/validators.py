@@ -179,7 +179,7 @@ def dk_iban_validator(v: str):
 def dk_clearing_code_bank_name(v: str) -> str:
     from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
     v = iban_filter(v)
-    if v.startswith('DK50'):
+    if v.startswith('DK'):
         v = v[4:]
     return DK_BANK_CLEARING_MAP.get(v[:4], '')
 

@@ -323,6 +323,9 @@ class Tests(TestCase):
         an = '8114 0008874093'
         name = dk_clearing_code_bank_name(an)
         self.assertEqual(name, 'Nykredit Bank')
+        an = 'DK2520006893703029'
+        name = dk_clearing_code_bank_name(an)
+        self.assertEqual(name, 'Nordea')
 
     def test_ascii_filter(self):
         pairs = [
