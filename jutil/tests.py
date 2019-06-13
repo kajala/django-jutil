@@ -309,6 +309,10 @@ class Tests(TestCase):
         self.assertEqual(se_clearing_code_bank_info('6789'), ('Handelsbanken', 9))
         se_iban_validator('SE45 5000 0000 0583 9825 7466')
         self.assertEqual(se_clearing_code_bank_info('9500'), ('Nordea AB', 10))
+        an = '957033025420'
+        bank_name, acc_digits = se_clearing_code_bank_info(an)
+        self.assertEqual(bank_name, 'Sparbanken Syd')
+        self.assertGreaterEqual(len(an)-4, acc_digits)
 
     def test_ascii_filter(self):
         pairs = [
