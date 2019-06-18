@@ -45,6 +45,6 @@ SE_BANK_CLEARING_LIST = (  # 46
     ('Skandiabanken AB', '9150', '9169', 7),
     ('Sparbanken Syd', '9570', '9579', 8),
     ('Swedbank', '7000', '7999', 7),
-    ('Swedbank', '8000', '8999', 10),
+    ('Swedbank', '8000', '8999', 8),
     ('Ålandsbanken Abp', '2300', '2399', 7),
 )
