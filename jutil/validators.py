@@ -16,6 +16,7 @@ STRIP_NON_NUMBERS = re.compile(r'[^0-9]')
 STRIP_NON_ALPHANUMERIC = re.compile(r'[^0-9A-Za-z]')
 STRIP_WHITESPACE = re.compile(r'\s+')
 IBAN_FILTER = re.compile(r'[^A-Z0-9]')
+DIGIT_FILTER = re.compile(r'[^0-9]')
 
 
 def phone_filter(v: str) -> str:
@@ -59,6 +60,10 @@ def ascii_filter(v: str) -> str:
     :return: str
     """
     return unicodedata.normalize('NFKD', v).encode('ASCII', 'ignore').decode()
+
+
+def digit_filter(v: str) -> str:
+    return DIGIT_FILTER.sub('', str(v)) if v else ''
 
 
 def iban_filter(v: str) -> str:
@@ -380,14 +385,15 @@ def se_ssn_validator(v: str):
         raise ValidationError(_('Invalid personal identification number')+' (SE.2): {}'.format(v), code='invalid_ssn')
 
 
-def se_clearing_code_bank_info(account_number: str) -> (str, int):
+def se_clearing_code_bank_info(v: str) -> (str, int):
     """
     Returns Sweden bank info by clearning code.
-    :param account_number: 4-digit clearing code or account number
+    :param v: 4-digit clearing code or account number
     :return: (Bank name, account digit count) or ('', None) if not found
     """
     from jutil.bank_const_se import SE_BANK_CLEARING_LIST
-    clearing = account_number[:4]
+    v = digit_filter(v)
+    clearing = v[:4]
     for name, begin, end, acc_digits in SE_BANK_CLEARING_LIST:
         if begin <= clearing <= end:
             return name, acc_digits
