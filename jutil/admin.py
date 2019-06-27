@@ -55,6 +55,37 @@ def admin_log(instances, msg: str, who: User=None, **kw):
             )
 
 
+def admin_obj_url(obj, route: str = '') -> str:
+    """
+    Returns admin URL to object. If object is standard model with default route name, the function
+    can deduct the route name as in "admin:<app>_<class-lowercase>_change".
+    :param obj: Object
+    :param route: Empty for default route
+    :return: URL to admin object change view
+    """
+    from django.urls import reverse
+    if not route:
+        o = type(obj)
+        model_path = o.__module__.split('.')
+        route = 'admin:' + ".".join(['.'.join(model_path[:-1]), o.__name__]).lower().replace('.', '_') + '_change'
+    return reverse(route, args=[obj.id])
+
+
+def admin_obj_link(obj, label: str = '', route: str = '') -> str:
+    """
+    Returns safe-marked admin link to object. If object is standard model with default route name, the function
+    can deduct the route name as in "admin:<app>_<class-lowercase>_change".
+    :param obj: Object
+    :param label: Optional label. If empty uses str(obj)
+    :param route: Empty for default route
+    :return: HTML link marked safe
+    """
+    from django.utils.html import format_html
+    from django.utils.safestring import mark_safe
+    url = admin_obj_url(obj, route)
+    return format_html("<a href='{}'>{}</a>", mark_safe(url), str(obj) if not label else label)
+
+
 class ModelAdminBase(admin.ModelAdmin):
     """
     ModelAdmin with save-on-top default enabled and customized (length-limited) history view.
