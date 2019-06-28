@@ -385,14 +385,14 @@ def se_ssn_validator(v: str):
         raise ValidationError(_('Invalid personal identification number')+' (SE.2): {}'.format(v), code='invalid_ssn')
 
 
-def se_clearing_code_bank_info(v: str) -> (str, int):
+def se_clearing_code_bank_info(account_number: str) -> (str, int):
     """
     Returns Sweden bank info by clearning code.
-    :param v: 4-digit clearing code or account number
+    :param account_number: Swedish account number with clearing code as prefix
     :return: (Bank name, account digit count) or ('', None) if not found
     """
     from jutil.bank_const_se import SE_BANK_CLEARING_LIST
-    v = digit_filter(v)
+    v = digit_filter(account_number)
     clearing = v[:4]
     for name, begin, end, acc_digits in SE_BANK_CLEARING_LIST:
         if begin <= clearing <= end:
