@@ -148,6 +148,8 @@ def xml_to_dict(xml_bytes: bytes, tags: list=[], array_tags: list=[], int_tags: 
 
 def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_prefix: str):
     # print('_xml_element_set_data_r({}): {}'.format(el.tag, data))
+    if not hasattr(data, 'items'):
+        data = {'@': data}
     for k, v in data.items():
         if k == value_key:
             el.text = str(v)

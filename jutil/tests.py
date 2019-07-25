@@ -160,15 +160,18 @@ class Tests(TestCase):
                 'A': [{'@class': 'x', 'B': {'@': 'hello', '@class': 'x2'}},
                       {'@class': 'y', 'B': {'@': 'world', '@class': 'y2'}}],
                 'C': 'value node',
+                'D': 123,
+                'E': ['abc'],
              }
         }
         el = dict_to_element(data)
         assert isinstance(el, Element)
         xml_str = ET.tostring(el, encoding='utf8', method='xml').decode()
         # print(xml_str)  # <Doc version="1.2"><C>value node</C><A class="x"><B class="x2">hello</B></A><A class="y"><B class="y2">world</B></A></Doc>
-        data2 = xml_to_dict(xml_str, document_tag=True)
-        # print(data)
-        # print(data2)
+        data2 = xml_to_dict(xml_str, document_tag=True, array_tags=['E'], int_tags=['D'])
+        print('')
+        pprint(data)
+        pprint(data2)
         self.assertEqual(data2, data)
 
     def test_per_delta(self):
