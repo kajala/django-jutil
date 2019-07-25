@@ -3,11 +3,11 @@ from xml.etree.ElementTree import Element
 from decimal import Decimal
 
 
-def _xml_element_value(el: Element, int_tags: list):
+def _xml_element_value(el: Element, is_int: bool = False):
     """
     Gets XML Element value.
     :param el: Element
-    :param int_tags: List of tags that should be treated as ints
+    :param is_int: If True return value is converted to int (if possible)
     :return: value of the element (int/str)
     """
     # None
@@ -15,7 +15,7 @@ def _xml_element_value(el: Element, int_tags: list):
         return None
     # int
     try:
-        if el.tag in int_tags:
+        if is_int:
             return int(el.text)
     except:
         pass
@@ -52,9 +52,10 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
     attrib = el.attrib if parse_attributes else {}
     is_complex = len(attrib) > 0 or len(list(el)) > 0
     is_array = tag in data or tag in array_tags
+    is_int = not is_array and tag in int_tags
 
     # set obj value
-    value = _xml_element_value(el, int_tags=int_tags)
+    value = _xml_element_value(el, is_int=is_int)
     if is_complex:
         obj = {}
         if value is not None:

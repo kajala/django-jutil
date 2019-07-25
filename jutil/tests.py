@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta, date
 from os.path import join
 from pprint import pprint
@@ -199,6 +200,15 @@ class Tests(TestCase):
         # pprint(data)
         self.assertEqual(data['Document']['TxsSummry']['TtlNtries']['NbOfNtries'], 12)
         self.assertEqual(data['Document']['TxsSummry']['TtlCdtNtries']['NbOfNtries'], 34)
+
+        filename = os.getenv('FAC') + '/data/fi_camt/723971444.xml'
+        if os.path.isfile(filename):
+            print('Testing additional XML file [jani]', filename)
+            atags = ['Ntry', 'NtryDtls', 'TxDtls', 'Bal']
+            itags = ['NbOfNtries', 'NbOfTxs']
+            with open(filename, 'rb') as fp:
+                data = xml_to_dict(fp.read(), document_tag=True, array_tags=atags, int_tags=itags)
+                pprint(data)
 
     def test_per_delta(self):
         begin = datetime(2017, 9, 17, 11, 42)
