@@ -169,10 +169,36 @@ class Tests(TestCase):
         xml_str = ET.tostring(el, encoding='utf8', method='xml').decode()
         # print(xml_str)  # <Doc version="1.2"><C>value node</C><A class="x"><B class="x2">hello</B></A><A class="y"><B class="y2">world</B></A></Doc>
         data2 = xml_to_dict(xml_str, document_tag=True, array_tags=['E'], int_tags=['D'])
-        print('')
-        pprint(data)
-        pprint(data2)
+        # print('')
+        # pprint(data)
+        # pprint(data2)
         self.assertEqual(data2, data)
+
+    def test_xml_to_dict(self):
+        from xml.etree.ElementTree import Element
+        from xml.etree import ElementTree as ET
+
+        xml_str = """<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <TxsSummry>
+    <TtlNtries>
+      <NbOfNtries>12</NbOfNtries>
+    </TtlNtries>
+    <TtlCdtNtries>
+      <NbOfNtries>34</NbOfNtries>
+      <Sum>1234.56</Sum>
+    </TtlCdtNtries>
+    <TtlDbtNtries>
+      <NbOfNtries>0</NbOfNtries>
+      <Sum>0</Sum>
+    </TtlDbtNtries>
+  </TxsSummry>
+</Document>"""
+        data = xml_to_dict(xml_str, document_tag=True, array_tags=[], int_tags=['NbOfNtries'])
+        # print('')
+        # pprint(data)
+        self.assertEqual(data['Document']['TxsSummry']['TtlNtries']['NbOfNtries'], 12)
+        self.assertEqual(data['Document']['TxsSummry']['TtlCdtNtries']['NbOfNtries'], 34)
 
     def test_per_delta(self):
         begin = datetime(2017, 9, 17, 11, 42)
