@@ -69,10 +69,10 @@ def format_timedelta(dt: timedelta) -> str:
     return s
 
 
-def format_xml(xml_str: str, exceptions: bool=False):
+def format_xml(xml_str: str, exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
-    :param xml_str: str (Input XML str)
+    :param xml_str: XML data as str
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
@@ -83,6 +83,35 @@ def format_xml(xml_str: str, exceptions: bool=False):
         if exceptions:
             raise
         return xml_str
+
+
+def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False, xmllint_path: str = '/usr/bin/xmllint') -> bytes:
+    """
+    Formats XML file as human-readable plain text and returns result in bytes.
+    Tries to format XML file first, if formatting fails the file content is returned as is.
+    If the file does not exist empty bytes is returned.
+    :param full_path: Full path to XML file
+    :param encoding: XML file encoding
+    :param exceptions: Raise exceptions on error
+    :param xmllint_path: Path to xmllint command line tool (optional). Pass empty string if the tool is not available.
+    :return: bytes
+    """
+    import subprocess
+    import xml.dom.minidom
+    try:
+        if xmllint_path:
+            return subprocess.check_output([xmllint_path, '--format', full_path])
+        with open(full_path, 'rb') as fp:
+            return xml.dom.minidom.parseString(fp).toprettyxml(encoding=encoding)
+    except Exception as e:
+        if exceptions:
+            raise
+    try:
+        with open(full_path, 'rb') as fp:
+            return fp.read()
+    except Exception as e:
+        pass
+    return b''
 
 
 def dec1(a) -> Decimal:
