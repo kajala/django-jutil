@@ -9,11 +9,13 @@ class FileSystemFileResponse(FileResponse):
     """
     File system download HTTP response.
     :param full_path: Full path to file
+    :param filename: Filename (optional) passed to client. Defaults to basename of the full path.
     """
-    def __init__(self, full_path: str, **kw):
-        filename = os.path.basename(full_path)
+    def __init__(self, full_path: str, filename: str = '', **kw):
         if not os.path.isfile(full_path):
             raise Http404(_("File {} not found").format(full_path))
+        if not filename:
+            filename = os.path.basename(full_path)
         content_type = mimetypes.guess_type(filename)[0]
         super().__init__(open(full_path, 'rb'), **kw)
         self['Content-Type'] = content_type
