@@ -102,7 +102,7 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
         if xmllint_path:
             return subprocess.check_output([xmllint_path, '--format', full_path])
         with open(full_path, 'rb') as fp:
-            return xml.dom.minidom.parseString(fp).toprettyxml(encoding=encoding)
+            return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)
     except Exception as e:
         if exceptions:
             raise
