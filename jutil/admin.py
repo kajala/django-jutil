@@ -12,12 +12,12 @@ from django.utils.translation import ugettext_lazy as _
 from jutil.responses import FileSystemFileResponse
 
 
-def admin_log(instances, msg: str, who: User=None, **kw):
+def admin_log(instances, msg: str, who: User or None = None, **kw):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances
     :param msg: Message to log
-    :param who: Who did the change
+    :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
     :param kw: Optional key-value attributes to append to message
     :return: None
     """
