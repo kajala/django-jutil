@@ -148,6 +148,17 @@ def calculate_age(born: date, today: date or None=None) -> int:
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
+def filter_country_company_reg_id(country_code: str, v: str):
+    if country_code == 'FI':
+        return fi_company_reg_id_filter(v)
+    return PASSPORT_FILTER.sub('', v)
+
+
+def validate_country_company_reg_id(country_code: str, v: str):
+    if country_code == 'FI':
+        fi_company_reg_id_validator(v)
+
+
 # ============================================================================
 # Country specific functions (countries in alphabetical order)
 # ============================================================================
