@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.timezone import now
+from django.utils.translation import override, ugettext as _
 from jutil.command import get_date_range_by_name
 from jutil.request import get_ip_info
 from jutil.urls import url_equals, url_mod, url_host
@@ -365,3 +366,8 @@ class Tests(TestCase):
         ]
         for a, b in pairs:
             self.assertEqual(ascii_filter(a), b, 'ascii_filter("{}") != "{}"'.format(b, ascii_filter(a)))
+
+    def test_l10n(self):
+        with override('fi'):
+            msg = _("'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
+            self.assertTrue('muoto ei kelpaa' in msg)

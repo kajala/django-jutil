@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-19 13:54+0000\n"
+"POT-Creation-Date: 2019-09-11 05:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,43 +17,59 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: jutil/admin.py:105
+#: jutil/admin.py:136
 #, python-format
 msgid "Change history: %s"
 msgstr ""
 
-#: jutil/admin.py:160 jutil/admin.py:167 jutil/responses.py:16
+#: jutil/admin.py:191 jutil/admin.py:198 jutil/responses.py:16
 msgid "File {} not found"
 msgstr ""
 
-#: jutil/validators.py:27 jutil/validators.py:34 jutil/validators.py:45
-#: jutil/validators.py:73
+#: jutil/parse.py:40
+#, python-format
+msgid "'%(value)s' value has an invalid format"
+msgstr ""
+
+#: jutil/parse.py:61
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#: jutil/validators.py:33 jutil/validators.py:40 jutil/validators.py:51
+#: jutil/validators.py:94
 msgid "Missing value"
 msgstr ""
 
-#: jutil/validators.py:28
+#: jutil/validators.py:34
 msgid "Invalid email"
 msgstr ""
 
-#: jutil/validators.py:35
+#: jutil/validators.py:41
 msgid "Invalid phone number"
 msgstr ""
 
-#: jutil/validators.py:46
+#: jutil/validators.py:52
 msgid "Invalid passport number"
 msgstr ""
 
-#: jutil/validators.py:73 jutil/validators.py:82 jutil/validators.py:88
-#: jutil/validators.py:90 jutil/validators.py:99
+#: jutil/validators.py:94 jutil/validators.py:103 jutil/validators.py:109
+#: jutil/validators.py:115
 msgid "Invalid IBAN account number"
 msgstr ""
 
-#: jutil/validators.py:180 jutil/validators.py:183 jutil/validators.py:190
-#: jutil/validators.py:194
+#: jutil/validators.py:251 jutil/validators.py:268 jutil/validators.py:272
+msgid "Invalid payment reference: {}"
+msgstr ""
+
+#: jutil/validators.py:304 jutil/validators.py:307 jutil/validators.py:314
+#: jutil/validators.py:318
 msgid "Invalid company registration ID"
 msgstr ""
 
-#: jutil/validators.py:200 jutil/validators.py:211 jutil/validators.py:233
-#: jutil/validators.py:252
+#: jutil/validators.py:324 jutil/validators.py:335 jutil/validators.py:377
+#: jutil/validators.py:396
 msgid "Invalid personal identification number"
 msgstr ""

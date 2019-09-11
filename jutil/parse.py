@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils.translation import ugettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
 from dateutil.parser import parse as dateutil_parse
@@ -36,16 +37,17 @@ def parse_bool(v, default=None, exceptions: bool=True) -> bool:
         return False
     else:
         if exceptions:
-            raise ValidationError('Failed to parse boolean from "{}"'.format(v))
+            msg = _("'%(value)s' value has an invalid format") % {'value': v}
+            raise ValidationError(msg)
         return default
 
 
-def parse_datetime(v, default=None, tz=None, exceptions: bool=True) -> datetime:
+def parse_datetime(v: str, default=None, tz=None, exceptions: bool=True) -> datetime:
     """
-    Parses datetime
+    Parses str to timezone-aware datetime.
     :param v: Input string
     :param default: Default value if exceptions=False
-    :param tz: Default pytz timezone or None if utc
+    :param tz: Default pytz timezone or None if use utc as default
     :param exceptions: Raise exception on error or not
     :return: datetime
     """
@@ -56,5 +58,6 @@ def parse_datetime(v, default=None, tz=None, exceptions: bool=True) -> datetime:
         return t if t.tzinfo else tz.localize(t)
     except Exception:
         if exceptions:
-            raise ValidationError('Failed to parse datetime from "{}"'.format(v))
+            msg = _("'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {'value': v}
+            raise ValidationError(msg)
         return default
