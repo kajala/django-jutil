@@ -20,7 +20,7 @@ FALSE_VALUES = (
 )
 
 
-def parse_bool(v, default=None, exceptions: bool=True) -> bool:
+def parse_bool(v, default = None, exceptions: bool = True) -> bool:
     """
     Parses boolean value
     :param v: Input string
@@ -37,12 +37,12 @@ def parse_bool(v, default=None, exceptions: bool=True) -> bool:
         return False
     else:
         if exceptions:
-            msg = _("'%(value)s' value has an invalid format") % {'value': v}
+            msg = _("%(value)s is not one of the available choices") % {'value': v}
             raise ValidationError(msg)
         return default
 
 
-def parse_datetime(v: str, default=None, tz=None, exceptions: bool=True) -> datetime:
+def parse_datetime(v: str, default = None, tz = None, exceptions: bool = True) -> datetime:
     """
     Parses str to timezone-aware datetime.
     :param v: Input string

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 05:30+0000\n"
+"POT-Creation-Date: 2019-09-11 05:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,10 +29,10 @@ msgstr "Tiedostoa {} ei löydy"
 
 #: jutil/parse.py:40
 #, python-format
-msgid "'%(value)s' value has an invalid format"
-msgstr "'%(value)s' arvo on virheellisessä muodossa"
+msgid "%(value)s is not one of the available choices"
+msgstr "%(value)s ei ole yksi valittavissa olevista arvoista"
 
-#: jutil/parse.py:61
+#: jutil/parse.py:62 jutil/tests.py:374
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -74,3 +74,6 @@ msgstr "Epäkelpo yrityksen tunnus"
 #: jutil/validators.py:396
 msgid "Invalid personal identification number"
 msgstr "Epäkelpo henkilötunnus"
+
+#~ msgid "'%(value)s' value has an invalid format"
+#~ msgstr "'%(value)s' arvo on virheellisessä muodossa"

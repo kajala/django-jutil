@@ -18,7 +18,7 @@ from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
 from jutil.format import format_full_name, format_xml
-from jutil.parse import parse_datetime
+from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
@@ -368,6 +368,13 @@ class Tests(TestCase):
             self.assertEqual(ascii_filter(a), b, 'ascii_filter("{}") != "{}"'.format(b, ascii_filter(a)))
 
     def test_l10n(self):
+        from rest_framework.exceptions import ValidationError
+
         with override('fi'):
             msg = _("'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
             self.assertTrue('muoto ei kelpaa' in msg)
+
+            try:
+                parse_bool('hello')
+            except ValidationError as e:
+                self.assertEqual(str(e), "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]")
