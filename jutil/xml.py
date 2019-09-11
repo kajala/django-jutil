@@ -85,10 +85,10 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
         data[tag] = obj
 
 
-def xml_to_dict(xml_bytes: bytes, tags: list=[], array_tags: list=[], int_tags: list=[],
-                strip_namespaces: bool=True, parse_attributes: bool=True,
-                value_key: str='@', attribute_prefix: str='@',
-                document_tag: bool=False) -> dict:
+def xml_to_dict(xml_bytes: bytes, tags: list = [], array_tags: list = [], int_tags: list = [],
+                strip_namespaces: bool = True, parse_attributes: bool = True,
+                value_key: str = '@', attribute_prefix: str = '@',
+                document_tag: bool = False) -> dict:
     """
     Parses XML string to dict. In case of simple elements (no children, no attributes) value is stored as is.
     For complex elements value is stored in key '@', attributes '@xxx' and children as sub-dicts.
