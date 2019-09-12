@@ -208,5 +208,6 @@ class AdminFileDownloadMixin(object):
         """
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            url(r'^.+(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download' % info),
+            url(r'^\d+/change/(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download' % info),
+            url(r'^(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download_changelist' % info),
         ]
