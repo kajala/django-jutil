@@ -2,6 +2,8 @@ import re
 import unicodedata
 from datetime import date
 from decimal import Decimal
+from random import randint
+
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
@@ -333,6 +335,24 @@ def fi_ssn_validator(v: str):
         ch = digits[d]
     if ch != v[-1:]:
         raise ValidationError(_('Invalid personal identification number')+' (FI.2): {}'.format(v), code='invalid_ssn')
+
+
+def fi_ssn_generator():
+    day = randint(1, 28)
+    month = randint(1, 12)
+    year = randint(1920, 2000)
+    suffix = randint(100, 999)
+    v = '{:02}{:02}{:02}-{}'.format(day, month, year-1900, suffix)
+    d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
+    digits = {
+        10: 'A', 	11: 'B', 	12: 'C', 	13: 'D', 	14: 'E', 	15: 'F', 	16: 'H',
+        17: 'J', 	18: 'K', 	19: 'L', 	20: 'M', 	21: 'N', 	22: 'P', 	23: 'R',
+        24: 'S', 	25: 'T', 	26: 'U', 	27: 'V', 	28: 'W', 	29: 'X', 	30: 'Y',
+    }
+    ch = str(d)
+    if d in digits:
+        ch = digits[d]
+    return v + ch
 
 
 def fi_ssn_birthday(v: str) -> date:
