@@ -340,9 +340,10 @@ def fi_ssn_validator(v: str):
 def fi_ssn_generator():
     day = randint(1, 28)
     month = randint(1, 12)
-    year = randint(1920, 2000)
+    year = randint(1920, 1999)
     suffix = randint(100, 999)
     v = '{:02}{:02}{:02}-{}'.format(day, month, year-1900, suffix)
+    print(v)
     d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
     digits = {
         10: 'A', 	11: 'B', 	12: 'C', 	13: 'D', 	14: 'E', 	15: 'F', 	16: 'H',
