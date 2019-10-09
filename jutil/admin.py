@@ -64,6 +64,8 @@ def admin_obj_url(obj, route: str = '') -> str:
     :return: URL to admin object change view
     """
     from django.urls import reverse
+    if obj is None:
+        return ''
     if not route:
         o = type(obj)
         model_path = o.__module__.split('.')
@@ -82,6 +84,8 @@ def admin_obj_link(obj, label: str = '', route: str = '') -> str:
     """
     from django.utils.html import format_html
     from django.utils.safestring import mark_safe
+    if obj is None:
+        return ''
     url = admin_obj_url(obj, route)
     return format_html("<a href='{}'>{}</a>", mark_safe(url), str(obj) if not label else label)
 
