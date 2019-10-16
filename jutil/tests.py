@@ -23,7 +23,7 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
     se_clearing_code_bank_info, ascii_filter, ee_iban_validator, be_iban_validator, dk_iban_validator, \
-    dk_iban_bank_info, dk_clearing_code_bank_name
+    dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer
 
 
 class Tests(TestCase):
@@ -378,3 +378,12 @@ class Tests(TestCase):
                 parse_bool('hello')
             except ValidationError as e:
                 self.assertEqual(str(e), "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]")
+
+    def test_sanitizers(self):
+        self.assertEqual(country_code_sanitizer('kods'), '')
+        self.assertEqual(country_code_sanitizer('fi'), 'FI')
+        self.assertEqual(phone_sanitizer('+13146094459'), '+13146094459')
+        self.assertEqual(phone_sanitizer('13146094459'), '13146094459')
+        self.assertEqual(phone_sanitizer('+13146094459A'), '+13146094459')
+        self.assertEqual(email_sanitizer('test@example.com'), 'test@example.com')
+        self.assertEqual(email_sanitizer('testexample.com'), '')

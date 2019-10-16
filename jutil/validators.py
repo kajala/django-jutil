@@ -25,6 +25,20 @@ def phone_filter(v: str) -> str:
     return PHONE_FILTER.sub('', str(v)) if v else ''
 
 
+def phone_validator(v: str):
+    v = phone_filter(v)
+    if not v or not PHONE_VALIDATOR.fullmatch(v):
+        v_str = _('Missing value') if v is None else str(v)
+        raise ValidationError(_('Invalid phone number') + ': {}'.format(v_str), code='invalid_phone')
+
+
+def phone_sanitizer(v: str) -> str:
+    v = phone_filter(v)
+    if not v or not PHONE_VALIDATOR.fullmatch(v):
+        return ''
+    return v
+
+
 def email_filter(v: str) -> str:
     return str(v).lower().strip() if v else ''
 
@@ -36,11 +50,11 @@ def email_validator(v: str) -> str:
         raise ValidationError(_('Invalid email') + ': {}'.format(v_str), code='invalid_email')
 
 
-def phone_validator(v: str):
-    v = phone_filter(v)
-    if not v or not PHONE_VALIDATOR.fullmatch(v):
-        v_str = _('Missing value') if v is None else str(v)
-        raise ValidationError(_('Invalid phone number') + ': {}'.format(v_str), code='invalid_phone')
+def email_sanitizer(v: str) -> str:
+    v = email_filter(v)
+    if not v or not EMAIL_VALIDATOR.fullmatch(v):
+        return ''
+    return v
 
 
 def passport_filter(v: str) -> str:
@@ -52,6 +66,34 @@ def passport_validator(v: str):
     if not v or len(v) < 5:
         v_str = _('Missing value') if v is None else str(v)
         raise ValidationError(_('Invalid passport number') + ': {}'.format(v_str), code='invalid_passport')
+
+
+def passport_sanitizer(v: str):
+    v = passport_filter(v)
+    if not v or len(v) < 5:
+        return ''
+    return v
+
+
+def country_code_filter(v: str) -> str:
+    return v.strip().upper()
+
+
+def country_code_validator(v: str):
+    """
+    Accepts both ISO-2 and ISO-3 formats.
+    :param v: str
+    :return: None
+    """
+    v = country_code_filter(v)
+    if not (2 <= len(v) <= 3):
+        v_str = _('Missing value') if v is None else str(v)
+        raise ValidationError(_('Invalid country code') + ': {}'.format(v_str), code='invalid_country_code')
+
+
+def country_code_sanitizer(v: str) -> str:
+    v = country_code_filter(v)
+    return v if 2 <= len(v) <= 3 else ''
 
 
 def ascii_filter(v: str) -> str:
