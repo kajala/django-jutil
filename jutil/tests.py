@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from django.utils.translation import override, ugettext as _
 from jutil.command import get_date_range_by_name
+from jutil.dict import dict_to_html
 from jutil.request import get_ip_info
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element
@@ -387,3 +388,8 @@ class Tests(TestCase):
         self.assertEqual(phone_sanitizer('+13146094459A'), '+13146094459')
         self.assertEqual(email_sanitizer('test@example.com'), 'test@example.com')
         self.assertEqual(email_sanitizer('testexample.com'), '')
+
+    def test_dict_to_html(self):
+        a = {'b': 1, 'c': {'@testVariable': '123'}}
+        res = '<pre>B: 1\nC:\n    Test variable: 123\n\n</pre>'
+        self.assertEqual(dict_to_html(a), res)
