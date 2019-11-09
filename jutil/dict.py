@@ -26,7 +26,7 @@ def choices_label(choices: tuple, value) -> str:
     return ''
 
 
-def _dict_to_html_format_key(self, k: str):
+def _dict_to_html_format_key(k: str):
     if k.startswith('@'):
         k = k[1:]
     k = k.replace('_', ' ')
@@ -59,7 +59,7 @@ def _dict_to_html_r(data: dict, margin: str = '') -> str:
     return out
 
 
-def dict_to_html(self, data: dict) -> str:
+def dict_to_html(data: dict) -> str:
     """
     Formats dict to simple pre-formatted html (<pre> tag).
     :param data: dict
