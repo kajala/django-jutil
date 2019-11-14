@@ -1,5 +1,7 @@
 import mimetypes
 import os
+from collections import OrderedDict
+
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -96,6 +98,20 @@ class ModelAdminBase(admin.ModelAdmin):
     """
     save_on_top = True
     max_history_length = 1000
+
+    def sort_actions_by_description(self, actions: dict) -> OrderedDict:
+        """
+        :param actions: dict of str: (callable, name, description)
+        :return: OrderedDict
+        """
+        sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: x[1])
+        sorted_actions = OrderedDict()
+        for k, description in sorted_descriptions:
+            sorted_actions[k] = actions[k]
+        return sorted_actions
+
+    def get_actions(self, request):
+        return self.sort_actions_by_description(super().get_actions(request))
 
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kw):
         """

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 05:45+0000\n"
+"POT-Creation-Date: 2019-11-14 19:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +18,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: jutil/admin.py:136
+#: jutil/admin.py:156
 #, python-format
 msgid "Change history: %s"
 msgstr "Muutoshistoria: %s"
 
-#: jutil/admin.py:191 jutil/admin.py:198 jutil/responses.py:16
+#: jutil/admin.py:211 jutil/admin.py:218 jutil/responses.py:16
 msgid "File {} not found"
 msgstr "Tiedostoa {} ei löydy"
 
@@ -32,46 +32,52 @@ msgstr "Tiedostoa {} ei löydy"
 msgid "%(value)s is not one of the available choices"
 msgstr "%(value)s ei ole yksi valittavissa olevista arvoista"
 
-#: jutil/parse.py:62 jutil/tests.py:374
+#: jutil/parse.py:61 jutil/tests.py:375
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
-#: jutil/validators.py:33 jutil/validators.py:40 jutil/validators.py:51
-#: jutil/validators.py:94
+#: jutil/validators.py:31 jutil/validators.py:49 jutil/validators.py:67
+#: jutil/validators.py:90 jutil/validators.py:138
 msgid "Missing value"
 msgstr "Puuttuva arvo"
 
-#: jutil/validators.py:34
-msgid "Invalid email"
-msgstr "Epäkelpo sähköposti"
-
-#: jutil/validators.py:41
+#: jutil/validators.py:32
 msgid "Invalid phone number"
 msgstr "Epäkelpo puhelinnumero"
 
-#: jutil/validators.py:52
+#: jutil/validators.py:50
+msgid "Invalid email"
+msgstr "Epäkelpo sähköposti"
+
+#: jutil/validators.py:68
 msgid "Invalid passport number"
 msgstr "Epäkelpo passin numero"
 
-#: jutil/validators.py:94 jutil/validators.py:103 jutil/validators.py:109
-#: jutil/validators.py:115
+#: jutil/validators.py:91
+#, fuzzy
+#| msgid "Invalid IBAN account number"
+msgid "Invalid country code"
+msgstr "Epäkelpo IBAN-tilinumero"
+
+#: jutil/validators.py:138 jutil/validators.py:147 jutil/validators.py:153
+#: jutil/validators.py:159
 msgid "Invalid IBAN account number"
 msgstr "Epäkelpo IBAN-tilinumero"
 
-#: jutil/validators.py:251 jutil/validators.py:268 jutil/validators.py:272
+#: jutil/validators.py:295 jutil/validators.py:312 jutil/validators.py:316
 msgid "Invalid payment reference: {}"
 msgstr ""
 
-#: jutil/validators.py:304 jutil/validators.py:307 jutil/validators.py:314
-#: jutil/validators.py:318
+#: jutil/validators.py:348 jutil/validators.py:351 jutil/validators.py:358
+#: jutil/validators.py:362
 msgid "Invalid company registration ID"
 msgstr "Epäkelpo yrityksen tunnus"
 
-#: jutil/validators.py:324 jutil/validators.py:335 jutil/validators.py:377
-#: jutil/validators.py:396
+#: jutil/validators.py:368 jutil/validators.py:379 jutil/validators.py:439
+#: jutil/validators.py:458
 msgid "Invalid personal identification number"
 msgstr "Epäkelpo henkilötunnus"
 
