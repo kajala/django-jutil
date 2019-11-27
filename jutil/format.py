@@ -1,5 +1,4 @@
 import re
-import subprocess
 import tempfile
 from datetime import timedelta
 from decimal import Decimal
@@ -76,12 +75,12 @@ def format_timedelta(dt: timedelta) -> str:
 def format_xml(content: str or bytes, exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
-    If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality).
-    Otherwise minidom toprettyxml is used.
+    If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
     :param content: XML data as str or bytes
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
+    import subprocess
     import xml.dom.minidom
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
@@ -101,22 +100,22 @@ def format_xml(content: str or bytes, exceptions: bool = False) -> str:
         return content.decode() if isinstance(content, bytes) else content
 
 
-def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False, xmllint_path: str = '/usr/bin/xmllint') -> bytes:
+def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
     """
     Formats XML file as human-readable plain text and returns result in bytes.
     Tries to format XML file first, if formatting fails the file content is returned as is.
     If the file does not exist empty bytes is returned.
+    If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
     :param full_path: Full path to XML file
     :param encoding: XML file encoding
     :param exceptions: Raise exceptions on error
-    :param xmllint_path: Path to xmllint command line tool (optional). Pass empty string if the tool is not available.
     :return: bytes
     """
     import subprocess
     import xml.dom.minidom
     try:
-        if xmllint_path:
-            return subprocess.check_output([xmllint_path, '--format', full_path])
+        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
+            return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])
         with open(full_path, 'rb') as fp:
             return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)
     except Exception as e:
