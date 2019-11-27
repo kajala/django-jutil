@@ -18,7 +18,7 @@ from jutil.xml import xml_to_dict, dict_to_element
 from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
-from jutil.format import format_full_name, format_xml
+from jutil.format import format_full_name, format_xml, format_xml_bytes
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
@@ -400,3 +400,5 @@ class Tests(TestCase):
         dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'
         dst = format_xml(src)
         self.assertEqual(dst, dst_ref)
+        dst = format_xml_bytes(src)
+        self.assertEqual(dst, dst_ref.encode())

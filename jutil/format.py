@@ -72,11 +72,12 @@ def format_timedelta(dt: timedelta) -> str:
     return s
 
 
-def format_xml(content: str or bytes, exceptions: bool = False) -> str:
+def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
     :param content: XML data as str or bytes
+    :param encoding: XML file encoding
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
@@ -85,19 +86,48 @@ def format_xml(content: str or bytes, exceptions: bool = False) -> str:
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
             if isinstance(content, str):
-                content = content.encode()
+                content = content.encode(encoding=encoding)
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(content)
                 fp.flush()
                 out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
                 return out.decode()
         if isinstance(content, bytes):
-            content = content.decode()
+            content = content.decode(encoding=encoding)
         return xml.dom.minidom.parseString(content).toprettyxml()
     except Exception:
         if exceptions:
             raise
         return content.decode() if isinstance(content, bytes) else content
+
+
+def format_xml_bytes(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
+    """
+    Formats XML document as human-readable plain text and returns result in bytes.
+    If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
+    :param content: XML data as str or bytes
+    :param encoding: XML file encoding
+    :param exceptions: Raise exceptions on error
+    :return: bytes (Formatted XML as bytes)
+    """
+    import subprocess
+    import xml.dom.minidom
+    try:
+        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
+            if isinstance(content, str):
+                content = content.encode(encoding=encoding)
+            with tempfile.NamedTemporaryFile() as fp:
+                fp.write(content)
+                fp.flush()
+                out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
+                return out
+        if isinstance(content, bytes):
+            content = content.decode(encoding=encoding)
+        return xml.dom.minidom.parseString(content).toprettyxml(encoding=encoding)
+    except Exception:
+        if exceptions:
+            raise
+        return content.encode(encoding=encoding) if isinstance(content, str) else content
 
 
 def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
