@@ -393,3 +393,10 @@ class Tests(TestCase):
         a = {'b': 1, 'c': {'@testVariable': '123'}}
         res = '<pre>B: 1\nC:\n    Test variable: 123\n\n</pre>'
         self.assertEqual(dict_to_html(a), res)
+
+    def test_format_xml(self):
+        assert settings.XMLLINT_PATH
+        src = '<ApplicationRequest> <CustomerId>1</CustomerId>  <Command>DownloadFileList</Command><Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp><Environment>PRODUCTION</Environment></ApplicationRequest>'
+        dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'
+        dst = format_xml(src)
+        self.assertEqual(dst, dst_ref)

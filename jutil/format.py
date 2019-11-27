@@ -1,6 +1,10 @@
 import re
+import subprocess
+import tempfile
 from datetime import timedelta
 from decimal import Decimal
+
+from django.conf import settings
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20):
@@ -69,20 +73,32 @@ def format_timedelta(dt: timedelta) -> str:
     return s
 
 
-def format_xml(xml_str: str, exceptions: bool = False) -> str:
+def format_xml(content: str or bytes, exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
-    :param xml_str: XML data as str
+    If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality).
+    Otherwise minidom toprettyxml is used.
+    :param content: XML data as str or bytes
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
+    import xml.dom.minidom
     try:
-        import xml.dom.minidom
-        return xml.dom.minidom.parseString(xml_str).toprettyxml()
+        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
+            if isinstance(content, str):
+                content = content.encode()
+            with tempfile.NamedTemporaryFile() as fp:
+                fp.write(content)
+                fp.flush()
+                out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
+                return out.decode()
+        if isinstance(content, bytes):
+            content = content.decode()
+        return xml.dom.minidom.parseString(content).toprettyxml()
     except Exception:
         if exceptions:
             raise
-        return xml_str
+        return content.decode() if isinstance(content, bytes) else content
 
 
 def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False, xmllint_path: str = '/usr/bin/xmllint') -> bytes:

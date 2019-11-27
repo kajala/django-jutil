@@ -140,4 +140,8 @@ DEFAULT_FROM_EMAIL = '"Customer Service" <support@kajala.com>'
 SERVER_EMAIL = 'admin@kajala.com'
 ADMINS = [('Jani Kajala', 'kajala@gmail.com',),]
 
-IPSTACK_TOKEN='DUMMY' # To pass python manage.py test --settings=project.base_settings
+IPSTACK_TOKEN='DUMMY'  # To pass python manage.py test --settings=project.base_settings
+
+# XML formatting
+
+XMLLINT_PATH = '/usr/bin/xmllint'
