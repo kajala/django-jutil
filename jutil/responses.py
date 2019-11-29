@@ -45,3 +45,13 @@ class CsvFileResponse(HttpResponse):
         buf = f.getvalue().encode('utf-8')
         super().__init__(content=buf, content_type='text/csv', **kw)
         self['Content-Disposition'] = 'attachment;filename="{0}"'.format(filename)
+
+
+class FormattedXmlResponse(HttpResponse):
+    def __init__(self, filename: str):
+        from jutil.format import format_xml_file
+        content = format_xml_file(filename)
+        super().__init__(content)
+        self['Content-Type'] = 'application/xml'
+        self['Content-Length'] = len(content)
+        self['Content-Disposition'] = "attachment; filename={}".format(os.path.basename(filename))
