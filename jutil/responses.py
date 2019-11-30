@@ -4,6 +4,8 @@ from io import StringIO
 from django.http import HttpResponse, FileResponse, Http404
 from django.utils.translation import ugettext as _
 
+from jutil.format import format_xml
+
 
 class FileSystemFileResponse(FileResponse):
     """
@@ -47,10 +49,20 @@ class CsvFileResponse(HttpResponse):
         self['Content-Disposition'] = 'attachment;filename="{0}"'.format(filename)
 
 
-class FormattedXmlResponse(HttpResponse):
+class FormattedXmlFileResponse(HttpResponse):
     def __init__(self, filename: str):
         from jutil.format import format_xml_file
         content = format_xml_file(filename)
+        super().__init__(content)
+        self['Content-Type'] = 'application/xml'
+        self['Content-Length'] = len(content)
+        self['Content-Disposition'] = "attachment; filename={}".format(os.path.basename(filename))
+
+
+class FormattedXmlResponse(HttpResponse):
+    def __init__(self, content: bytes, filename: str):
+        from jutil.format import format_xml_file
+        content = format_xml(content)
         super().__init__(content)
         self['Content-Type'] = 'application/xml'
         self['Content-Length'] = len(content)
