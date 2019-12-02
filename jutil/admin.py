@@ -10,7 +10,7 @@ from django.http import HttpRequest, Http404, FileResponse
 from django.utils.timezone import now
 from jutil.format import format_timedelta
 from jutil.model import get_model_field_label_and_value
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from jutil.responses import FileSystemFileResponse
 
 
@@ -130,7 +130,7 @@ class ModelAdminBase(admin.ModelAdmin):
         from django.core.exceptions import PermissionDenied
         from django.utils.text import capfirst
         from django.utils.encoding import force_text
-        from django.utils.translation import ugettext as _
+        from django.utils.translation import gettext as _
 
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
@@ -178,7 +178,7 @@ class AdminLogEntryMixin(object):
     """
 
     def fields_changed(self, field_names: list, who: User, **kw):
-        from django.utils.translation import ugettext as _
+        from django.utils.translation import gettext as _
 
         fv_str = ''
         for k in field_names:

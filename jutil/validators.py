@@ -6,7 +6,7 @@ from random import randint
 
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from jutil.bank_const_iban import IBAN_LENGTH_BY_COUNTRY
 
 

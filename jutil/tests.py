@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.timezone import now
-from django.utils.translation import override, ugettext as _
+from django.utils.translation import override, gettext as _
 from jutil.command import get_date_range_by_name
 from jutil.dict import dict_to_html
 from jutil.request import get_ip_info

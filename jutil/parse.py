@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
 from dateutil.parser import parse as dateutil_parse
