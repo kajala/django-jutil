@@ -121,7 +121,8 @@ def xml_to_dict(xml_bytes: bytes, tags: list = [], array_tags: list = [], int_ta
 
     Returns: dict
     """
-    root = fromstring(xml_bytes)
+    from xml import etree
+    root = etree.ElementTree.fromstring(xml_bytes)
     if tags:
         if document_tag:
             raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list since selective tag list finds tags from the whole document, not only directly under root document tag')
