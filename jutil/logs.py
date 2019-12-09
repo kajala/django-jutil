@@ -7,7 +7,7 @@ from rest_framework.request import Request
 logger = logging.getLogger(__name__)
 
 
-def log_event(name: str, request: Request=None, data=None, ip=None):
+def log_event(name: str, request: Request or None = None, data: dict or None = None, ip: str = ''):
     """
     Logs consistent event for easy parsing/analysis.
     :param name: Name of the event. Will be logged as EVENT_XXX with XXX in capitals.

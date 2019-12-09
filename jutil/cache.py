@@ -1,11 +1,10 @@
 import logging
-from django.utils.timezone import now
 
 
 logger = logging.getLogger(__name__)
 
 
-class CachedFieldsMixin(object):
+class CachedFieldsMixin:
     """
     Cached fields mixin. Usage:
     1) List cached field names in cached_fields list
@@ -15,25 +14,25 @@ class CachedFieldsMixin(object):
     """
     cached_fields = []
 
-    def update_cached_fields(self, commit: bool=True, exceptions: bool=True, updated_fields: list=None):
+    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: list or None = None):
+        """
+        Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
+        :param commit: Save update fields to DB
+        :param exceptions: Raise exceptions or not
+        :param updated_fields: List of cached fields to update. Pass None for all cached fields.
+        """
         try:
-            """
-            Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
-            :param commit: Save update fields to DB
-            :param exceptions: Raise exceptions or not
-            :param updated_fields: List of cached fields to update. Pass None for all cached fields.
-            """
             fields = updated_fields or self.cached_fields
             for k in fields:
                 f = 'get_' + k
                 if not hasattr(self, f):
-                    raise Exception('Field {} marked as cached in {} but function get_{}() does not exist'.format(k, self, k))
+                    raise Exception('Field {k} marked as cached in {obj} but function get_{k}() does not exist'.format(k=k, obj=self))
                 v = self.__getattribute__(f)()
                 setattr(self, k, v)
             if commit:
                 self.save(update_fields=fields)
         except Exception as e:
-            logger.error('{}.update_cached_fields: {}'.format(self.__class__, e))
+            logger.error('%s.update_cached_fields: %s', self.__class__, e)
             if exceptions:
                 raise e
 

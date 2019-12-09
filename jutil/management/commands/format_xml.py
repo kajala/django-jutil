@@ -9,7 +9,7 @@ class Command(BaseCommand):
         parser.add_argument('filename', type=str)
         parser.add_argument('--encoding', type=str, default='UTF-8')
 
-    def handle(self, **options):
+    def handle(self, *args, **options):
         filename = options['filename']
         encoding = options['encoding']
         print(format_xml_file(filename, encoding=encoding).decode())

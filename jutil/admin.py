@@ -1,4 +1,4 @@
-import mimetypes
+
 import os
 from collections import OrderedDict
 
@@ -6,9 +6,9 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.http import HttpRequest, Http404, FileResponse
-from django.utils.timezone import now
-from jutil.format import format_timedelta
+from django.http import HttpRequest, Http404
+
+
 from jutil.model import get_model_field_label_and_value
 from django.utils.translation import gettext_lazy as _
 from jutil.responses import FileSystemFileResponse
@@ -31,7 +31,7 @@ def admin_log(instances, msg: str, who: User or None = None, **kw):
     # use system user if 'who' is missing
     if not who:
         username = settings.DJANGO_SYSTEM_USER if hasattr(settings, 'DJANGO_SYSTEM_USER') else 'system'
-        who, created = User.objects.get_or_create(username=username)
+        who = User.objects.get_or_create(username=username)[0]
 
     # append extra keyword attributes if any
     att_str = ''
@@ -104,10 +104,12 @@ class ModelAdminBase(admin.ModelAdmin):
         :param actions: dict of str: (callable, name, description)
         :return: OrderedDict
         """
+        # pylint:disable=unused-variable
         sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: x[1])
         sorted_actions = OrderedDict()
         for k, description in sorted_descriptions:
             sorted_actions[k] = actions[k]
+        # pylint:enable=unused-variable
         return sorted_actions
 
     def get_actions(self, request):
@@ -124,6 +126,7 @@ class ModelAdminBase(admin.ModelAdmin):
         return self.changelist_view(request, extra_context)
 
     def history_view(self, request, object_id, extra_context=None):
+        # pylint:disable=too-many-arguments,too-many-locals
         from django.template.response import TemplateResponse
         from django.contrib.admin.options import get_content_type_for_model
         from django.contrib.admin.utils import unquote
@@ -131,9 +134,8 @@ class ModelAdminBase(admin.ModelAdmin):
         from django.utils.text import capfirst
         from django.utils.encoding import force_text
         from django.utils.translation import gettext as _
-
-        "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
@@ -169,17 +171,16 @@ class ModelAdminBase(admin.ModelAdmin):
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context)
+        # pylint:enable=too-many-arguments,too-many-locals
 
 
-class AdminLogEntryMixin(object):
+class AdminLogEntryMixin:
     """
     Mixin for logging Django admin changes of models.
     Call fields_changed() on change events.
     """
 
     def fields_changed(self, field_names: list, who: User, **kw):
-        from django.utils.translation import gettext as _
-
         fv_str = ''
         for k in field_names:
             label, value = get_model_field_label_and_value(self, k)
@@ -189,7 +190,7 @@ class AdminLogEntryMixin(object):
         admin_log([who, self], msg, who, **kw)
 
 
-class AdminFileDownloadMixin(object):
+class AdminFileDownloadMixin:
     """
     Model Admin mixin for downloading uploaded files. Checks object permission before allowing download.
     """

@@ -1,4 +1,4 @@
-from pprint import pprint
+# pylint: disable=too-many-branches
 from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
@@ -17,7 +17,7 @@ def fi_iban_load_map(filename: str) -> dict:
     out = {}
     with open(filename, 'rt') as fp:
         lines = [line.strip().split(',') for line in fp.readlines()]
-        ver = lines.pop(0)
+        lines.pop(0)  # ver
         head = lines.pop(0)
         if head != ['National ID', 'BIC Code', 'Financial Institution Name']:
             raise ValidationError('Incompatible file content in {}'.format(filename))

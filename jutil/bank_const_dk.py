@@ -3546,4 +3546,3 @@ DK_BANK_CLEARING_MAP = {  # 3546
     '9942': 'Diba Bank',
     '9960': 'Forvaltningsinstituttet for Lokale Pengeinstitutter',
 }
-

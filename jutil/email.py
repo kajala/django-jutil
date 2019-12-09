@@ -1,10 +1,11 @@
+#pylint: disable=too-many-arguments,too-many-locals
 import logging
 
 
 logger = logging.getLogger(__name__)
 
 
-def send_email(recipients: list, subject: str, text: str, html: str='', sender: str='', files: list=[], exceptions: bool=False):
+def send_email(recipients: list, subject: str, text: str, html: str = '', sender: str = '', files: list or None = None, exceptions: bool = False):
     """
     :param recipients: List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
     :param subject: Subject of the email
@@ -22,6 +23,9 @@ def send_email(recipients: list, subject: str, text: str, html: str='', sender: 
     from os.path import basename
     from django.utils.timezone import now
     from jutil.logs import log_event
+
+    if files is None:
+        files = []
 
     try:
         # default sender to settings.DEFAULT_FROM_EMAIL
@@ -60,7 +64,7 @@ def send_email(recipients: list, subject: str, text: str, html: str='', sender: 
             to_email = sendgrid.Email()
             if isinstance(recipient, str):
                 to_email.email = recipient
-            elif (isinstance(recipient, list) or isinstance(recipient, tuple)) and len(recipient) == 2:
+            elif isinstance(recipient, (list, tuple)) and len(recipient) == 2:
                 to_email.name = recipient[0]
                 to_email.email = recipient[1]
             else:

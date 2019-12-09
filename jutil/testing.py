@@ -1,26 +1,10 @@
 import json
-from datetime import datetime, timedelta
-from os.path import join
-from pprint import pprint
-import pytz
-from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.test import TestCase
-from django.utils.timezone import now
-from jutil.request import get_ip_info
-from jutil.urls import url_equals, url_mod, url_host
-from jutil.xml import xml_to_dict, dict_to_element
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
-from jutil.dates import add_month, per_delta, per_month
-from jutil.format import format_full_name, format_xml
-from jutil.parse import parse_datetime
-from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
-    se_iban_validator, iban_filter_readable, email_filter
 
 
-class DefaultTestSetupMixin(object):
+class DefaultTestSetupMixin:
     user = None
     token = None
     api_client = None
@@ -70,7 +54,7 @@ class DefaultTestSetupMixin(object):
             raise Exception('HTTP {} {} {}: {} {}'.format('DELETE', status_code, path, data, reply))
         return reply
 
-    def add_test_user(self, email: str='test@example.com', password: str='test1234'):
+    def add_test_user(self, email: str = 'test@example.com', password: str = 'test1234'):
         """
         Add and login test user.
         :param email:
@@ -78,6 +62,6 @@ class DefaultTestSetupMixin(object):
         :return:
         """
         self.user = User.objects.create_user(email, email, password)
-        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.token = Token.objects.get_or_create(user=self.user)[0]
         self.api_client = APIClient()
         self.api_client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.token.key))

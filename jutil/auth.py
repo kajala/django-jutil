@@ -1,10 +1,9 @@
 from django.contrib.auth.models import User
-from django.db.models import QuerySet
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.request import Request
 
 
-def require_auth(request: Request, exceptions: bool=True) -> User:
+def require_auth(request: Request, exceptions: bool = True) -> User or None:
     """
     Returns authenticated User.
     :param request: HttpRequest
@@ -18,7 +17,7 @@ def require_auth(request: Request, exceptions: bool=True) -> User:
     return request.user
 
 
-class AuthUserMixin(object):
+class AuthUserMixin:
     @property
     def auth_user(self) -> User:
         """

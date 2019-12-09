@@ -3,7 +3,7 @@ from django.conf import settings
 from jutil.validators import phone_filter
 
 
-def send_sms(phone: str, message: str, sender: str='', **kw):
+def send_sms(phone: str, message: str, sender: str = '', **kw):
     """
     Sends SMS via Kajala Group SMS API. Contact info@kajala.com for access.
     :param phone: Phone number

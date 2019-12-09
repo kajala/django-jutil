@@ -33,13 +33,12 @@ def parse_bool(v, default = None, exceptions: bool = True) -> bool:
     s = str(v).lower()
     if s in TRUE_VALUES:
         return True
-    elif s in FALSE_VALUES:
+    if s in FALSE_VALUES:
         return False
-    else:
-        if exceptions:
-            msg = _("%(value)s is not one of the available choices") % {'value': v}
-            raise ValidationError(msg)
-        return default
+    if exceptions:
+        msg = _("%(value)s is not one of the available choices") % {'value': v}
+        raise ValidationError(msg)
+    return default
 
 
 def parse_datetime(v: str, default = None, tz = None, exceptions: bool = True) -> datetime:

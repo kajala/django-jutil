@@ -29,13 +29,13 @@ def get_model_field_label_and_value(instance, field_name) -> (str, str):
     for f in instance._meta.fields:
         if f.attname == field_name:
             label = f.verbose_name
-            if hasattr(f, 'choices') and len(f.choices) > 0:
+            if hasattr(f, 'choices') and f.choices:
                 value = choices_label(f.choices, value)
             break
     return label, force_text(value)
 
 
-def clone_model(instance, cls, commit: bool=True, exclude_fields: tuple=('id',), base_class_suffix: str='_ptr', **kw):
+def clone_model(instance, cls, commit: bool = True, exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr', **kw):
     """
     Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')

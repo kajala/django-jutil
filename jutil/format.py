@@ -148,13 +148,13 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
             return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])
         with open(full_path, 'rb') as fp:
             return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)
-    except Exception as e:
+    except Exception:
         if exceptions:
             raise
     try:
         with open(full_path, 'rb') as fp:
             return fp.read()
-    except Exception as e:
+    except Exception:
         pass
     return b''
 

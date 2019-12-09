@@ -153,7 +153,7 @@ def iban_validator(v: str):
         raise ValidationError(_('Invalid IBAN account number') + ' ({}.1): {}'.format(country, v), code='invalid_iban')
 
 
-def validate_country_iban(v: str, country: str, length: int):
+def validate_country_iban(v: str, country: str):
     v = iban_filter(v)
     if v[0:2] != country:
         raise ValidationError(_('Invalid IBAN account number') + ' ({}.2): {}'.format(country, v), code='invalid_iban')
@@ -172,8 +172,7 @@ def iban_bank_info(v: str) -> (str, str):
     func = globals().get(func_name)
     if func is not None:
         return func(v)
-    else:
-        return '', ''
+    return '', ''
 
 
 def iban_bic(v: str) -> str:
@@ -186,7 +185,7 @@ def iban_bic(v: str) -> str:
     return info[0] if info else ''
 
 
-def calculate_age(born: date, today: date or None=None) -> int:
+def calculate_age(born: date, today: date or None = None) -> int:
     if not today:
         today = now().date()
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -213,7 +212,7 @@ def validate_country_company_reg_id(country_code: str, v: str):
 # ----------------------------------------------------------------------------
 
 def be_iban_validator(v: str):
-    validate_country_iban(v, 'BE', IBAN_LENGTH_BY_COUNTRY.get('BE'))
+    validate_country_iban(v, 'BE')
 
 
 def be_iban_bank_info(v: str) -> (str, str):
@@ -233,7 +232,7 @@ def be_iban_bank_info(v: str) -> (str, str):
 # ----------------------------------------------------------------------------
 
 def dk_iban_validator(v: str):
-    validate_country_iban(v, 'DK', IBAN_LENGTH_BY_COUNTRY.get('DK'))
+    validate_country_iban(v, 'DK')
 
 
 def dk_clearing_code_bank_name(v: str) -> str:
@@ -259,7 +258,7 @@ def dk_iban_bank_info(v: str) -> (str, str):
 # ----------------------------------------------------------------------------
 
 def ee_iban_validator(v: str):
-    validate_country_iban(v, 'EE', IBAN_LENGTH_BY_COUNTRY.get('EE'))
+    validate_country_iban(v, 'EE')
 
 
 # ----------------------------------------------------------------------------
@@ -317,7 +316,7 @@ def iso_payment_reference_validator(v: str):
 
 
 def fi_iban_validator(v: str):
-    validate_country_iban(v, 'FI', IBAN_LENGTH_BY_COUNTRY.get('FI'))
+    validate_country_iban(v, 'FI')
 
 
 def fi_iban_bank_info(v: str) -> (str, str):
@@ -353,7 +352,7 @@ def fi_company_reg_id_validator(v0: str) -> str:
     x = 0
     for i, m in enumerate(multipliers):
         x += int(v[i]) * m
-    quotient, remainder = divmod(x, 11)
+    remainder = divmod(x, 11)[1]
     if remainder == 1:
         raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v0), code='invalid_company_reg_id')
     if remainder >= 2:
@@ -372,9 +371,7 @@ def fi_ssn_validator(v: str):
         17: 'J', 	18: 'K', 	19: 'L', 	20: 'M', 	21: 'N', 	22: 'P', 	23: 'R',
         24: 'S', 	25: 'T', 	26: 'U', 	27: 'V', 	28: 'W', 	29: 'X', 	30: 'Y',
     }
-    ch = str(d)
-    if d in digits:
-        ch = digits[d]
+    ch = digits.get(d, str(d))
     if ch != v[-1:]:
         raise ValidationError(_('Invalid personal identification number')+' (FI.2): {}'.format(v), code='invalid_ssn')
 
@@ -391,9 +388,7 @@ def fi_ssn_generator():
         17: 'J', 	18: 'K', 	19: 'L', 	20: 'M', 	21: 'N', 	22: 'P', 	23: 'R',
         24: 'S', 	25: 'T', 	26: 'U', 	27: 'V', 	28: 'W', 	29: 'X', 	30: 'Y',
     }
-    ch = str(d)
-    if d in digits:
-        ch = digits[d]
+    ch = digits.get(d, str(d))
     return v + ch
 
 
@@ -413,7 +408,7 @@ def fi_ssn_birthday(v: str) -> date:
     return date(year, month, day)
 
 
-def fi_ssn_age(ssn: str, today: date or None=None) -> int:
+def fi_ssn_age(ssn: str, today: date or None = None) -> int:
     return calculate_age(fi_ssn_birthday(ssn), today)
 
 
@@ -426,7 +421,7 @@ SE_SSN_VALIDATOR = re.compile(r'^\d{6}[-]\d{3}[\d]$')
 
 
 def se_iban_validator(v: str):
-    validate_country_iban(v, 'SE', IBAN_LENGTH_BY_COUNTRY.get('SE'))
+    validate_country_iban(v, 'SE')
 
 
 def se_ssn_filter(v: str) -> str:

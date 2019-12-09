@@ -24,7 +24,6 @@ class SafeCommand(BaseCommand):
     Uses list of emails from settings.ADMINS.
     Implement do() in derived classes.
     """
-
     def handle(self, *args, **options):
         try:
             if hasattr(settings, 'LANGUAGE_CODE'):
@@ -37,6 +36,9 @@ class SafeCommand(BaseCommand):
             if not settings.DEBUG:
                 send_email(settings.ADMINS, 'Error @ {}'.format(getpass.getuser()), msg)
 
+    def do(self, *args, **kwargs):
+        pass
+
 
 def add_date_range_arguments(parser: CommandParser):
     parser.add_argument('--begin', type=str)
@@ -47,7 +49,7 @@ def add_date_range_arguments(parser: CommandParser):
         parser.add_argument('--' + v.replace('_', '-'), action='store_true')
 
 
-def get_date_range_by_name(name: str, today: datetime=None, tz=None) -> (datetime, datetime):
+def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> (datetime, datetime):
     """
     :param name: yesterday, last_month
     :param today: Optional current datetime. Default is now().
@@ -58,35 +60,34 @@ def get_date_range_by_name(name: str, today: datetime=None, tz=None) -> (datetim
         today = datetime.utcnow()
     if name == 'last_month':
         return last_month(today, tz)
-    elif name == 'last_week':
+    if name == 'last_week':
         return last_week(today, tz)
-    elif name == 'this_month':
+    if name == 'this_month':
         return this_month(today, tz)
-    elif name == 'last_year':
+    if name == 'last_year':
         return last_year(today, tz)
-    elif name == 'yesterday':
+    if name == 'yesterday':
         return yesterday(today, tz)
-    elif name == 'today':
+    if name == 'today':
         begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
         end = begin + timedelta(hours=24)
         return localize_time_range(begin, end, tz)
-    else:
-        m = re.match(r'^plus_minus_(\d+)d$', name)
-        if m:
-            days = int(m.group(1))
-            return localize_time_range(today - timedelta(days=days), today + timedelta(days=days), tz)
-        m = re.match(r'^prev_(\d+)d$', name)
-        if m:
-            days = int(m.group(1))
-            return localize_time_range(today - timedelta(days=days), today, tz)
-        m = re.match(r'^next_(\d+)d$', name)
-        if m:
-            days = int(m.group(1))
-            return localize_time_range(today, today + timedelta(days=days), tz)
+    m = re.match(r'^plus_minus_(\d+)d$', name)
+    if m:
+        days = int(m.group(1))
+        return localize_time_range(today - timedelta(days=days), today + timedelta(days=days), tz)
+    m = re.match(r'^prev_(\d+)d$', name)
+    if m:
+        days = int(m.group(1))
+        return localize_time_range(today - timedelta(days=days), today, tz)
+    m = re.match(r'^next_(\d+)d$', name)
+    if m:
+        days = int(m.group(1))
+        return localize_time_range(today, today + timedelta(days=days), tz)
     raise ValueError('Invalid date range name: {}'.format(name))
 
 
-def parse_date_range_arguments(options: dict, default_range='last_month') -> (datetime, datetime, list):
+def parse_date_range_arguments(options: dict, default_range: str = 'last_month') -> (datetime, datetime, list):
     """
     :param options:
     :param default_range: Default datetime range to return if no other selected

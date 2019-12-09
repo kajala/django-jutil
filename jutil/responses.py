@@ -61,7 +61,6 @@ class FormattedXmlFileResponse(HttpResponse):
 
 class FormattedXmlResponse(HttpResponse):
     def __init__(self, content: bytes, filename: str):
-        from jutil.format import format_xml_file
         content = format_xml(content)
         super().__init__(content)
         self['Content-Type'] = 'application/xml'

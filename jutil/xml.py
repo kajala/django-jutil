@@ -1,4 +1,6 @@
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+# pylint: disable=too-many-arguments,too-many-locals
+from xml import etree
+from xml.etree.ElementTree import Element, SubElement
 
 
 def _xml_element_value(el: Element, is_int: bool = False):
@@ -15,7 +17,7 @@ def _xml_element_value(el: Element, is_int: bool = False):
     try:
         if is_int:
             return int(el.text)
-    except:
+    except Exception:
         pass
     # default to str if not empty
     s = str(el.text).strip()
@@ -83,7 +85,7 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
         data[tag] = obj
 
 
-def xml_to_dict(xml_bytes: bytes, tags: list = [], array_tags: list = [], int_tags: list = [],
+def xml_to_dict(xml_bytes: bytes, tags: list or None = None, array_tags: list or None = None, int_tags: list or None = None,
                 strip_namespaces: bool = True, parse_attributes: bool = True,
                 value_key: str = '@', attribute_prefix: str = '@',
                 document_tag: bool = False) -> dict:
@@ -121,11 +123,18 @@ def xml_to_dict(xml_bytes: bytes, tags: list = [], array_tags: list = [], int_ta
 
     Returns: dict
     """
-    from xml import etree
+    if tags is None:
+        tags = []
+    if array_tags is None:
+        array_tags = []
+    if int_tags is None:
+        int_tags = []
+
     root = etree.ElementTree.fromstring(xml_bytes)
     if tags:
         if document_tag:
-            raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list since selective tag list finds tags from the whole document, not only directly under root document tag')
+            raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list '
+                            'since selective tag list finds tags from the whole document, not only directly under root document tag')
         root_elements = []
         for tag in tags:
             root_elements.extend(root.iter(tag))
@@ -155,7 +164,7 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
             el.text = str(v)
         elif k.startswith(attribute_prefix):
             el.set(k[1:], str(v))
-        elif isinstance(v, list) or isinstance(v, tuple):
+        elif isinstance(v, (list, tuple)):
             for v2 in v:
                 el2 = SubElement(el, k)
                 assert isinstance(el2, Element)
@@ -170,7 +179,7 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
             el2.text = str(v)
 
 
-def dict_to_element(doc: dict, value_key: str='@', attribute_prefix: str='@') -> Element:
+def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@') -> Element:
     """
     Generates XML Element from dict.
     Generates complex elements by assuming element attributes are prefixed with '@', and value is stored to plain '@'

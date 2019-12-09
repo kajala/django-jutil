@@ -660,4 +660,3 @@ FI_BANK_NAME_BY_BIC = {  # 13
     'SBANFIHH': 'S-Pankki',
     'SWEDFIHH': 'Swedbank',
 }
-

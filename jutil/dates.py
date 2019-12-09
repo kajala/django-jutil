@@ -46,7 +46,7 @@ def get_last_day_of_month(t: datetime) -> int:
     return tt.day
 
 
-def localize_time_range(begin: datetime, end: datetime, tz=None) -> (datetime, datetime):
+def localize_time_range(begin: datetime, end: datetime, tz = None) -> (datetime, datetime):
     """
     Localizes time range. Uses pytz.utc if None provided.
     :param begin: Begin datetime
@@ -59,7 +59,7 @@ def localize_time_range(begin: datetime, end: datetime, tz=None) -> (datetime, d
     return tz.localize(begin), tz.localize(end)
 
 
-def this_week(today: datetime=None, tz=None):
+def this_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns this week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -73,7 +73,7 @@ def this_week(today: datetime=None, tz=None):
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def this_month(today: datetime=None, tz=None):
+def this_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns current month begin (inclusive) and end (exclusive).
     :param today: Some date in the month (defaults current datetime)
@@ -88,7 +88,7 @@ def this_month(today: datetime=None, tz=None):
     return localize_time_range(begin, end, tz)
 
 
-def next_week(today: datetime=None, tz=None):
+def next_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns next week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -102,7 +102,7 @@ def next_week(today: datetime=None, tz=None):
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def next_month(today: datetime=None, tz=None):
+def next_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns next month begin (inclusive) and end (exclusive).
     :param today: Some date in the month (defaults current datetime)
@@ -119,7 +119,7 @@ def next_month(today: datetime=None, tz=None):
     return localize_time_range(begin, end, tz)
 
 
-def last_week(today: datetime=None, tz=None):
+def last_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns last week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -133,7 +133,7 @@ def last_week(today: datetime=None, tz=None):
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def last_month(today: datetime=None, tz=None):
+def last_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns last month begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -148,7 +148,7 @@ def last_month(today: datetime=None, tz=None):
     return localize_time_range(begin, end, tz)
 
 
-def last_year(today: datetime=None, tz=None):
+def last_year(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns last year begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -163,7 +163,7 @@ def last_year(today: datetime=None, tz=None):
     return localize_time_range(begin, end, tz)
 
 
-def yesterday(today: datetime=None, tz=None):
+def yesterday(today: datetime or None = None, tz = None) -> (datetime, datetime):
     """
     Returns yesterday begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -178,7 +178,7 @@ def yesterday(today: datetime=None, tz=None):
     return localize_time_range(begin, end, tz)
 
 
-def add_month(t: datetime, n: int=1) -> datetime:
+def add_month(t: datetime, n: int = 1) -> datetime:
     """
     Adds +- n months to datetime.
     Clamps to number of days in given month.
@@ -186,6 +186,7 @@ def add_month(t: datetime, n: int=1) -> datetime:
     :param n: count
     :return: datetime
     """
+    #pylint: disable=unused-variable
     t2 = t
     for count in range(abs(n)):
         if n > 0:
@@ -195,8 +196,9 @@ def add_month(t: datetime, n: int=1) -> datetime:
         try:
             t2 = t.replace(year=t2.year, month=t2.month)
         except Exception:
-            first, last = monthrange(t2.year, t2.month)
+            last = monthrange(t2.year, t2.month)[1]
             t2 = t.replace(year=t2.year, month=t2.month, day=last)
+    #pylint: enable=unused-variable
     return t2
 
 
@@ -217,7 +219,7 @@ def per_delta(start: datetime, end: datetime, delta: timedelta):
         curr = curr_end
 
 
-def per_month(start: datetime, end: datetime, n: int=1):
+def per_month(start: datetime, end: datetime, n: int = 1):
     """
     Iterates over time range in one month steps.
     Clamps to number of days in given month.

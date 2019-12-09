@@ -1,5 +1,5 @@
+# pylint: disable=too-many-branches
 import csv
-import re
 from copy import copy
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
@@ -22,8 +22,6 @@ def dk_iban_load_map(filename: str) -> list:
     :return: list of (code, name)
     """
     data_list = []
-    name_repl = {
-    }
     with open(filename) as fp:
         for row in csv.reader(fp):
             if len(row) >= 2 and is_int(row[0]) and row[1]:
@@ -40,7 +38,6 @@ class Command(SafeCommand):
 
     def do(self, *args, **kw):
         new_bank_list = dk_iban_load_map(kw['filename']) if kw['filename'] else []
-        # pprint(bank_list)
 
         from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
         bank_data = dict(copy(DK_BANK_CLEARING_MAP))

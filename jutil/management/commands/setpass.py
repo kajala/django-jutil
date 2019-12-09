@@ -10,11 +10,11 @@ class Command(BaseCommand):
         parser.add_argument('name', type=str)
         parser.add_argument('password', type=str)
 
-    def handle(self, **options):
+    def handle(self, *args, **options):
         name = options['name']
         passwd = options['password']
         users = User.objects.filter(Q(username=name) | Q(email=name))
-        if len(users) == 0:
+        if not users:
             print('User not found')
         for user in users:
             assert isinstance(user, User)

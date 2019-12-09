@@ -1,12 +1,9 @@
+# pylint: disable=too-many-branches,too-many-nested-blocks,too-many-locals
 import csv
 import re
 from copy import copy
-from pprint import pprint
-from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
-from jutil.dict import sorted_dict
-from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 
 
 def se_iban_load_map(filename: str) -> list:
@@ -38,8 +35,7 @@ def se_iban_load_map(filename: str) -> list:
 
                 # clean up name
                 name = re.sub(r'\n.*', '', name)
-                if name in name_repl:
-                    name = name_repl[name]
+                name = name_repl.get(name, name)
 
                 # clean up series
                 ml_acc_digits = acc_digits.split('\n')
@@ -88,10 +84,12 @@ class Command(SafeCommand):
         bank_list = list(copy(SE_BANK_CLEARING_LIST))
         for name, begin, end, acc_digits in new_bank_list:
             exists = False
+            #pylint: disable=unused-variable
             for name0, begin0, end0, acc_digits0 in bank_list:
                 if begin0 == begin and end0 == end:
                     exists = True
                     break
+            #pylint: enable=unused-variable
             if not exists:
                 bank_list.append((name, begin, end, acc_digits))
 
