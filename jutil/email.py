@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def send_email(recipients: list, subject: str, text: str, html: str = '', sender: str = '', files: list or None = None, exceptions: bool = False):
+def send_email(recipients: list, subject: str, text: str, html: str = '', sender: str = '', files: list or None = None, exceptions: bool = False):  # noqa: C901
     """
     :param recipients: List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
     :param subject: Subject of the email
