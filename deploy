@@ -1,3 +1,11 @@
+source venv/bin/activate
+prospector
+if [ "$?" != "0" ]; then
+    echo "Prospector reported problems, terminating release"
+    exit 1
+fi
+echo "Prospector cleared build, proceeding..."
+
 DIR=`pwd`
 PROJECT=`basename $DIR`
 REL=`parse-setup-version.py`
