@@ -45,6 +45,9 @@ pip install django-jutil
 Changes
 =======
 
+2.3.2:
++ Prospector clean & checked when making new release
+
 2.3.1:
 + Cleanup related to prospector results (https://pypi.org/project/prospector/)
 
