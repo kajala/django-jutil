@@ -7,7 +7,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.http import HttpRequest, Http404
-
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from jutil.model import get_model_field_label_and_value
 from django.utils.translation import gettext_lazy as _
@@ -211,6 +213,16 @@ class AdminFileDownloadMixin:
         if not obj:
             raise Http404(_('File {} not found').format(filename))
         return self.get_object(request, obj.id)  # for permission check
+
+    def get_download_url(self, obj, file_field: str = '') -> str:
+        obj_id = obj.pk
+        filename = getattr(obj, self.file_field if not file_field else file_field)
+        info = self.model._meta.app_label, self.model._meta.model_name
+        return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
+
+    def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:
+        label = label or getattr(obj, self.file_field if not file_field else file_field)
+        return mark_safe(format_html('<a href="{}">{}</a>', self.get_download_url(obj, file_field), label))
 
     def file_download_view(self, request, filename, form_url='', extra_context=None):
         full_path = os.path.join(settings.MEDIA_ROOT, filename)
