@@ -362,7 +362,6 @@ def fi_company_reg_id_validator(v0: str) -> str:
 
 
 def fi_company_reg_id_generator() -> str:
-    from random import randint
     remainder = 1
     v = ''
     while remainder < 2:
