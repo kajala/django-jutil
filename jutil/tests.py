@@ -24,7 +24,8 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_reg_id_validator, \
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
     se_clearing_code_bank_info, ascii_filter, ee_iban_validator, be_iban_validator, dk_iban_validator, \
-    dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer
+    dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer, \
+    fi_company_reg_id_generator
 
 
 class Tests(TestCase):
@@ -298,6 +299,10 @@ class Tests(TestCase):
             except ValidationError:
                 # print('ok')
                 pass
+        for n in range(10):
+            v0 = fi_company_reg_id_generator()
+            # print(v0)
+            fi_company_reg_id_validator(v0)
 
     def test_reference_number_validators(self):
         valid_fi_refs = [

@@ -361,6 +361,21 @@ def fi_company_reg_id_validator(v0: str) -> str:
             raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v0), code='invalid_company_reg_id')
 
 
+def fi_company_reg_id_generator() -> str:
+    from random import randint
+    remainder = 1
+    v = ''
+    while remainder < 2:
+        v = str(randint(11111111, 99999999))
+        multipliers = (7, 9, 10, 5, 8, 4, 2)
+        x = 0
+        for i, m in enumerate(multipliers):
+            x += int(v[i]) * m
+        remainder = divmod(x, 11)[1]
+    check_digit = str(11 - remainder)
+    return v[:-1] + '-' + check_digit
+
+
 def fi_ssn_validator(v: str):
     v = fi_ssn_filter(v)
     if not FI_SSN_VALIDATOR.fullmatch(v):
