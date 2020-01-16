@@ -40,29 +40,30 @@ def _dict_to_html_format_key(k: str):
     return ' '.join(out)
 
 
-def _dict_to_html_r(data: dict, margin: str = '') -> str:
+def _dict_to_html_r(data: dict, margin: str = '', format_keys: bool = True) -> str:
     if not isinstance(data, dict):
         return '{}{}\n'.format(margin, data)
     out = ''
     for k, v in sorted_dict(data).items():
         if isinstance(v, dict):
-            out += '{}{}:\n'.format(margin, _dict_to_html_format_key(k))
-            out += _dict_to_html_r(v, margin + '    ')
+            out += '{}{}:\n'.format(margin, _dict_to_html_format_key(k) if format_keys else k)
+            out += _dict_to_html_r(v, margin + '    ', format_keys=format_keys)
             out += '\n'
         elif isinstance(v, list):
             for v2 in v:
-                out += '{}{}:\n'.format(margin, _dict_to_html_format_key(k))
-                out += _dict_to_html_r(v2, margin + '    ')
+                out += '{}{}:\n'.format(margin, _dict_to_html_format_key(k) if format_keys else k)
+                out += _dict_to_html_r(v2, margin + '    ', format_keys=format_keys)
             out += '\n'
         else:
-            out += '{}{}: {}\n'.format(margin, _dict_to_html_format_key(k), v)
+            out += '{}{}: {}\n'.format(margin, _dict_to_html_format_key(k) if format_keys else k, v)
     return out
 
 
-def dict_to_html(data: dict) -> str:
+def dict_to_html(data: dict, format_keys: bool = True) -> str:
     """
     Formats dict to simple pre-formatted html (<pre> tag).
     :param data: dict
+    :param format_keys: Re-format 'additionalInfo' and 'additional_info' type of keys as 'Additional info'
     :return: str (html)
     """
-    return '<pre>' + _dict_to_html_r(data) + '</pre>'
+    return '<pre>' + _dict_to_html_r(data, format_keys=format_keys) + '</pre>'
