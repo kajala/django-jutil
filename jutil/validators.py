@@ -191,15 +191,15 @@ def calculate_age(born: date, today: date or None = None) -> int:
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def filter_country_company_reg_id(country_code: str, v: str):
+def filter_country_company_org_id(country_code: str, v: str):
     if country_code == 'FI':
-        return fi_company_reg_id_filter(v)
+        return fi_company_org_id_filter(v)
     return PASSPORT_FILTER.sub('', v)
 
 
-def validate_country_company_reg_id(country_code: str, v: str):
+def validate_country_company_org_id(country_code: str, v: str):
     if country_code == 'FI':
-        fi_company_reg_id_validator(v)
+        fi_company_org_id_validator(v)
 
 
 # ============================================================================
@@ -267,7 +267,7 @@ def ee_iban_validator(v: str):
 
 FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
 FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
-FI_COMPANY_REG_ID_FILTER = re.compile(r'[^0-9]')
+FI_COMPANY_ORG_ID_FILTER = re.compile(r'[^0-9]')
 
 
 def fi_payment_reference_number(num: str):
@@ -335,33 +335,33 @@ def fi_ssn_filter(v: str) -> str:
     return FI_SSN_FILTER.sub('', v.upper())
 
 
-def fi_company_reg_id_filter(v: str) -> str:
-    v = FI_COMPANY_REG_ID_FILTER.sub('', v)
+def fi_company_org_id_filter(v: str) -> str:
+    v = FI_COMPANY_ORG_ID_FILTER.sub('', v)
     return v[:-1] + '-' + v[-1:] if len(v) >= 2 else ''
 
 
-def fi_company_reg_id_validator(v0: str) -> str:
-    v = fi_company_reg_id_filter(v0)
+def fi_company_org_id_validator(v0: str) -> str:
+    v = fi_company_org_id_filter(v0)
     prefix = v[:2]
     if v[-2:-1] != '-' and prefix != 'FI':
-        raise ValidationError(_('Invalid company registration ID')+' (FI.1): {}'.format(v0), code='invalid_company_reg_id')
+        raise ValidationError(_('Invalid company organization ID')+' (FI.1): {}'.format(v0), code='invalid_company_org_id')
     v = v.replace('-', '', 1)
     if len(v) != 8:
-        raise ValidationError(_('Invalid company registration ID')+' (FI.2): {}'.format(v0), code='invalid_company_reg_id')
+        raise ValidationError(_('Invalid company organization ID')+' (FI.2): {}'.format(v0), code='invalid_company_org_id')
     multipliers = (7, 9, 10, 5, 8, 4, 2)
     x = 0
     for i, m in enumerate(multipliers):
         x += int(v[i]) * m
     remainder = divmod(x, 11)[1]
     if remainder == 1:
-        raise ValidationError(_('Invalid company registration ID')+' (FI.3): {}'.format(v0), code='invalid_company_reg_id')
+        raise ValidationError(_('Invalid company organization ID')+' (FI.3): {}'.format(v0), code='invalid_company_org_id')
     if remainder >= 2:
         check_digit = str(11 - remainder)
         if check_digit != v[-1:]:
-            raise ValidationError(_('Invalid company registration ID')+' (FI.4): {}'.format(v0), code='invalid_company_reg_id')
+            raise ValidationError(_('Invalid company organization ID')+' (FI.4): {}'.format(v0), code='invalid_company_org_id')
 
 
-def fi_company_reg_id_generator() -> str:
+def fi_company_org_id_generator() -> str:
     remainder = 1
     v = ''
     while remainder < 2:
