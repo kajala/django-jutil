@@ -28,6 +28,8 @@ def send_email(recipients: list, subject: str,  # noqa
     import sendgrid
     from sendgrid.helpers.mail import Content, Mail, Attachment
     from sendgrid import Personalization
+    from sendgrid import TrackingSettings
+    from sendgrid import ClickTracking
     from django.conf import settings
     from base64 import b64encode
     from os.path import basename
@@ -80,6 +82,9 @@ def send_email(recipients: list, subject: str,  # noqa
 
         mail = Mail(from_email=from_email, subject=subject, plain_text_content=text_content, html_content=html_content)
         mail.add_personalization(personalization)
+
+        # stop SendGrid from replacing all links in the email
+        mail.tracking_settings = TrackingSettings(click_tracking=ClickTracking(enable=False))
 
         for filename in files:
             with open(filename, 'rb') as fp:

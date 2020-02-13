@@ -17,7 +17,7 @@ class Command(SafeCommand):
         files = kw['attach'] if kw['attach'] else []
         subject = 'hello ' + now().isoformat()
         text = 'body text'
-        html = '<h1>html text</h1>'
+        html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
         sender = '"Kajala Group Asiakaspalvelu" <asiakaspalvelu@kajala.com>'
         res = send_email(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'])
         print('send_email returned', res)
