@@ -9,6 +9,8 @@ class Command(SafeCommand):
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument('email', type=str)
+        parser.add_argument('--cc', type=str)
+        parser.add_argument('--bcc', type=str)
         parser.add_argument('--attach', type=str, nargs='*')
 
     def do(self, *args, **kw):
@@ -17,5 +19,5 @@ class Command(SafeCommand):
         text = 'body text'
         html = '<h1>html text</h1>'
         sender = '"Kajala Group Asiakaspalvelu" <asiakaspalvelu@kajala.com>'
-        res = send_email(kw['email'], subject, text, html, sender, files)
+        res = send_email(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'])
         print('send_email returned', res)
