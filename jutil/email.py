@@ -27,9 +27,8 @@ def send_email(recipients: list, subject: str,  # noqa
     """
     import sendgrid
     from sendgrid.helpers.mail import Content, Mail, Attachment
-    from sendgrid import Personalization
-    from sendgrid import TrackingSettings
-    from sendgrid import ClickTracking
+    from sendgrid import ClickTracking, FileType, FileName, TrackingSettings, Personalization
+    from sendgrid import FileContent, ContentId, Disposition
     from django.conf import settings
     from base64 import b64encode
     from os.path import basename
@@ -89,11 +88,11 @@ def send_email(recipients: list, subject: str,  # noqa
         for filename in files:
             with open(filename, 'rb') as fp:
                 attachment = Attachment()
-                attachment.content = b64encode(fp.read()).decode()
-                attachment.type = "application/octet-stream"
-                attachment.filename = basename(filename)
-                attachment.content_id = basename(filename)
-                attachment.disposition = "attachment"
+                attachment.file_type = FileType("application/octet-stream")
+                attachment.file_name = FileName(basename(filename))
+                attachment.file_content = FileContent(b64encode(fp.read()).decode())
+                attachment.content_id = ContentId(basename(filename))
+                attachment.disposition = Disposition("attachment")
                 mail.add_attachment(attachment)
 
         send_time = now()

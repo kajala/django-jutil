@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.core.management.base import CommandParser
 from django.utils.timezone import now
 from jutil.command import SafeCommand
@@ -15,6 +18,8 @@ class Command(SafeCommand):
 
     def do(self, *args, **kw):
         files = kw['attach'] if kw['attach'] else []
+        if not files:
+            files.append(os.path.join(settings.BASE_DIR, 'data/attachment.jpg'))
         subject = 'hello ' + now().isoformat()
         text = 'body text'
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
