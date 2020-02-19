@@ -12,7 +12,7 @@ def parse_sftp_connection(connection: str, exceptions: bool = True) -> (str, str
     Returns the match if hostname can be parsed correctly.
     :param connection: str
     :param exceptions: bool
-    :return: username, password, host, remote_path
+    :return: sftp_username, sftp_password, sftp_host, sftp_path
     """
     username, password, host, remote_path = '', '', '', ''
     m = SFTP_CONNECTION_STRING_REGEX_1.match(connection)
@@ -33,6 +33,8 @@ def parse_sftp_connection(connection: str, exceptions: bool = True) -> (str, str
             if len(key_value_pair) == 2:
                 k, v = key_value_pair
                 k = k.lower()
+                if k.startswith('sftp_'):
+                    k = k[5:]
                 if k in ('username', 'user'):
                     username = v
                 elif k in ('password', 'passwd', 'pass'):
