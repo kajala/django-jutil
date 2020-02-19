@@ -13,6 +13,7 @@ from django.utils.translation import override, gettext as _
 from jutil.command import get_date_range_by_name
 from jutil.dict import dict_to_html
 from jutil.request import get_ip_info
+from jutil.sftp import parse_sftp_connection
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element
 from rest_framework.test import APIClient
@@ -407,3 +408,18 @@ class Tests(TestCase):
         self.assertEqual(dst, dst_ref)
         dst = format_xml_bytes(src)
         self.assertEqual(dst, dst_ref.encode())
+
+    def test_parse_sftp(self):
+        test_cases = [
+            ('jani@kajala.com', ['jani', '', 'kajala.com', '']),
+            ('jani.kajala:1231!@kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
+            ('jani:1231!@kajala.com:/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
+            ('jani.kajala:1231!@kajala.com:my/dir', ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
+            ('user=jani;host=kajala.com', ['jani', '', 'kajala.com', '']),
+            ('user=jani.kajala;pass=1231!;host=kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
+            ('user=jani;pass=1231!;host=kajala.com;path=/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
+            ('user=jani.kajala;pass=1231!;host=kajala.com;path=my/dir', ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
+        ]
+        for connection, ref_res in test_cases:
+            res = parse_sftp_connection(connection)
+            self.assertListEqual(list(res), ref_res, 'SFTP connection string "{}" parsed incorrectly'.format(connection))
