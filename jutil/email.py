@@ -13,7 +13,7 @@ def send_email(recipients: list, subject: str,  # noqa
                bcc_recipients: list or None = None,
                exceptions: bool = False):
     """
-    Sends email using SendGrid API client.
+    Sends email using SendGrid API client. Requires settings EMAIL_SENDGRID_API_KEY to be set.
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :param subject: Subject of the email
     :param text: Body (text), optional
