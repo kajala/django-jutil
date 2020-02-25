@@ -42,6 +42,12 @@ Install
 pip install django-jutil
 
 
+Test Code Coverage
+==================
+
+* `coverage run manage.py; coverage report`
+
+
 Changes
 =======
 

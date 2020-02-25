@@ -1,25 +1,29 @@
-import json
-import os
 from datetime import datetime, timedelta, date
+from decimal import Decimal
 from os.path import join
-from pprint import pprint
 import pytz
 from django.conf import settings
+from django.contrib.admin.models import LogEntry
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.management import CommandParser
 from django.test import TestCase
-from django.utils.timezone import now
 from django.utils.translation import override, gettext as _
-from jutil.command import get_date_range_by_name
+from jutil.admin import admin_log, admin_obj_url, admin_obj_link
+from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html
 from jutil.request import get_ip_info
 from jutil.sftp import parse_sftp_connection
+from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element
 from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
-from jutil.format import format_full_name, format_xml, format_xml_bytes
+from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
+    dec6
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -29,9 +33,9 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     fi_company_org_id_generator
 
 
-class Tests(TestCase):
+class Tests(TestCase, DefaultTestSetupMixin):
     def setUp(self):
-        pass
+        self.add_test_user()
 
     def tearDown(self):
         pass
@@ -423,3 +427,35 @@ class Tests(TestCase):
         for connection, ref_res in test_cases:
             res = parse_sftp_connection(connection)
             self.assertListEqual(list(res), ref_res, 'SFTP connection string "{}" parsed incorrectly'.format(connection))
+
+    def test_admin(self):
+        obj = self.user
+        admin_log([obj], 'Hello, world')
+        e = LogEntry.objects.all().filter(object_id=obj.id).last()
+        self.assertIsNotNone(e)
+        assert isinstance(e, LogEntry)
+        self.assertEqual(e.change_message, 'Hello, world')
+        self.assertEqual(admin_obj_url(obj, 'admin:auth_user_change'), '/admin/auth/user/{}/change/'.format(obj.id))
+        link = admin_obj_link(obj, 'User', 'admin:auth_user_change')
+        self.assertEqual(link, "<a href='/admin/auth/user/{}/change/'>User</a>".format(obj.id))
+
+    def test_cmd_parser(self):
+        parser = CommandParser()
+        add_date_range_arguments(parser)
+        argv = parser.parse_args(['--begin', '2019-06-25', '--end', '2020-02-01'])
+        options = argv.__dict__
+        begin, end, steps = parse_date_range_arguments(options)
+        self.assertEqual(begin, pytz.utc.localize(datetime(2019, 6, 25)))
+        self.assertEqual(end, pytz.utc.localize(datetime(2020, 2, 1)))
+
+    def test_format_timedelta(self):
+        self.assertEqual(format_timedelta(timedelta(seconds=90), include_seconds=True), '1min30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=90), include_seconds=False), '1min')
+
+    def test_dec123456(self):
+        self.assertEqual(dec1(Decimal('1.2345678')), Decimal('1.2'))
+        self.assertEqual(dec2(Decimal('1.2345678')), Decimal('1.23'))
+        self.assertEqual(dec3(Decimal('1.2345678')), Decimal('1.235'))
+        self.assertEqual(dec4(Decimal('1.2345678')), Decimal('1.2346'))
+        self.assertEqual(dec5(Decimal('1.2345678')), Decimal('1.23457'))
+        self.assertEqual(dec6(Decimal('1.2345678')), Decimal('1.234568'))

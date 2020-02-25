@@ -50,10 +50,11 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20):
     return full_name
 
 
-def format_timedelta(dt: timedelta) -> str:
+def format_timedelta(dt: timedelta, include_seconds: bool = True) -> str:
     """
-    Formats timedelta to readable format, e.g. 1h30min.
+    Formats timedelta to readable format, e.g. 1h30min15s.
     :param dt: timedelta
+    :param include_seconds: If seconds should be included in formatted string. Default is True.
     :return: str
     """
     seconds = int(dt.total_seconds())
@@ -67,6 +68,8 @@ def format_timedelta(dt: timedelta) -> str:
         s += str(hours) + "h"
     if minutes > 0:
         s += str(minutes) + "min"
+    if seconds > 0 and include_seconds:
+        s += str(seconds) + "s"
     if s == "":
         s = "0min"
     return s
