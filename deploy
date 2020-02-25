@@ -14,6 +14,7 @@ echo $FILE
 cd dist
 tar xvf "$FILE.tar.gz"
 rm -rf "$FILE/venv"
+rm -rf "$FILE/data"
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
 rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
