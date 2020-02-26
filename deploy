@@ -1,4 +1,4 @@
-DIR=`pwd`
+7DIR=`pwd`
 PROJECT=`basename $DIR`
 REL=`parse-setup-version.py`
 echo "Making release $REL of $PROJECT"
@@ -15,6 +15,7 @@ cd dist
 tar xvf "$FILE.tar.gz"
 rm -rf "$FILE/venv"
 rm -rf "$FILE/data"
+rm -rf "$FILE/linecalc.conf"
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
 rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
@@ -22,3 +23,4 @@ rm -rf $FILE
 cd ..
 
 twine upload dist/$FILE.tar.gz
+
