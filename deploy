@@ -1,4 +1,4 @@
-7DIR=`pwd`
+DIR=`pwd`
 PROJECT=`basename $DIR`
 REL=`parse-setup-version.py`
 echo "Making release $REL of $PROJECT"
