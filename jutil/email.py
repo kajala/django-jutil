@@ -1,7 +1,7 @@
 #pylint: disable=too-many-arguments,too-many-locals
 import logging
 from django.conf import settings
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.utils.timezone import now
 from jutil.logs import log_event
 
@@ -156,7 +156,7 @@ def send_email_smtp(recipients: list, subject: str,  # noqa
         EMAIL_HOST = 'smtp.gmail.com'
         EMAIL_PORT = 587
         EMAIL_HOST_USER = 'xxxx@gmail.com'
-        EMAIL_HOST_PASSWORD = 'xxxx'
+        EMAIL_HOST_PASSWORD = 'xxxx'  # noqa
         EMAIL_USE_TLS = True
 
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
@@ -170,8 +170,6 @@ def send_email_smtp(recipients: list, subject: str,  # noqa
     :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :return: Status code 202 if emails were sent successfully
     """
-    from django.core.mail import send_mail
-
     if files is None:
         files = []
     if cc_recipients is None:
