@@ -239,7 +239,7 @@ class AdminFileDownloadMixin:
         return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
 
     def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:
-        label = label or getattr(obj, self.file_field if not file_field else file_field).label
+        label = str(label or getattr(obj, self.file_field if not file_field else file_field))
         return mark_safe(format_html('<a href="{}">{}</a>', self.get_download_url(obj, file_field), label))
 
     def file_download_view(self, request, filename, form_url='', extra_context=None):
