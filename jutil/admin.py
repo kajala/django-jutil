@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpRequest, Http404
 from django.urls import reverse
 from django.utils.html import format_html
@@ -197,6 +198,16 @@ class AdminFileDownloadMixin:
     """
     upload_to = 'uploads'
     file_field = 'file'
+    file_fields = []
+
+    def get_file_fields(self) -> list:
+        if self.file_fields and self.file_field:
+            raise AssertionError('Invalid configuration: AdminFileDownloadMixin cannot have both file_fields and file_field set ({})'.format(self.__class__))
+        out = set()
+        for f in self.file_fields or [self.file_field]:
+            if f:
+                out.add(f)
+        return list(out)
 
     def get_object_by_filename(self, request, filename):
         """
@@ -206,21 +217,29 @@ class AdminFileDownloadMixin:
         :param filename: File name of the downloaded object.
         :return: owner object
         """
-        kw = dict()
-        kw[self.file_field] = filename
-        obj = self.get_queryset(request).filter(**kw).first()
-        if not obj:
-            raise Http404(_('File {} not found').format(filename))
-        return self.get_object(request, obj.id)  # for permission check
+        query = None
+        for k in self.get_file_fields():
+            query_params = {k: filename}
+            if query is None:
+                query = Q(**query_params)
+            else:
+                query = query | Q(**query_params)
+        objs = self.get_queryset(request).filter(query)
+        for obj in objs:
+            try:
+                return self.get_object(request, obj.id)  # for permission check
+            except Exception:
+                pass
+        raise Http404(_('File {} not found').format(filename))
 
     def get_download_url(self, obj, file_field: str = '') -> str:
         obj_id = obj.pk
-        filename = getattr(obj, self.file_field if not file_field else file_field)
+        filename = getattr(obj, self.file_field if not file_field else file_field).name
         info = self.model._meta.app_label, self.model._meta.model_name
         return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
 
     def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:
-        label = label or getattr(obj, self.file_field if not file_field else file_field)
+        label = label or getattr(obj, self.file_field if not file_field else file_field).label
         return mark_safe(format_html('<a href="{}">{}</a>', self.get_download_url(obj, file_field), label))
 
     def file_download_view(self, request, filename, form_url='', extra_context=None):
