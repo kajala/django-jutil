@@ -14,6 +14,7 @@ from django.utils.translation import override, gettext as _
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html
+from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
 from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
@@ -459,3 +460,24 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(dec4(Decimal('1.2345678')), Decimal('1.2346'))
         self.assertEqual(dec5(Decimal('1.2345678')), Decimal('1.23457'))
         self.assertEqual(dec6(Decimal('1.2345678')), Decimal('1.234568'))
+
+    def test_model_funcs(self):
+        admin_log([self.user], 'test msg 1')
+        obj = LogEntry.objects.all().order_by('-pk').last()
+        assert isinstance(obj, LogEntry)
+        self.assertFalse(is_model_field_changed(obj, 'change_message'))
+        obj.change_message = 'hello world'
+        self.assertTrue(is_model_field_changed(obj, 'change_message'))
+        obj.save()
+        self.assertFalse(is_model_field_changed(obj, 'change_message'))
+        obj2 = clone_model(obj)
+        assert isinstance(obj2, LogEntry)
+        self.assertEqual(obj.change_message, obj2.change_message)
+        self.assertGreater(obj2.pk, obj.pk)
+        label, val = get_model_field_label_and_value(obj, 'action_time')
+        self.assertEqual(label, _('action time'))
+        self.assertEqual(str(obj.action_time), val)
+        obj_b = get_object_or_none(obj.__class__, id=obj.id)
+        self.assertEqual(obj_b.id, obj.id)
+        obj_b = get_object_or_none(obj.__class__, id=-1)
+        self.assertIsNone(obj_b)
