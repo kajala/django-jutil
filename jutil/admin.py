@@ -1,6 +1,7 @@
 
 import os
 from collections import OrderedDict
+from typing import List
 
 from django.conf import settings
 from django.conf.urls import url
@@ -200,14 +201,23 @@ class AdminFileDownloadMixin:
     file_field = 'file'
     file_fields = []
 
-    def get_file_fields(self) -> list:
+    def get_file_fields(self) -> List[str]:
         if self.file_fields and self.file_field:
             raise AssertionError('Invalid configuration: AdminFileDownloadMixin cannot have both file_fields and file_field set ({})'.format(self.__class__))
         out = set()
         for f in self.file_fields or [self.file_field]:
             if f:
                 out.add(f)
+        if not out:
+            raise AssertionError('Invalid configuration: AdminFileDownloadMixin must have either file_fields or file_field set ({})'.format(self.__class__))
         return list(out)
+
+    @property
+    def single_file_field(self) -> str:
+        out = self.get_file_fields()
+        if len(out) != 1:
+            raise AssertionError('Invalid configuration: AdminFileDownloadMixin has multiple file fields, you need to specify field explicitly'.format(self.__class__))
+        return out[0]
 
     def get_object_by_filename(self, request, filename):
         """
@@ -234,12 +244,12 @@ class AdminFileDownloadMixin:
 
     def get_download_url(self, obj, file_field: str = '') -> str:
         obj_id = obj.pk
-        filename = getattr(obj, self.file_field if not file_field else file_field).name
+        filename = getattr(obj, self.single_file_field if not file_field else file_field).name
         info = self.model._meta.app_label, self.model._meta.model_name
         return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
 
     def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:
-        label = str(label or getattr(obj, self.file_field if not file_field else file_field))
+        label = str(label or getattr(obj, self.single_file_field if not file_field else file_field))
         return mark_safe(format_html('<a href="{}">{}</a>', self.get_download_url(obj, file_field), label))
 
     def file_download_view(self, request, filename, form_url='', extra_context=None):
