@@ -203,20 +203,23 @@ class AdminFileDownloadMixin:
 
     def get_file_fields(self) -> List[str]:
         if self.file_fields and self.file_field:
-            raise AssertionError('Invalid configuration: AdminFileDownloadMixin cannot have both file_fields and file_field set ({})'.format(self.__class__))
+            raise AssertionError('AdminFileDownloadMixin cannot have both file_fields and '
+                                 'file_field set ({})'.format(self.__class__))
         out = set()
         for f in self.file_fields or [self.file_field]:
             if f:
                 out.add(f)
         if not out:
-            raise AssertionError('Invalid configuration: AdminFileDownloadMixin must have either file_fields or file_field set ({})'.format(self.__class__))
+            raise AssertionError('AdminFileDownloadMixin must have either file_fields or '
+                                 'file_field set ({})'.format(self.__class__))
         return list(out)
 
     @property
     def single_file_field(self) -> str:
         out = self.get_file_fields()
         if len(out) != 1:
-            raise AssertionError('Invalid configuration: AdminFileDownloadMixin has multiple file fields, you need to specify field explicitly'.format(self.__class__))
+            raise AssertionError('AdminFileDownloadMixin has multiple file fields, '
+                                 'you need to specify field explicitly ({})'.format(self.__class__))
         return out[0]
 
     def get_object_by_filename(self, request, filename):
