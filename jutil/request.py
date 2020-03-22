@@ -1,5 +1,7 @@
 import logging
 from django.conf import settings
+import requests
+import socket
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +27,6 @@ def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
     :param timeout: timeout in seconds
     :return: dict
     """
-    import requests
     try:
         res = requests.get('http://api.ipstack.com/{}?access_key={}&format=1'.format(ip, settings.IPSTACK_TOKEN), timeout=timeout)
         if res.status_code != 200:
@@ -49,7 +50,6 @@ def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> (str, s
     :param timeout: Timeout in seconds. Note that timeout only affects geo IP part, not getting host name.
     :return: (ip, country_code, host)
     """
-    import socket
     if not ip:  # localhost
         return None, '', ''
     host = ''

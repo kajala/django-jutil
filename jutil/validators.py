@@ -3,11 +3,15 @@ import unicodedata
 from datetime import date
 from decimal import Decimal
 from random import randint
-
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from jutil.bank_const_iban import IBAN_LENGTH_BY_COUNTRY
+# Country-specific bank constants (abc-order):
+from jutil.bank_const_be import BE_BIC_BY_ACCOUNT_NUMBER, BE_BANK_NAME_BY_BIC
+from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
+from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
+from jutil.bank_const_se import SE_BANK_CLEARING_LIST
 
 
 EMAIL_VALIDATOR = re.compile(r'[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+')
@@ -221,7 +225,6 @@ def be_iban_bank_info(v: str) -> (str, str):
     :param v: IBAN account number
     :return: (BIC code, bank name) or ('', '') if not found
     """
-    from jutil.bank_const_be import BE_BIC_BY_ACCOUNT_NUMBER, BE_BANK_NAME_BY_BIC
     v = iban_filter(v)
     bic = BE_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
     return (bic, BE_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
@@ -236,7 +239,6 @@ def dk_iban_validator(v: str):
 
 
 def dk_clearing_code_bank_name(v: str) -> str:
-    from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
     v = iban_filter(v)
     if v.startswith('DK'):
         v = v[4:]
@@ -325,7 +327,6 @@ def fi_iban_bank_info(v: str) -> (str, str):
     :param v: IBAN account number
     :return: (BIC code, bank name) or ('', '') if not found
     """
-    from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
     return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
@@ -473,7 +474,6 @@ def se_clearing_code_bank_info(account_number: str) -> (str, int):
     :param account_number: Swedish account number with clearing code as prefix
     :return: (Bank name, account digit count) or ('', None) if not found
     """
-    from jutil.bank_const_se import SE_BANK_CLEARING_LIST
     v = digit_filter(account_number)
     clearing = v[:4]
     for name, begin, end, acc_digits in SE_BANK_CLEARING_LIST:

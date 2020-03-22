@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
 from ipware.ip import get_real_ip
+from jutil.email import send_email
 
 
 logger = logging.getLogger(__name__)
@@ -50,8 +51,6 @@ class LogExceptionMiddleware:
         :param request: HttpRequest
         :param e: Exception
         """
-        from jutil.email import send_email
-
         assert isinstance(request, HttpRequest)
         full_path = request.get_full_path()
         user = request.user

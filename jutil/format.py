@@ -2,8 +2,9 @@ import re
 import tempfile
 from datetime import timedelta
 from decimal import Decimal
-
+import subprocess
 from django.conf import settings
+import xml.dom.minidom
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20):
@@ -84,8 +85,6 @@ def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool 
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
-    import subprocess
-    import xml.dom.minidom
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
             if isinstance(content, str):
@@ -113,8 +112,6 @@ def format_xml_bytes(content: str or bytes, encoding: str = 'UTF-8', exceptions:
     :param exceptions: Raise exceptions on error
     :return: bytes (Formatted XML as bytes)
     """
-    import subprocess
-    import xml.dom.minidom
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
             if isinstance(content, str):
@@ -144,8 +141,6 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     :param exceptions: Raise exceptions on error
     :return: bytes
     """
-    import subprocess
-    import xml.dom.minidom
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
             return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])

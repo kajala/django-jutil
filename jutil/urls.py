@@ -1,3 +1,6 @@
+from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
+
+
 def url_equals(a: str, b: str) -> bool:
     """
     Compares two URLs/paths and returns True if they point to same URI.
@@ -6,7 +9,6 @@ def url_equals(a: str, b: str) -> bool:
     :param b: URL/path
     :return: True if URLs/paths are equal
     """
-    from urllib.parse import urlparse, parse_qsl
     a2 = list(urlparse(a))
     b2 = list(urlparse(b))
     a2[4] = dict(parse_qsl(a2[4]))
@@ -22,7 +24,6 @@ def url_mod(url: str, new_params: dict) -> str:
     :param new_params: Querystring parameters to set/override (dict)
     :return: New URL/path
     """
-    from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
     res = urlparse(url)
     query_params = dict(parse_qsl(res.query))
     for k, v in new_params.items():
@@ -41,6 +42,5 @@ def url_host(url: str) -> str:
     :param url: URL
     :return: hostname
     """
-    from urllib.parse import urlparse
     res = urlparse(url)
     return res.netloc.split(':')[0] if res.netloc else ''

@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils.timezone import now
 from jutil.logs import log_event
+from base64 import b64encode
+from os.path import basename
 
 
 logger = logging.getLogger(__name__)
@@ -57,12 +59,10 @@ def send_email_sendgrid(recipients: list, subject: str,  # noqa
     :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :return: Status code 202 if emails were sent successfully
     """
-    import sendgrid
-    from sendgrid.helpers.mail import Content, Mail, Attachment
-    from sendgrid import ClickTracking, FileType, FileName, TrackingSettings, Personalization
-    from sendgrid import FileContent, ContentId, Disposition
-    from base64 import b64encode
-    from os.path import basename
+    import sendgrid  # pylint: disable=import-outside-toplevel
+    from sendgrid.helpers.mail import Content, Mail, Attachment  # pylint: disable=import-outside-toplevel
+    from sendgrid import ClickTracking, FileType, FileName, TrackingSettings  # pylint: disable=import-outside-toplevel
+    from sendgrid import Personalization, FileContent, ContentId, Disposition  # pylint: disable=import-outside-toplevel
 
     if files is None:
         files = []

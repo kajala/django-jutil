@@ -3,7 +3,7 @@ import csv
 from copy import copy
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
-
+from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
 
 
 def is_int(x) -> bool:
@@ -39,7 +39,6 @@ class Command(SafeCommand):
     def do(self, *args, **kw):
         new_bank_list = dk_iban_load_map(kw['filename']) if kw['filename'] else []
 
-        from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
         bank_data = dict(copy(DK_BANK_CLEARING_MAP))
         for code, name in new_bank_list:
             if code not in bank_data:

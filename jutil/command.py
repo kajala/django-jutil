@@ -117,7 +117,7 @@ def parse_date_range_arguments(options: dict, default_range: str = 'last_month')
                 after_end += timedelta(days=31)
     steps = None
     if step_type:
-        begins = [t for t in rrule.rrule(step_type, dtstart=begin, until=after_end)]
+        begins = list(rrule.rrule(step_type, dtstart=begin, until=after_end))
         steps = [(begins[i], begins[i+1]) for i in range(len(begins)-1)]
     if steps is None:
         steps = [(begin, end)]

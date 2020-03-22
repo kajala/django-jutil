@@ -3,8 +3,8 @@ import os
 from io import StringIO
 from django.http import HttpResponse, FileResponse, Http404
 from django.utils.translation import gettext as _
-
-from jutil.format import format_xml
+from jutil.format import format_xml, format_xml_file
+import csv
 
 
 class FileSystemFileResponse(FileResponse):
@@ -37,8 +37,6 @@ class CsvFileResponse(HttpResponse):
         :param dialect: csv.writer dialect
         :param kw: Parameters to be passed to HttpResponse __init__
         """
-        import csv
-
         f = StringIO()
         writer = csv.writer(f, dialect=dialect)
         for row in rows:
@@ -51,7 +49,6 @@ class CsvFileResponse(HttpResponse):
 
 class FormattedXmlFileResponse(HttpResponse):
     def __init__(self, filename: str):
-        from jutil.format import format_xml_file
         content = format_xml_file(filename)
         super().__init__(content)
         self['Content-Type'] = 'application/xml'

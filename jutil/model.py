@@ -1,5 +1,4 @@
 from typing import Type
-
 from django.utils.encoding import force_text
 from jutil.dict import choices_label
 
@@ -11,7 +10,7 @@ def get_object_or_none(cls, **kwargs):
     :param kwargs: Filters for get() call
     :return: Object or None
     """
-    from django.shortcuts import _get_queryset
+    from django.shortcuts import _get_queryset  # pylint: disable=import-outside-toplevel
     qs = _get_queryset(cls)
     try:
         return qs.get(**kwargs)

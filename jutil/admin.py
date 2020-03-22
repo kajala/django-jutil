@@ -1,8 +1,6 @@
-
 import os
 from collections import OrderedDict
 from typing import List
-
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -12,10 +10,17 @@ from django.http import HttpRequest, Http404
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-
 from jutil.model import get_model_field_label_and_value
 from django.utils.translation import gettext_lazy as _
 from jutil.responses import FileSystemFileResponse
+from django.contrib.admin.models import CHANGE
+from django.template.response import TemplateResponse
+from django.contrib.admin.options import get_content_type_for_model
+from django.contrib.admin.utils import unquote
+from django.core.exceptions import PermissionDenied
+from django.utils.text import capfirst
+from django.utils.encoding import force_text
+from django.contrib.admin.models import LogEntry
 
 
 def admin_log(instances, msg: str, who: User or None = None, **kw):
@@ -27,11 +32,6 @@ def admin_log(instances, msg: str, who: User or None = None, **kw):
     :param kw: Optional key-value attributes to append to message
     :return: None
     """
-
-    from django.contrib.admin.models import LogEntry, CHANGE
-    from django.contrib.admin.options import get_content_type_for_model
-    from django.utils.encoding import force_text
-
     # use system user if 'who' is missing
     if not who:
         username = settings.DJANGO_SYSTEM_USER if hasattr(settings, 'DJANGO_SYSTEM_USER') else 'system'
@@ -118,27 +118,17 @@ class ModelAdminBase(admin.ModelAdmin):
     def get_actions(self, request):
         return self.sort_actions_by_description(super().get_actions(request))
 
-    def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kw):
+    def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kwargs):  # pylint: disable=unused-argument
         """
         Changelist view which allow key-value arguments.
         :param request: HttpRequest
         :param extra_context: Extra context dict
-        :param kw: Key-value dict
+        :param kwargs: Key-value dict
         :return: See changelist_view()
         """
         return self.changelist_view(request, extra_context)
 
     def history_view(self, request, object_id, extra_context=None):
-        # pylint:disable=too-many-arguments,too-many-locals
-        from django.template.response import TemplateResponse
-        from django.contrib.admin.options import get_content_type_for_model
-        from django.contrib.admin.utils import unquote
-        from django.core.exceptions import PermissionDenied
-        from django.utils.text import capfirst
-        from django.utils.encoding import force_text
-        from django.utils.translation import gettext as _
-        from django.contrib.admin.models import LogEntry
-
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
@@ -255,7 +245,7 @@ class AdminFileDownloadMixin:
         label = str(label or getattr(obj, self.single_file_field if not file_field else file_field))
         return mark_safe(format_html('<a href="{}">{}</a>', self.get_download_url(obj, file_field), label))
 
-    def file_download_view(self, request, filename, form_url='', extra_context=None):
+    def file_download_view(self, request, filename, form_url='', extra_context=None):  # pylint: disable=unused-argument
         full_path = os.path.join(settings.MEDIA_ROOT, filename)
         obj = self.get_object_by_filename(request, filename)
         if not obj:
