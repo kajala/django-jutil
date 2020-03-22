@@ -57,6 +57,6 @@ def parse_datetime(v: str, default = None, tz = None, exceptions: bool = True) -
         return t if t.tzinfo else tz.localize(t)
     except Exception:
         if exceptions:
-            msg = _("'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {'value': v}
+            msg = _("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {'value': v}
             raise ValidationError(msg)
         return default

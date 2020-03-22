@@ -51,6 +51,12 @@ Test Code Coverage
 Changes
 =======
 
+3.0.0:
++ Django 3.0.4 compatibility
+
+2.4.14:
++ Unit test improvements etc.
+
 2.3.2:
 + Prospector clean & checked when making new release
 

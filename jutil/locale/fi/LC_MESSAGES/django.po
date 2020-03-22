@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-08 00:46+0000\n"
+"POT-Creation-Date: 2020-03-22 22:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,12 +18,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: jutil/admin.py:157
+#: jutil/admin.py:161
 #, python-format
 msgid "Change history: %s"
 msgstr "Muutoshistoria: %s"
 
-#: jutil/admin.py:211 jutil/admin.py:228 jutil/responses.py:18
+#: jutil/admin.py:246 jutil/admin.py:262 jutil/responses.py:18
 msgid "File {} not found"
 msgstr "Tiedostoa {} ei löydy"
 
@@ -32,11 +32,15 @@ msgstr "Tiedostoa {} ei löydy"
 msgid "%(value)s is not one of the available choices"
 msgstr "%(value)s ei ole yksi valittavissa olevista arvoista"
 
-#: jutil/parse.py:60 jutil/tests.py:380
+#: jutil/parse.py:60 jutil/tests.py:386
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
+msgstr ""
+
+#: jutil/tests.py:478
+msgid "action time"
 msgstr ""
 
 #: jutil/validators.py:31 jutil/validators.py:49 jutil/validators.py:67

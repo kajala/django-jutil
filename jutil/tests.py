@@ -383,7 +383,9 @@ class Tests(TestCase, DefaultTestSetupMixin):
         from rest_framework.exceptions import ValidationError
 
         with override('fi'):
-            msg = _("'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
+            msg = _("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
+            if 'muoto ei kelpaa' not in msg:
+                print(msg)
             self.assertTrue('muoto ei kelpaa' in msg)
 
             try:
@@ -406,7 +408,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(dict_to_html(a), res)
 
     def test_format_xml(self):
-        assert settings.XMLLINT_PATH
+        assert settings.XMLLINT_PATH, 'add e.g. XMLLINT_PATH = "/usr/bin/xmllint" to settings.py'
         src = '<ApplicationRequest> <CustomerId>1</CustomerId>  <Command>DownloadFileList</Command><Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp><Environment>PRODUCTION</Environment></ApplicationRequest>'
         dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'
         dst = format_xml(src)
