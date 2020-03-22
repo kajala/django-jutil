@@ -2,6 +2,7 @@ django-jutil
 ============
 
 Collection of small utilities for Django and Django REST framework projects.
+Django 3.0 compatible. Unit test coverage 55%.
 
 Features
 ========
