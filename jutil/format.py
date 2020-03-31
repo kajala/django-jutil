@@ -4,8 +4,8 @@ from datetime import timedelta
 from decimal import Decimal
 import subprocess
 from typing import List, Any
-
 from django.conf import settings
+from django.utils.functional import lazy
 import xml.dom.minidom
 
 
@@ -256,6 +256,18 @@ def format_table(rows: List[List[Any]], max_col: int or None = 10, max_line: int
     if row_sep:
         lines3.append(row_sep * max_line_len + row_sep_term)
     return '\n'.join(lines3)
+
+
+def ucfirst(v: str) -> str:
+    """
+    Converts first character of the string to uppercase.
+    :param v: str
+    :return: str
+    """
+    return v[0:1].upper() + v[1:]
+
+
+ucfirst_lazy = lazy(ucfirst, str)
 
 
 def dec1(a) -> Decimal:

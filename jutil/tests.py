@@ -10,7 +10,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.management import CommandParser
 from django.test import TestCase
-from django.utils.translation import override, gettext as _
+from django.utils import translation
+from django.utils.translation import override, gettext as _, gettext_lazy
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html
@@ -24,7 +25,7 @@ from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
-    dec6, format_table
+    dec6, format_table, ucfirst_lazy
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -561,3 +562,15 @@ class Tests(TestCase, DefaultTestSetupMixin):
 -----------------------------------------------------
             """.strip()
         self.assertEqual(out, out_ref)
+
+    def test_ucfirst_lazy(self):
+        s = gettext_lazy(ucfirst_lazy("missing value"))
+        s_ref = gettext_lazy("Missing value")
+        s_en = "Missing value"
+        s_fi = "Puuttuva arvo"
+        with override('fi'):
+            self.assertEqual(s, s_fi)
+            self.assertEqual(s, s_ref)
+        with override('en'):
+            self.assertEqual(s, s_en)
+            self.assertEqual(s, s_ref)

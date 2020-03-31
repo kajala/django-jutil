@@ -61,10 +61,8 @@ msgid "Invalid passport number"
 msgstr "Epäkelpo passin numero"
 
 #: jutil/validators.py:91
-#, fuzzy
-#| msgid "Invalid IBAN account number"
 msgid "Invalid country code"
-msgstr "Epäkelpo IBAN-tilinumero"
+msgstr "Epäkelpo maakoodi"
 
 #: jutil/validators.py:138 jutil/validators.py:147 jutil/validators.py:153
 #: jutil/validators.py:159
