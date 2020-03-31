@@ -24,7 +24,7 @@ from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
-    dec6
+    dec6, format_table
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -483,3 +483,81 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(obj_b.id, obj.id)
         obj_b = get_object_or_none(obj.__class__, id=-1)
         self.assertIsNone(obj_b)
+
+    def test_format_table(self):
+        a = [
+            ['date', 'description', 'count', 'unit price', 'total price'],
+            [date(2019, 12, 15), 'oranges', 1000, dec2('0.99'), dec2('990.00')],
+            [date(2020, 1, 3), 'apples', 4, dec2('1.10'), dec2('4.40')],
+            [date(2020, 11, 3), 'apples', 5, dec2('10.10'), dec2('50.50')],
+        ]
+        out = format_table(a, has_label_row=True, max_col=10)
+        out_ref = """
+---------------------------------------------------
+|      date|descript..|count|unit price|total pr..|
+---------------------------------------------------
+|2019-12-15|   oranges| 1000|      0.99|    990.00|
+|2020-01-03|    apples|    4|      1.10|      4.40|
+|2020-11-03|    apples|    5|     10.10|     50.50|
+---------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)
+
+        out = format_table(a, has_label_row=True, max_col=20)
+        out_ref = """
+-----------------------------------------------------
+|      date|description|count|unit price|total price|
+-----------------------------------------------------
+|2019-12-15|    oranges| 1000|      0.99|     990.00|
+|2020-01-03|     apples|    4|      1.10|       4.40|
+|2020-11-03|     apples|    5|     10.10|      50.50|
+-----------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)
+
+        out = format_table(a, has_label_row=True, max_col=20, col_sep=' | ')
+        out_ref = """
+-------------------------------------------------------------
+|      date | description | count | unit price | total price|
+-------------------------------------------------------------
+|2019-12-15 |     oranges |  1000 |       0.99 |      990.00|
+|2020-01-03 |      apples |     4 |       1.10 |        4.40|
+|2020-11-03 |      apples |     5 |      10.10 |       50.50|
+-------------------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)
+
+        out = format_table(a, has_label_row=True, max_col=20, col_sep=' | ', left_align=[1])
+        out_ref = """
+-------------------------------------------------------------
+|      date | description | count | unit price | total price|
+-------------------------------------------------------------
+|2019-12-15 | oranges     |  1000 |       0.99 |      990.00|
+|2020-01-03 | apples      |     4 |       1.10 |        4.40|
+|2020-11-03 | apples      |     5 |      10.10 |       50.50|
+-------------------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)
+
+        out = format_table(a, has_label_row=True, max_col=20, col_sep=' | ', left_align=[1], max_line=50)
+        out_ref = """
+-------------------------------------------------
+|      date | description | count | unit price|..
+-------------------------------------------------
+|2019-12-15 | oranges     |  1000 |       0.99|..
+|2020-01-03 | apples      |     4 |       1.10|..
+|2020-11-03 | apples      |     5 |      10.10|..
+-------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)
+
+        out = format_table(a, left_align=[1], center_align=[0,2,3,4], max_col=50)
+        out_ref = """
+-----------------------------------------------------
+|   date   |description|count|unit price|total price|
+|2019-12-15|oranges    |1000 |   0.99   |  990.00   |
+|2020-01-03|apples     |  4  |   1.10   |   4.40    |
+|2020-11-03|apples     |  5  |  10.10   |   50.50   |
+-----------------------------------------------------
+            """.strip()
+        self.assertEqual(out, out_ref)

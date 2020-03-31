@@ -3,6 +3,8 @@ import tempfile
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
+from typing import List, Any
+
 from django.conf import settings
 import xml.dom.minidom
 
@@ -155,6 +157,105 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     except Exception:
         pass
     return b''
+
+
+def format_table(rows: List[List[Any]], max_col: int or None = 10, max_line: int or None = 200,  # noqa
+                 col_sep: str = '|', row_sep: str = '-', row_begin: str = '|', row_end: str = '|',
+                 has_label_row: bool = False,
+                 left_align: List[int] or None = None, center_align: List[int] or None = None) -> str:
+    """
+    Formats "ASCII-table" rows by padding column widths to longest column value, optionally limiting column widths.
+    Optionally separates colums with ' | ' character and header row with '-' characters.
+    Supports left, right and center alignment. Useful for console apps / debugging.
+
+    :param rows: List[str]
+    :param max_col: Max column value width. Pass None for unlimited length.
+    :param max_line: Maximum single line length. Exceeding columns truncated. Pass None for unlimited length.
+    :param col_sep: Column separator string.
+    :param row_sep: Row separator character used before first row, end, after first row (if has_label_row).
+    :param row_begin: Row begin string, inserted before each row.
+    :param row_end: Row end string, appended after each row.
+    :param has_label_row: Set to True if table starts with column label row.
+    :param left_align: Indexes of left-aligned columns. By default all are right aligned.
+    :param center_align: Indexes of center-aligned columns. By default all are right aligned.
+    :return: str
+    """
+    assert max_col > 2
+    if left_align is None:
+        left_align = []
+    if center_align is None:
+        center_align = []
+
+    ncols = 0
+    col_lens = []
+    for row in rows:
+        ncols = max(ncols, len(row))
+    while len(col_lens) < ncols:
+        col_lens.append(0)
+
+    lines = []
+    for row in rows:
+        line = []
+        for ix, v in enumerate(row):
+            v = str(v)
+            if max_col is not None and len(v) > max_col:
+                v = v[:max_col-2] + '..'
+            line.append(v)
+            col_lens[ix] = max(col_lens[ix], len(v))
+        while len(line) < ncols:
+            line.append('')
+        lines.append(line)
+
+    lines2 = []
+    for line in lines:
+        line2 = []
+        for ix, v in enumerate(line):
+            col_len = col_lens[ix]
+            if len(v) < col_len:
+                if ix in left_align:
+                    v = v + ' ' * (col_len - len(v))
+                elif ix in center_align:
+                    pad = col_len - len(v)
+                    lpad = int(pad/2)
+                    rpad = pad - lpad
+                    v = ' ' * lpad + v + ' '*rpad
+                else:
+                    v = ' '*(col_len-len(v)) + v
+            line2.append(v)
+        lines2.append(line2)
+
+    max_line_len = 0
+    col_sep_len = len(col_sep)
+    ncols0 = ncols
+    for line in lines2:
+        if max_line is not None:
+            line_len = len(row_begin) + sum(len(v)+col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
+            while line_len > max_line:
+                ncols -= 1
+                line_len = len(row_begin) + sum(len(v)+col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
+            max_line_len = max(max_line_len, line_len)
+
+    line_term = ''
+    row_sep_term = ''
+    if ncols0 > ncols:
+        line_term = '..'
+        row_sep_term = row_sep * int(2 / len(row_sep))
+
+    lines3 = []
+    if row_sep:
+        lines3.append(row_sep * max_line_len + row_sep_term)
+    for line_ix, line in enumerate(lines2):
+        while len(line) > ncols:
+            line.pop()
+        line_out = col_sep.join(line)
+        lines3.append(row_begin + line_out + row_end + line_term)
+        if line_ix == 0 and row_sep and has_label_row:
+            lines3.append(row_sep * max_line_len + row_sep_term)
+        if line_ix >= ncols:
+            break
+    if row_sep:
+        lines3.append(row_sep * max_line_len + row_sep_term)
+    return '\n'.join(lines3)
 
 
 def dec1(a) -> Decimal:
