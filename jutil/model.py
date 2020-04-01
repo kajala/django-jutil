@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, List
 from django.utils.encoding import force_text
 from jutil.dict import choices_label
 
@@ -10,15 +10,14 @@ def get_object_or_none(cls, **kwargs):
     :param kwargs: Filters for get() call
     :return: Object or None
     """
-    from django.shortcuts import _get_queryset  # pylint: disable=import-outside-toplevel
-    qs = _get_queryset(cls)
     try:
+        qs = cls._default_manager.all() if hasattr(cls, '_default_manager') else cls  # pylint: disable=protected-access
         return qs.get(**kwargs)
-    except qs.model.DoesNotExist:
+    except Exception:
         return None
 
 
-def get_model_field_label_and_value(instance, field_name) -> (str, str):
+def get_model_field_label_and_value(instance, field_name: str) -> (str, str):
     """
     Returns model field label and value (as text).
     :param instance: Model instance
@@ -36,7 +35,7 @@ def get_model_field_label_and_value(instance, field_name) -> (str, str):
     return label, force_text(value)
 
 
-def is_model_field_changed(instance, field_name) -> bool:
+def is_model_field_changed(instance, field_name: str) -> bool:
     """
     Compares model instance field value to value stored in DB.
     If object has not been stored in DB (yet) field is considered unchanged.
@@ -52,7 +51,15 @@ def is_model_field_changed(instance, field_name) -> bool:
     return qs.filter(**params).first() is None
 
 
-def clone_model(instance, cls: Type or None = None, commit: bool = True, exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr', **kw):
+def get_model_keys(instance, cls: Type or None = None,
+                   exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr') -> List[str]:
+    if cls is None:
+        cls = instance.__class__
+    return [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
+
+
+def clone_model(instance, cls: Type or None = None, commit: bool = True,
+                exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr', **kw):
     """
     Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')
@@ -65,11 +72,10 @@ def clone_model(instance, cls: Type or None = None, commit: bool = True, exclude
     """
     if cls is None:
         cls = instance.__class__
-    keys = [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
+    keys = get_model_keys(instance, cls=cls, exclude_fields=exclude_fields, base_class_suffix=base_class_suffix)
     new_instance = cls()
     for k in keys:
-        v = getattr(instance, k)
-        setattr(new_instance, k, v)
+        setattr(new_instance, k, getattr(instance, k))
     for k, v in kw.items():
         setattr(new_instance, k, v)
     if commit:
