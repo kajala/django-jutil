@@ -27,10 +27,10 @@ class Command(SafeCommand):
         sender = '"Kajala Group Asiakaspalvelu" <asiakaspalvelu@kajala.com>'
 
         if kw['smtp']:
-            res = send_email_smtp(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'])
+            res = send_email_smtp(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'], exceptions=True)
         elif kw['sendgrid']:
-            res = send_email_sendgrid(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'])
+            res = send_email_sendgrid(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'], exceptions=True)
         else:
-            res = send_email(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'])
+            res = send_email(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'], exceptions=True)
 
         print('send_email returned', res)

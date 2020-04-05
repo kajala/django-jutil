@@ -1,5 +1,6 @@
 import logging
 import re
+import sys
 import traceback
 from datetime import datetime, timedelta
 import pytz
@@ -32,9 +33,9 @@ class SafeCommand(BaseCommand):
         except Exception as e:
             msg = "ERROR: {} {}".format(str(e), traceback.format_exc())
             logger.error(msg)
-            print(msg)
             if not settings.DEBUG:
                 send_email(settings.ADMINS, 'Error @ {}'.format(getpass.getuser()), msg)
+            raise
 
     def do(self, *args, **kwargs):
         pass
