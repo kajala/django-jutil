@@ -13,6 +13,8 @@ FILE="$PROJECT-$REL"
 echo $FILE
 cd dist
 tar xvf "$FILE.tar.gz"
+rm -f "$FILE/.covera*"
+rm -f "$FILE/coverage.xml"
 rm -rf "$FILE/venv"
 rm -rf "$FILE/data"
 rm -rf "$FILE/linecalc.conf"
