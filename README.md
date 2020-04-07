@@ -2,7 +2,7 @@ django-jutil
 ============
 
 Collection of small utilities for Django and Django REST framework projects.
-Django 3.0 compatible. Unit test coverage 55%.
+Django 3.0 compatible. [![codecov](https://codecov.io/gh/kajala/django-jutil/branch/master/graph/badge.svg)](https://codecov.io/gh/kajala/django-jutil)
 
 Features
 ========
