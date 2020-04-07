@@ -132,6 +132,7 @@ def send_email_sendgrid(recipients: list, subject: str,  # noqa
             log_event('EMAIL_ERROR', data={'time': send_dt, 'to': recipients, 'subject': subject, 'status': res.status_code, 'body': res.body})
 
     except Exception as e:
+        logger.error('Failed to send email (SendGrid) to %s: %s', recipients, e)
         log_event('EMAIL_ERROR', data={'to': recipients, 'subject': subject, 'exception': str(e)})
         if exceptions:
             raise
@@ -205,6 +206,7 @@ def send_email_smtp(recipients: list, subject: str,  # noqa
         log_event('EMAIL_SENT', data={'time': send_dt, 'to': recipients, 'subject': subject})
 
     except Exception as e:
+        logger.error('Failed to send email (SMTP) to %s: %s', recipients, e)
         log_event('EMAIL_ERROR', data={'to': recipients, 'subject': subject, 'exception': str(e)})
         if exceptions:
             raise

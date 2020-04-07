@@ -13,6 +13,7 @@ class Command(SafeCommand):
         parser.add_argument('email', type=str)
         parser.add_argument('--cc', type=str)
         parser.add_argument('--bcc', type=str)
+        parser.add_argument('--sender', type=str)
         parser.add_argument('--attach', type=str, nargs='*')
         parser.add_argument('--smtp', action='store_true')
         parser.add_argument('--sendgrid', action='store_true')
@@ -24,7 +25,7 @@ class Command(SafeCommand):
         subject = 'hello ' + now().isoformat()
         text = 'body text'
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
-        sender = '"Kajala Group Customer Service" <support@kajala.com>'
+        sender = kw['sender'] if kw['sender'] else ''
 
         if kw['smtp']:
             res = send_email_smtp(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'], exceptions=True)
