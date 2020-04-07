@@ -7,7 +7,7 @@ from jutil.email import send_email, send_email_smtp, send_email_sendgrid
 
 
 class Command(SafeCommand):
-    help = 'Send test email with attachment'
+    help = 'Send test email with (optional) attachment'
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument('email', type=str)
@@ -24,7 +24,7 @@ class Command(SafeCommand):
         subject = 'hello ' + now().isoformat()
         text = 'body text'
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
-        sender = '"Kajala Group Asiakaspalvelu" <asiakaspalvelu@kajala.com>'
+        sender = '"Kajala Group Customer Service" <support@kajala.com>'
 
         if kw['smtp']:
             res = send_email_smtp(kw['email'], subject, text, html, sender, files, bcc_recipients=kw['bcc'], cc_recipients=kw['cc'], exceptions=True)
