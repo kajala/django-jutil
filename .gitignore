@@ -12,5 +12,4 @@ __pycache__
 /db.sqlite3
 /project/settings.py
 /*.gz
-/.coverage
 
