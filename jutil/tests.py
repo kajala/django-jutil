@@ -32,7 +32,9 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
     se_clearing_code_bank_info, ascii_filter, ee_iban_validator, be_iban_validator, dk_iban_validator, \
     dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer, \
-    fi_company_org_id_generator
+    fi_company_org_id_generator, phone_validator, passport_filter, passport_validator, passport_sanitizer, \
+    country_code_validator, validate_country_iban, iban_bic, validate_country_company_org_id, fi_ssn_generator, \
+    fi_ssn_validator
 
 
 class Tests(TestCase, DefaultTestSetupMixin):
@@ -73,6 +75,51 @@ class Tests(TestCase, DefaultTestSetupMixin):
         se_ssn_validator('670919-9530')
         with self.assertRaises(ValidationError):
             se_ssn_validator('811228-9873')
+
+    def test_phone_numbers(self):
+        try:
+            phone_validator('+358456343767')
+        except Exception:
+            self.fail('phone_validator("+358456343767") should not raise Exception')
+        with self.assertRaisesMessage(ValidationError, _('Invalid phone number')):
+            phone_validator('214')
+        self.assertEqual(phone_sanitizer('214'), '')
+
+    def test_passport(self):
+        self.assertEqual(passport_filter('?ADsd-12312dsds'), 'ADSD-12312DSDS')
+        with self.assertRaisesMessage(ValidationError, _('Invalid passport number')):
+            passport_validator('214')
+        self.assertEqual(passport_sanitizer('214'), '')
+
+    def test_country_code(self):
+        with self.assertRaisesMessage(ValidationError, _('Invalid country code')):
+            country_code_validator('Finland')
+
+    def test_bic(self):
+        bic = iban_bic('FI21 1234 5600 0007 85')
+        self.assertEqual(bic, 'NDEAFIHH')
+
+    def test_org_id(self):
+        try:
+            validate_country_company_org_id('FI', '2084069-9')
+        except Exception:
+            self.fail('2084069-9 is valid org id')
+        with self.assertRaisesMessage(ValidationError, _('Invalid company organization ID')):
+            validate_country_company_org_id('FI', '2084069-8')
+
+    def test_validate_country_iban(self):
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            validate_country_iban('FI15616515616156', 'SE')
+
+    def test_fi_ssn_generator(self):
+        self.assertEqual(len(fi_ssn_generator()), 6+1+4)
+        for n in range(10):
+            ssn = fi_ssn_generator()
+            try:
+                fi_ssn_age(ssn)
+                fi_ssn_validator(ssn)
+            except Exception:
+                self.fail('{} is valid SSN'.format(ssn))
 
     def test_iban(self):
         iban_validator('FI2112345600000785')
