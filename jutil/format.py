@@ -1,7 +1,6 @@
 import logging
 import re
 import tempfile
-import traceback
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
