@@ -149,6 +149,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
             (' @a-a2.com', '@a-a2.com', False),
             (' a-a2.com', 'a-a2.com', False),
             ('ää-a2@ää-a2.com', 'ää-a2@ää-a2.com', False),
+            ('aaa.bbbbb@ccc-ddd.fi', 'aaa.bbbbb@ccc-ddd.fi', True),
         ]
         for i, o, is_valid in emails:
             # print('email_filter({}) -> {}'.format(i, email_filter(i)))
