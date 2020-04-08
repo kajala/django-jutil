@@ -20,7 +20,7 @@ from jutil.request import get_ip_info
 from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
-from jutil.xml import xml_to_dict, dict_to_element
+from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
@@ -35,6 +35,8 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     fi_company_org_id_generator, phone_validator, passport_filter, passport_validator, passport_sanitizer, \
     country_code_validator, validate_country_iban, iban_bic, validate_country_company_org_id, fi_ssn_generator, \
     fi_ssn_validator
+from xml.etree.ElementTree import Element
+from xml.etree import ElementTree as ET
 
 
 class Tests(TestCase, DefaultTestSetupMixin):
@@ -210,9 +212,6 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(ref_data, data)
 
     def test_dict_to_xml(self):
-        from xml.etree.ElementTree import Element
-        from xml.etree import ElementTree as ET
-
         data = {
             'Doc': {
                 '@version': '1.2',
@@ -233,10 +232,28 @@ class Tests(TestCase, DefaultTestSetupMixin):
         # pprint(data2)
         self.assertEqual(data2, data)
 
-    def test_xml_to_dict(self):
-        from xml.etree.ElementTree import Element
-        from xml.etree import ElementTree as ET
+    def test_dict_to_xml2(self):
+        self.assertEqual(_xml_filter_tag_name('TagName[0]'), 'TagName')
+        self.assertEqual(_xml_filter_tag_name('TagName[1]'), 'TagName')
+        self.assertEqual(_xml_filter_tag_name('TagName'), 'TagName')
+        data = {
+            'Doc': {
+                '@version': '1.2',
+                'A': [{'@class': 'x', 'B': {'@': 'hello', '@class': 'x2'}},
+                      {'@class': 'y', 'B': {'@': 'world', '@class': 'y2'}}],
+                'C': 'value node',
+                'D': 123,
+                'E': ['abc'],
+                'F': ['line 1', 'line 2']
+            }
+        }
+        el = dict_to_element(data)
+        assert isinstance(el, Element)
+        xml_str = ET.tostring(el, encoding='utf8', method='xml').decode()
+        data2 = xml_to_dict(xml_str, document_tag=True, array_tags=['E', 'F'], int_tags=['D'])
+        self.assertEqual(data2, data)
 
+    def test_xml_to_dict(self):
         xml_str = """<?xml version="1.0" encoding="utf-8"?>
 <Document>
   <TxsSummry>

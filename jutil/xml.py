@@ -1,4 +1,6 @@
 # pylint: disable=too-many-arguments,too-many-locals
+import re
+from typing import List
 from xml import etree
 from xml.etree.ElementTree import Element, SubElement
 
@@ -155,6 +157,10 @@ def xml_to_dict(xml_bytes: bytes, tags: list or None = None, array_tags: list or
     return data if not document_tag else {root.tag: data}
 
 
+def _xml_filter_tag_name(tag: str) -> str:
+    return re.sub(r'\[\d+\]', '', tag)
+
+
 def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_prefix: str):
     # print('_xml_element_set_data_r({}): {}'.format(el.tag, data))
     if not hasattr(data, 'items'):
@@ -166,15 +172,15 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
             el.set(k[1:], str(v))
         elif isinstance(v, (list, tuple)):
             for v2 in v:
-                el2 = SubElement(el, k)
+                el2 = SubElement(el, _xml_filter_tag_name(k))
                 assert isinstance(el2, Element)
                 _xml_element_set_data_r(el2, v2, value_key, attribute_prefix)
         elif isinstance(v, dict):
-            el2 = SubElement(el, k)
+            el2 = SubElement(el, _xml_filter_tag_name(k))
             assert isinstance(el2, Element)
             _xml_element_set_data_r(el2, v, value_key, attribute_prefix)
         else:
-            el2 = SubElement(el, k)
+            el2 = SubElement(el, _xml_filter_tag_name(k))
             assert isinstance(el2, Element)
             el2.text = str(v)
 
@@ -192,6 +198,8 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
                 'A': [{'@class': 'x', 'B': {'@': 'hello', '@class': 'x2'}},
                       {'@class': 'y', 'B': {'@': 'world', '@class': 'y2'}}],
                 'C': 'value node',
+                'D[]': 'value node line 1',
+                'D[]': 'value node line 2',
             }
          }
     is returned as follows:
@@ -204,6 +212,8 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
                 <B class="y2">world</B>
             </A>
             <C>value node</C>
+            <D>value node line 1</D>
+            <D>value node line 2</D>
         </Doc>
 
     Args:
@@ -217,7 +227,7 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
         raise Exception('Invalid data dict for XML generation, document root must have single element')
 
     for tag, data in doc.items():
-        el = Element(tag)
+        el = Element(_xml_filter_tag_name(tag))
         assert isinstance(el, Element)
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
         return el
