@@ -1,6 +1,5 @@
 # pylint: disable=too-many-arguments,too-many-locals
 import re
-from typing import List
 from xml import etree
 from xml.etree.ElementTree import Element, SubElement
 
