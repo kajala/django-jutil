@@ -163,7 +163,6 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
             return fp.read()
     except Exception as e:
         logger.error('format_xml_file failed (2): %s', e)
-        pass
     return b''
 
 
