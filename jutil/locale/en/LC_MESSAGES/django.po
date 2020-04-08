@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 22:02+0000\n"
+"POT-Creation-Date: 2020-04-08 03:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: jutil/admin.py:161
+#: jutil/admin.py:151
 #, python-format
 msgid "Change history: %s"
 msgstr ""
 
-#: jutil/admin.py:246 jutil/admin.py:262 jutil/responses.py:18
+#: jutil/admin.py:236 jutil/admin.py:252 jutil/responses.py:18
 msgid "File {} not found"
 msgstr ""
 
@@ -31,53 +31,53 @@ msgstr ""
 msgid "%(value)s is not one of the available choices"
 msgstr ""
 
-#: jutil/parse.py:60 jutil/tests.py:386
+#: jutil/parse.py:60 jutil/tests.py:435
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
-#: jutil/tests.py:478
-msgid "action time"
-msgstr ""
-
-#: jutil/validators.py:31 jutil/validators.py:49 jutil/validators.py:67
-#: jutil/validators.py:90 jutil/validators.py:138
-msgid "Missing value"
-msgstr ""
-
-#: jutil/validators.py:32
+#: jutil/tests.py:84 jutil/validators.py:36
 msgid "Invalid phone number"
 msgstr ""
 
-#: jutil/validators.py:50
-msgid "Invalid email"
-msgstr ""
-
-#: jutil/validators.py:68
+#: jutil/tests.py:90 jutil/validators.py:72
 msgid "Invalid passport number"
 msgstr ""
 
-#: jutil/validators.py:91
+#: jutil/tests.py:95 jutil/validators.py:95
 msgid "Invalid country code"
 msgstr ""
 
-#: jutil/validators.py:138 jutil/validators.py:147 jutil/validators.py:153
-#: jutil/validators.py:159
-msgid "Invalid IBAN account number"
-msgstr ""
-
-#: jutil/validators.py:294 jutil/validators.py:311 jutil/validators.py:315
-msgid "Invalid payment reference: {}"
-msgstr ""
-
-#: jutil/validators.py:347 jutil/validators.py:350 jutil/validators.py:357
-#: jutil/validators.py:361
+#: jutil/tests.py:107 jutil/validators.py:348 jutil/validators.py:351
+#: jutil/validators.py:358 jutil/validators.py:362
 msgid "Invalid company organization ID"
 msgstr ""
 
-#: jutil/validators.py:381 jutil/validators.py:390 jutil/validators.py:448
-#: jutil/validators.py:467
+#: jutil/tests.py:111 jutil/validators.py:142 jutil/validators.py:151
+#: jutil/validators.py:157 jutil/validators.py:163
+msgid "Invalid IBAN account number"
+msgstr ""
+
+#: jutil/tests.py:529
+msgid "action time"
+msgstr ""
+
+#: jutil/tests.py:616 jutil/validators.py:35 jutil/validators.py:53
+#: jutil/validators.py:71 jutil/validators.py:94 jutil/validators.py:142
+msgid "Missing value"
+msgstr ""
+
+#: jutil/validators.py:54
+msgid "Invalid email"
+msgstr ""
+
+#: jutil/validators.py:296 jutil/validators.py:313 jutil/validators.py:317
+msgid "Invalid payment reference: {}"
+msgstr ""
+
+#: jutil/validators.py:382 jutil/validators.py:391 jutil/validators.py:449
+#: jutil/validators.py:468
 msgid "Invalid personal identification number"
 msgstr ""
