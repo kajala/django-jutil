@@ -102,7 +102,7 @@ def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool 
     except Exception:
         if exceptions:
             raise
-        return content.decode() if isinstance(content, bytes) else content
+        return content.decode(encoding=encoding) if isinstance(content, bytes) else content
 
 
 def format_xml_bytes(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
