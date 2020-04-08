@@ -1,5 +1,7 @@
+import logging
 import re
 import tempfile
+import traceback
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
@@ -7,6 +9,9 @@ from typing import List, Any
 from django.conf import settings
 from django.utils.functional import lazy
 import xml.dom.minidom
+
+
+logger = logging.getLogger(__name__)
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20):
@@ -95,11 +100,12 @@ def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool 
                 fp.write(content)
                 fp.flush()
                 out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
-                return out.decode()
+                return out.decode(encoding=encoding)
         if isinstance(content, bytes):
             content = content.decode(encoding=encoding)
         return xml.dom.minidom.parseString(content).toprettyxml()
-    except Exception:
+    except Exception as e:
+        logger.error('format_xml failed: %s', e)
         if exceptions:
             raise
         return content.decode(encoding=encoding) if isinstance(content, bytes) else content
@@ -126,7 +132,8 @@ def format_xml_bytes(content: str or bytes, encoding: str = 'UTF-8', exceptions:
         if isinstance(content, bytes):
             content = content.decode(encoding=encoding)
         return xml.dom.minidom.parseString(content).toprettyxml(encoding=encoding)
-    except Exception:
+    except Exception as e:
+        logger.error('format_xml_bytes failed: %s', e)
         if exceptions:
             raise
         return content.encode(encoding=encoding) if isinstance(content, str) else content
@@ -148,13 +155,15 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
             return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])
         with open(full_path, 'rb') as fp:
             return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)
-    except Exception:
+    except Exception as e:
+        logger.error('format_xml_file failed (1): %s', e)
         if exceptions:
             raise
     try:
         with open(full_path, 'rb') as fp:
             return fp.read()
-    except Exception:
+    except Exception as e:
+        logger.error('format_xml_file failed (2): %s', e)
         pass
     return b''
 
