@@ -3,7 +3,7 @@ import os
 from io import StringIO
 from django.http import HttpResponse, FileResponse, Http404
 from django.utils.translation import gettext as _
-from jutil.format import format_xml, format_xml_file
+from jutil.format import format_xml_file, format_xml_bytes
 import csv
 
 
@@ -56,10 +56,14 @@ class FormattedXmlFileResponse(HttpResponse):
         self['Content-Disposition'] = "attachment; filename={}".format(os.path.basename(filename))
 
 
-class FormattedXmlResponse(HttpResponse):
+class XmlResponse(HttpResponse):
     def __init__(self, content: bytes, filename: str):
-        content = format_xml(content)
         super().__init__(content)
         self['Content-Type'] = 'application/xml'
         self['Content-Length'] = len(content)
         self['Content-Disposition'] = "attachment; filename={}".format(os.path.basename(filename))
+
+
+class FormattedXmlResponse(XmlResponse):
+    def __init__(self, content: bytes, filename: str, encoding: str = 'UTF-8', exceptions: bool = True):
+        super().__init__(format_xml_bytes(content, encoding=encoding, exceptions=exceptions), filename)
