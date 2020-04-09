@@ -1,6 +1,7 @@
 import mimetypes
 import os
 from io import StringIO
+from typing import Any, List
 from django.http import HttpResponse, FileResponse, Http404
 from django.utils.translation import gettext as _
 from jutil.format import format_xml_file, format_xml_bytes
@@ -25,11 +26,11 @@ class FileSystemFileResponse(FileResponse):
         self['Content-Disposition'] = "attachment; filename={}".format(filename)
 
 
-class CsvFileResponse(HttpResponse):
+class CsvResponse(HttpResponse):
     """
-    CSV file download HTTP response.
+    CSV download HTTP response.
     """
-    def __init__(self, rows: list, filename: str, dialect='excel', **kw):
+    def __init__(self, rows: List[List[Any]], filename: str, dialect='excel', **kw):
         """
         Returns CSV response.
         :param rows: List of column lists
@@ -44,7 +45,7 @@ class CsvFileResponse(HttpResponse):
 
         buf = f.getvalue().encode('utf-8')
         super().__init__(content=buf, content_type='text/csv', **kw)
-        self['Content-Disposition'] = 'attachment;filename="{0}"'.format(filename)
+        self['Content-Disposition'] = 'attachment;filename="{}"'.format(filename)
 
 
 class FormattedXmlFileResponse(HttpResponse):
