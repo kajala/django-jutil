@@ -14,6 +14,8 @@ class Command(SafeCommand):
         parser.add_argument('--cc', type=str)
         parser.add_argument('--bcc', type=str)
         parser.add_argument('--sender', type=str)
+        parser.add_argument('--subject', type=str)
+        parser.add_argument('--body', type=str)
         parser.add_argument('--attach', type=str, nargs='*')
         parser.add_argument('--smtp', action='store_true')
         parser.add_argument('--sendgrid', action='store_true')
@@ -25,6 +27,10 @@ class Command(SafeCommand):
         subject = 'hello ' + now().isoformat()
         text = 'body text'
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
+        if kw['body']:
+            html = kw['body']
+        if kw['subject']:
+            subject = kw['subject']
         sender = kw['sender'] if kw['sender'] else ''
 
         if kw['smtp']:
