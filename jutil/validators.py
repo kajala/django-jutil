@@ -83,6 +83,10 @@ def country_code_filter(v: str) -> str:
     return v.strip().upper()
 
 
+def bic_filter(v: str) -> str:
+    return v.strip().upper()
+
+
 def country_code_validator(v: str):
     """
     Accepts both ISO-2 and ISO-3 formats.
@@ -98,6 +102,11 @@ def country_code_validator(v: str):
 def country_code_sanitizer(v: str) -> str:
     v = country_code_filter(v)
     return v if 2 <= len(v) <= 3 else ''
+
+
+def bic_sanitizer(v: str) -> str:
+    v = bic_filter(v)
+    return v if 8 <= len(v) <= 11 else ''
 
 
 def ascii_filter(v: str) -> str:
@@ -135,7 +144,24 @@ def iban_filter_readable(acct) -> str:
     return acct
 
 
+def bic_validator(v: str):
+    """
+    Validates bank BIC/SWIFT code (8-11 characters).
+    :param v: str
+    :return: None
+    """
+    v = bic_filter(v)
+    if not (8 <= len(v) <= 11):
+        v_str = _('Missing value') if v is None else str(v)
+        raise ValidationError(_('Invalid bank BIC/SWIFT code') + ': {}'.format(v_str), code='invalid_bic')
+
+
 def iban_validator(v: str):
+    """
+    Validates IBAN format bank account number.
+    :param v: str
+    :return: None
+    """
     # validate IBAN numeric part
     v = iban_filter(v)
     if not v:

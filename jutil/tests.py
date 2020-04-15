@@ -34,7 +34,7 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer, \
     fi_company_org_id_generator, phone_validator, passport_filter, passport_validator, passport_sanitizer, \
     country_code_validator, validate_country_iban, iban_bic, validate_country_company_org_id, fi_ssn_generator, \
-    fi_ssn_validator
+    fi_ssn_validator, bic_validator
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
 
@@ -124,6 +124,12 @@ class Tests(TestCase, DefaultTestSetupMixin):
                 self.fail('{} is valid SSN'.format(ssn))
 
     def test_iban(self):
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            iban_validator('FI2112345600000786')
+        bic_validator('HELSFIHH')
+        bic_validator('HELSFIHHXXX')
+        with self.assertRaisesMessage(ValidationError, _('Invalid bank BIC/SWIFT code')):
+            bic_validator('HELSFIH')
         iban_validator('FI2112345600000785')
         iban_validator('SE4550000000058398257466')
         fi_iban_validator('FI2112345600000785')
