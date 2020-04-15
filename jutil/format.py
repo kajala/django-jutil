@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import tempfile
 from datetime import timedelta
@@ -329,3 +330,36 @@ def dec6(a) -> Decimal:
     :return: Decimal with 4 decimal digits
     """
     return Decimal(a).quantize(Decimal('1.000000'))
+
+
+def strip_media_root(file_path: str) -> str:
+    """
+    If file path starts with (settings) MEDIA_ROOT,
+    the MEDIA_ROOT part gets stripped and only relative path is returned.
+    Otherwise file path is returned as is. This enabled stored file names in more
+    portable format for different environment / storage.
+    If MEDIA_ROOT is missing or empty, the filename is returned as is.
+    Reverse operation of this is get_media_full_path().
+    :param file_path: str
+    :return: str
+    """
+    if hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and file_path.startswith(settings.MEDIA_ROOT):
+        file_path = file_path[len(settings.MEDIA_ROOT):]
+        if file_path.startswith('/'):
+            return file_path[1:]
+    return file_path
+
+
+def get_media_full_path(file_path: str) -> str:
+    """
+    If file path is absolute, the path is returned as is.
+    Otherwise it is returned relative to (settings) MEDIA_ROOT.
+    This enabled stored file names in more portable format for different environment / storage.
+    If MEDIA_ROOT is missing or empty, the filename is returned as is.
+    Reverse operation of this is strip_media_root().
+    :param file_path: str
+    :return: str
+    """
+    if file_path and not os.path.isabs(file_path):
+        return os.path.join(settings.MEDIA_ROOT, file_path)
+    return file_path

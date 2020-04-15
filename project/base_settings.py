@@ -16,6 +16,7 @@ import os
 import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_ROOT = BASE_DIR
 
 
 # Quick-start development settings - unsuitable for production

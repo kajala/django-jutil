@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from os.path import join
@@ -25,7 +26,7 @@ from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
-    dec6, format_table, ucfirst_lazy
+    dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -49,7 +50,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
 
-    def test_format(self):
+    def test_format_full_name(self):
         samples = [
             ('Short', 'Full Name', 'Short Full Name'),
             ('Short Middle Name Is Quite Long', 'Full Name', 'Short Full Name'),
@@ -645,3 +646,15 @@ class Tests(TestCase, DefaultTestSetupMixin):
         with override('en'):
             self.assertEqual(s, s_en)
             self.assertEqual(s, s_ref)
+
+    def test_media_paths(self):
+        media_root1 = os.path.join(settings.MEDIA_ROOT, 'path1/path2')
+        media_root2 = os.path.join(settings.MEDIA_ROOT, 'path3') + '/'
+        test_paths = [
+            (os.path.join(media_root1, 'test1.file'), 'path1/path2/test1.file'),
+            (os.path.join('/diff/path', 'test1.file'), '/diff/path/test1.file'),
+            (os.path.join(media_root2, 'test1.file'), 'path3/test1.file'),
+        ]
+        for src, dst in test_paths:
+            self.assertEqual(strip_media_root(src), dst)
+            self.assertEqual(get_media_full_path(dst), src)
