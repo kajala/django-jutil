@@ -525,8 +525,11 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(end, pytz.utc.localize(datetime(2020, 2, 1)))
 
     def test_format_timedelta(self):
-        self.assertEqual(format_timedelta(timedelta(seconds=90), include_seconds=True), '1min30s')
-        self.assertEqual(format_timedelta(timedelta(seconds=90), include_seconds=False), '1min')
+        self.assertEqual(format_timedelta(timedelta(seconds=90)), '1min30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=3600+90)), '1h1min30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=90), minutes_label='min ', seconds_label='s '), '1min 30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=3600+90), hours_label='h ', minutes_label='min ', seconds_label='s '), '1h 1min 30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=90), seconds_label=''), '1min')
 
     def test_dec123456(self):
         self.assertEqual(dec1(Decimal('1.2345678')), Decimal('1.2'))

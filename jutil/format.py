@@ -58,29 +58,37 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20):
     return full_name
 
 
-def format_timedelta(dt: timedelta, include_seconds: bool = True) -> str:
+def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h',
+                     minutes_label: str = 'min', seconds_label: str = 's', **kwargs) -> str:
     """
     Formats timedelta to readable format, e.g. 1h30min15s.
     :param dt: timedelta
-    :param include_seconds: If seconds should be included in formatted string. Default is True.
+    :param days_label: Label for days. Leave empty '' if value should be skipped / ignored.
+    :param hours_label: Label for hours. Leave empty '' if value should be skipped / ignored.
+    :param minutes_label: Label for minutes. Leave empty '' if value should be skipped / ignored.
+    :param seconds_label: Label for seconds. Leave empty '' if value should be skipped / ignored.
     :return: str
     """
+    if 'include_seconds' in kwargs:
+        logger.warning('format_timedelta: include_seconds deprecated and will be removed in future versions')
+        include_seconds = kwargs.pop('include_seconds')
+        if not include_seconds:
+            seconds_label = ''
+
+    parts = (
+        (86400, days_label),
+        (3600, hours_label),
+        (60, minutes_label),
+        (1, seconds_label),
+    )
+    out = ""
     seconds = int(dt.total_seconds())
-    days, remainder = divmod(seconds, 86400)
-    hours, remainder = divmod(remainder, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    s = ""
-    if days > 0:
-        s += str(days) + "d"
-    if hours > 0:
-        s += str(hours) + "h"
-    if minutes > 0:
-        s += str(minutes) + "min"
-    if seconds > 0 and include_seconds:
-        s += str(seconds) + "s"
-    if s == "":
-        s = "0min"
-    return s
+    for n_secs, label in parts:
+        n, remainder = divmod(seconds, n_secs)
+        if n > 0 and label:
+            out += str(n) + label
+            seconds = remainder
+    return out.strip()
 
 
 def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> str:
