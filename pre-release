@@ -7,7 +7,7 @@ fi
 echo "Django manage.py test ok, proceeding..."
 
 source venv/bin/activate
-pip install prospector --upgrade
+pip install prospector --upgrade -q
 prospector
 if [ "$?" != "0" ]; then
     echo "Prospector reported problems, terminating release"
@@ -16,7 +16,7 @@ fi
 echo "Prospector cleared build, proceeding..."
 
 source venv/bin/activate
-pip install pytype --upgrade
+pip install pytype --upgrade -q
 pytype -V3.6 jutil
 if [ "$?" != "0" ]; then
     echo "Pytype reported problems, terminating release"
@@ -26,7 +26,7 @@ echo "Pytype cleared build, proceeding..."
 
 echo "Updating test coverage"
 source venv/bin/activate
-pip install --upgrade codecov
+pip install --upgrade codecov -q
 coverage run --source='.' --omit='*/venv/*' manage.py test
 coverage report
 codecov
