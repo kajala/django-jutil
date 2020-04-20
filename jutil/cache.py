@@ -30,7 +30,7 @@ class CachedFieldsMixin:
                 v = self.__getattribute__(f)()
                 setattr(self, k, v)
             if commit:
-                self.save(update_fields=fields)
+                self.save(update_fields=fields)  # pytype: disable=attribute-error
         except Exception as e:
             logger.error('%s.update_cached_fields: %s', self.__class__, e)
             if exceptions:
@@ -41,7 +41,7 @@ class CachedFieldsMixin:
         Call on pre_save signal for objects (to automatically refresh on save).
         :param update_fields: list of fields to update
         """
-        if self.id and update_fields is None:
+        if hasattr(self, 'id') and self.id and update_fields is None:
             self.update_cached_fields(commit=False, exceptions=False)
 
 

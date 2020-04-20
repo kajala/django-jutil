@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from typing import Tuple
+
 import pytz
 from calendar import monthrange
 
@@ -46,7 +48,7 @@ def get_last_day_of_month(t: datetime) -> int:
     return tt.day
 
 
-def localize_time_range(begin: datetime, end: datetime, tz = None) -> (datetime, datetime):
+def localize_time_range(begin: datetime, end: datetime, tz = None) -> Tuple[datetime, datetime]:
     """
     Localizes time range. Uses pytz.utc if None provided.
     :param begin: Begin datetime
@@ -59,7 +61,7 @@ def localize_time_range(begin: datetime, end: datetime, tz = None) -> (datetime,
     return tz.localize(begin), tz.localize(end)
 
 
-def this_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def this_week(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns this week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -73,7 +75,7 @@ def this_week(today: datetime or None = None, tz = None) -> (datetime, datetime)
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def this_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def this_month(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns current month begin (inclusive) and end (exclusive).
     :param today: Some date in the month (defaults current datetime)
@@ -88,7 +90,7 @@ def this_month(today: datetime or None = None, tz = None) -> (datetime, datetime
     return localize_time_range(begin, end, tz)
 
 
-def next_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def next_week(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns next week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -102,7 +104,7 @@ def next_week(today: datetime or None = None, tz = None) -> (datetime, datetime)
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def next_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def next_month(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns next month begin (inclusive) and end (exclusive).
     :param today: Some date in the month (defaults current datetime)
@@ -119,7 +121,7 @@ def next_month(today: datetime or None = None, tz = None) -> (datetime, datetime
     return localize_time_range(begin, end, tz)
 
 
-def last_week(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def last_week(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns last week begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -133,7 +135,7 @@ def last_week(today: datetime or None = None, tz = None) -> (datetime, datetime)
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
 
-def last_month(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def last_month(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns last month begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -148,7 +150,7 @@ def last_month(today: datetime or None = None, tz = None) -> (datetime, datetime
     return localize_time_range(begin, end, tz)
 
 
-def last_year(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def last_year(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns last year begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
@@ -163,7 +165,7 @@ def last_year(today: datetime or None = None, tz = None) -> (datetime, datetime)
     return localize_time_range(begin, end, tz)
 
 
-def yesterday(today: datetime or None = None, tz = None) -> (datetime, datetime):
+def yesterday(today: datetime or None = None, tz = None) -> Tuple[datetime, datetime]:
     """
     Returns yesterday begin (inclusive) and end (exclusive).
     :param today: Some date (defaults current datetime)
