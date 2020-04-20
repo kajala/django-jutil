@@ -1,0 +1,13 @@
+django/core/management/base /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/utils/timezone /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/conf/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/dates /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dates.pyi
+django/core/mail/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+rest_framework/request /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/logs /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/logs.pyi
+sendgrid/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+sendgrid/helpers/mail/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/email /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/email.pyi
+django/utils/translation/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/command /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi
+jutil/bank_const_dk /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_dk.pyi

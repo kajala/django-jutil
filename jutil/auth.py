@@ -1,9 +1,11 @@
+from typing import Optional
+
 from django.contrib.auth.models import User
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.request import Request
 
 
-def require_auth(request: Request, exceptions: bool = True) -> User or None:
+def require_auth(request: Request, exceptions: bool = True) -> Optional[User]:
     """
     Returns authenticated User.
     :param request: HttpRequest

@@ -91,11 +91,11 @@ def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h
     return out.strip()
 
 
-def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> str:
+def format_xml(content: str, encoding: str = 'UTF-8', exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
-    :param content: XML data as str or bytes
+    :param content: XML data as str
     :param encoding: XML file encoding
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
@@ -119,11 +119,11 @@ def format_xml(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool 
         return content.decode(encoding=encoding) if isinstance(content, bytes) else content
 
 
-def format_xml_bytes(content: str or bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
+def format_xml_bytes(content: bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
     """
     Formats XML document as human-readable plain text and returns result in bytes.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
-    :param content: XML data as str or bytes
+    :param content: XML data as bytes
     :param encoding: XML file encoding
     :param exceptions: Raise exceptions on error
     :return: bytes (Formatted XML as bytes)

@@ -1,4 +1,6 @@
 import json
+from typing import Tuple
+
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
@@ -14,7 +16,7 @@ class DefaultTestSetupMixin:
         if kw.pop('verbose', self.verbose):
             print(*args)
 
-    def request(self, method: str, path: str, data: dict, **kw) -> (dict, int):
+    def request(self, method: str, path: str, data: dict, **kw) -> Tuple[dict, int]:
         verbose = kw.pop('verbose', self.verbose)
         self.debug_print('HTTP {} {} {}'.format(method.upper(), path, data), verbose=verbose)
         # print('HTTP {method} {data}'.format(method=method.upper(), data=data))

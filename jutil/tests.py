@@ -194,7 +194,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
         # parse_xml1.xml
         xml_str = open(join(settings.BASE_DIR, 'data/parse_xml1.xml'), 'rt').read()
-        data = xml_to_dict(xml_str)
+        data = xml_to_dict(xml_str.encode())
         # pprint(data)
         ref_data = {'@version': '1.2',
                     'A': [{'@class': 'x', 'B': {'@': 'hello', '@class': 'x2'}},
@@ -204,14 +204,14 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
         # parse_xml1.xml / no attributes
         xml_str = open(join(settings.BASE_DIR, 'data/parse_xml1.xml'), 'rt').read()
-        data = xml_to_dict(xml_str, parse_attributes=False)
+        data = xml_to_dict(xml_str.encode(), parse_attributes=False)
         # pprint(data)
         ref_data = {'A': [{'B': 'hello'}, {'B': 'world'}], 'C': 'value node'}
         self.assertEqual(ref_data, data)
 
         # parse_xml2.xml / no attributes
         xml_str = open(join(settings.BASE_DIR, 'data/parse_xml2.xml'), 'rt').read()
-        data = xml_to_dict(xml_str, ['VastausLoki', 'LuottoTietoMerkinnat'], parse_attributes=False)
+        data = xml_to_dict(xml_str.encode(), ['VastausLoki', 'LuottoTietoMerkinnat'], parse_attributes=False)
         # pprint(data)
         ref_data = {'VastausLoki': {'KysyttyHenkiloTunnus': '020685-1234',
                     'PaluuKoodi': 'Palveluvastaus onnistui',
@@ -233,7 +233,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         assert isinstance(el, Element)
         xml_str = ET.tostring(el, encoding='utf8', method='xml').decode()
         # print(xml_str)  # <Doc version="1.2"><C>value node</C><A class="x"><B class="x2">hello</B></A><A class="y"><B class="y2">world</B></A></Doc>
-        data2 = xml_to_dict(xml_str, document_tag=True, array_tags=['E'], int_tags=['D'])
+        data2 = xml_to_dict(xml_str.encode(), document_tag=True, array_tags=['E'], int_tags=['D'])
         # print('')
         # pprint(data)
         # pprint(data2)
@@ -257,7 +257,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         el = dict_to_element(data)
         assert isinstance(el, Element)
         xml_str = ET.tostring(el, encoding='utf8', method='xml').decode()
-        data2 = xml_to_dict(xml_str, document_tag=True, array_tags=['E', 'F'], int_tags=['D'])
+        data2 = xml_to_dict(xml_str.encode(), document_tag=True, array_tags=['E', 'F'], int_tags=['D'])
         self.assertEqual(data2, data)
 
     def test_xml_to_dict(self):
@@ -277,7 +277,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
     </TtlDbtNtries>
   </TxsSummry>
 </Document>"""
-        data = xml_to_dict(xml_str, document_tag=True, array_tags=[], int_tags=['NbOfNtries'])
+        data = xml_to_dict(xml_str.encode(), document_tag=True, array_tags=[], int_tags=['NbOfNtries'])
         # print('')
         # pprint(data)
         self.assertEqual(data['Document']['TxsSummry']['TtlNtries']['NbOfNtries'], 12)
@@ -486,7 +486,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'
         dst = format_xml(src)
         self.assertEqual(dst, dst_ref)
-        dst = format_xml_bytes(src)
+        dst = format_xml_bytes(src.encode())
         self.assertEqual(dst, dst_ref.encode())
 
     def test_parse_sftp(self):

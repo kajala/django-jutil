@@ -1,0 +1,117 @@
+rule infer
+  command = /home/jani/www/kajala/django-jutil/venv/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.6 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /home/jani/www/kajala/django-jutil/venv/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.6 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_iban.pyi: check /home/jani/www/kajala/django-jutil/jutil/bank_const_iban.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.bank_const_iban.imports
+  module = jutil.bank_const_iban
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_be.pyi: check /home/jani/www/kajala/django-jutil/jutil/bank_const_be.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.bank_const_be.imports
+  module = jutil.bank_const_be
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_dk.pyi: check /home/jani/www/kajala/django-jutil/jutil/bank_const_dk.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.bank_const_dk.imports
+  module = jutil.bank_const_dk
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_fi.pyi: check /home/jani/www/kajala/django-jutil/jutil/bank_const_fi.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.bank_const_fi.imports
+  module = jutil.bank_const_fi
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_se.pyi: check /home/jani/www/kajala/django-jutil/jutil/bank_const_se.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.bank_const_se.imports
+  module = jutil.bank_const_se
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/validators.pyi: check /home/jani/www/kajala/django-jutil/jutil/validators.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_iban.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_be.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_dk.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_fi.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_se.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.validators.imports
+  module = jutil.validators
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/sms.pyi: check /home/jani/www/kajala/django-jutil/jutil/sms.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/validators.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.sms.imports
+  module = jutil.sms
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/apps.pyi: check /home/jani/www/kajala/django-jutil/jutil/apps.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.apps.imports
+  module = jutil.apps
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/permissions.pyi: check /home/jani/www/kajala/django-jutil/jutil/permissions.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.permissions.imports
+  module = jutil.permissions
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/setpass.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/setpass.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.setpass.imports
+  module = jutil.management.commands.setpass
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/__init__.pyi: check /home/jani/www/kajala/django-jutil/jutil/__init__.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.__init__.imports
+  module = jutil.__init__
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/object.pyi: check /home/jani/www/kajala/django-jutil/jutil/object.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.object.imports
+  module = jutil.object
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/cache.pyi: check /home/jani/www/kajala/django-jutil/jutil/cache.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.cache.imports
+  module = jutil.cache
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/logs.pyi: check /home/jani/www/kajala/django-jutil/jutil/logs.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.logs.imports
+  module = jutil.logs
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/email.pyi: check /home/jani/www/kajala/django-jutil/jutil/email.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/logs.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.email.imports
+  module = jutil.email
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/middleware.pyi: check /home/jani/www/kajala/django-jutil/jutil/middleware.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/email.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.middleware.imports
+  module = jutil.middleware
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/__init__.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/__init__.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.__init__.imports
+  module = jutil.management.commands.__init__
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dict.pyi: check /home/jani/www/kajala/django-jutil/jutil/dict.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.dict.imports
+  module = jutil.dict
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/model.pyi: check /home/jani/www/kajala/django-jutil/jutil/model.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dict.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.model.imports
+  module = jutil.model
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/format.pyi: check /home/jani/www/kajala/django-jutil/jutil/format.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.format.imports
+  module = jutil.format
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/responses.pyi: check /home/jani/www/kajala/django-jutil/jutil/responses.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/format.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.responses.imports
+  module = jutil.responses
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/admin.pyi: check /home/jani/www/kajala/django-jutil/jutil/admin.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/model.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/responses.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.admin.imports
+  module = jutil.admin
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dates.pyi: check /home/jani/www/kajala/django-jutil/jutil/dates.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.dates.imports
+  module = jutil.dates
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi: check /home/jani/www/kajala/django-jutil/jutil/command.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dates.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/email.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.command.imports
+  module = jutil.command
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/request.pyi: check /home/jani/www/kajala/django-jutil/jutil/request.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.request.imports
+  module = jutil.request
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/sftp.pyi: check /home/jani/www/kajala/django-jutil/jutil/sftp.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.sftp.imports
+  module = jutil.sftp
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/testing.pyi: check /home/jani/www/kajala/django-jutil/jutil/testing.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.testing.imports
+  module = jutil.testing
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/urls.pyi: check /home/jani/www/kajala/django-jutil/jutil/urls.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.urls.imports
+  module = jutil.urls
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/xml.pyi: check /home/jani/www/kajala/django-jutil/jutil/xml.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.xml.imports
+  module = jutil.xml
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/parse.pyi: check /home/jani/www/kajala/django-jutil/jutil/parse.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.parse.imports
+  module = jutil.parse
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/tests.pyi: check /home/jani/www/kajala/django-jutil/jutil/tests.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/admin.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dict.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/model.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/request.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/sftp.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/testing.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/urls.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/xml.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dates.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/format.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/parse.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/validators.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.tests.imports
+  module = jutil.tests
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/test_email.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/test_email.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/email.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.test_email.imports
+  module = jutil.management.commands.test_email
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/make_bank_const_fi.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/make_bank_const_fi.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/dict.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_fi.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.make_bank_const_fi.imports
+  module = jutil.management.commands.make_bank_const_fi
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/auth.pyi: check /home/jani/www/kajala/django-jutil/jutil/auth.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.auth.imports
+  module = jutil.auth
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/__init__.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/__init__.py
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.__init__.imports
+  module = jutil.management.__init__
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/make_bank_const_se.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/make_bank_const_se.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_se.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.make_bank_const_se.imports
+  module = jutil.management.commands.make_bank_const_se
+build /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/management/commands/make_bank_const_dk.pyi: check /home/jani/www/kajala/django-jutil/jutil/management/commands/make_bank_const_dk.py | /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/command.pyi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_dk.pyi
+  imports = /home/jani/www/kajala/django-jutil/.pytype/imports/jutil.management.commands.make_bank_const_dk.imports
+  module = jutil.management.commands.make_bank_const_dk

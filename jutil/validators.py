@@ -3,6 +3,8 @@ import unicodedata
 from datetime import date
 from decimal import Decimal
 from random import randint
+from typing import Tuple, Optional
+
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -47,7 +49,7 @@ def email_filter(v: str) -> str:
     return str(v).lower().strip() if v else ''
 
 
-def email_validator(v: str) -> str:
+def email_validator(v: str):
     v = email_filter(v)
     if not v or not EMAIL_VALIDATOR.fullmatch(v):
         v_str = _('Missing value') if not v else str(v)
@@ -190,7 +192,7 @@ def validate_country_iban(v: str, country: str):
     iban_validator(v)
 
 
-def iban_bank_info(v: str) -> (str, str):
+def iban_bank_info(v: str) -> Tuple[str, str]:
     """
     Returns BIC code and bank name from IBAN number.
     :param v: IBAN account number
@@ -245,7 +247,7 @@ def be_iban_validator(v: str):
     validate_country_iban(v, 'BE')
 
 
-def be_iban_bank_info(v: str) -> (str, str):
+def be_iban_bank_info(v: str) -> Tuple[str, str]:
     """
     Returns BIC code and bank name from BE IBAN number.
     :param v: IBAN account number
@@ -271,7 +273,7 @@ def dk_clearing_code_bank_name(v: str) -> str:
     return DK_BANK_CLEARING_MAP.get(v[:4], '')
 
 
-def dk_iban_bank_info(v: str) -> (str, str):
+def dk_iban_bank_info(v: str) -> Tuple[str, str]:
     """
     Returns empty string (BIC not available) and bank name from DK IBAN number.
     DK5000400440116243
@@ -347,7 +349,7 @@ def fi_iban_validator(v: str):
     validate_country_iban(v, 'FI')
 
 
-def fi_iban_bank_info(v: str) -> (str, str):
+def fi_iban_bank_info(v: str) -> Tuple[str, str]:
     """
     Returns BIC code and bank name from FI IBAN number.
     :param v: IBAN account number
@@ -367,7 +369,7 @@ def fi_company_org_id_filter(v: str) -> str:
     return v[:-1] + '-' + v[-1:] if len(v) >= 2 else ''
 
 
-def fi_company_org_id_validator(v0: str) -> str:
+def fi_company_org_id_validator(v0: str):
     v = fi_company_org_id_filter(v0)
     prefix = v[:2]
     if v[-2:-1] != '-' and prefix != 'FI':
@@ -494,7 +496,7 @@ def se_ssn_validator(v: str):
         raise ValidationError(_('Invalid personal identification number')+' (SE.2): {}'.format(v), code='invalid_ssn')
 
 
-def se_clearing_code_bank_info(account_number: str) -> (str, int):
+def se_clearing_code_bank_info(account_number: str) -> Tuple[str, Optional[int]]:
     """
     Returns Sweden bank info by clearning code.
     :param account_number: Swedish account number with clearing code as prefix

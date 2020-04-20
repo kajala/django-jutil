@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import List
+from typing import List, Optional
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -23,7 +23,7 @@ from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
 
-def admin_log(instances, msg: str, who: User or None = None, **kw):
+def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances
@@ -54,7 +54,7 @@ def admin_log(instances, msg: str, who: User or None = None, **kw):
             LogEntry.objects.log_action(
                 user_id=who.pk,
                 content_type_id=get_content_type_for_model(instance).pk,
-                object_id=instance.pk,
+                object_id=instance.pk,  # pytype: disable=attribute-error
                 object_repr=force_text(instance),
                 action_flag=CHANGE,
                 change_message=msg,
@@ -179,7 +179,8 @@ class AdminLogEntryMixin:
             label, value = get_model_field_label_and_value(self, k)
             fv_str += '{}={}'.format(label, value) if not fv_str else ', {}={}'.format(label, value)
 
-        msg = "{class_name} id={id}: {fv_str}".format(class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)
+        msg = "{class_name} id={id}: {fv_str}".format(
+            class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)  # pytype: disable=attribute-error
         admin_log([who, self], msg, who, **kw)
 
 
@@ -227,10 +228,10 @@ class AdminFileDownloadMixin:
                 query = Q(**query_params)
             else:
                 query = query | Q(**query_params)
-        objs = self.get_queryset(request).filter(query)
+        objs = self.get_queryset(request).filter(query)  # pytype: disable=attribute-error
         for obj in objs:
             try:
-                return self.get_object(request, obj.id)  # for permission check
+                return self.get_object(request, obj.id)  # pytype: disable=attribute-error
             except Exception:
                 pass
         raise Http404(_('File {} not found').format(filename))
@@ -238,7 +239,7 @@ class AdminFileDownloadMixin:
     def get_download_url(self, obj, file_field: str = '') -> str:
         obj_id = obj.pk
         filename = getattr(obj, self.single_file_field if not file_field else file_field).name
-        info = self.model._meta.app_label, self.model._meta.model_name
+        info = self.model._meta.app_label, self.model._meta.model_name  # # pytype: disable=attribute-error
         return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
 
     def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:
@@ -260,7 +261,7 @@ class AdminFileDownloadMixin:
 
         Returns: File download URLs for this model.
         """
-        info = self.model._meta.app_label, self.model._meta.model_name
+        info = self.model._meta.app_label, self.model._meta.model_name  # pytype: disable=attribute-error
         return [
             url(r'^\d+/change/(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download' % info),
             url(r'^(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download_changelist' % info),

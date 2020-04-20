@@ -1,10 +1,11 @@
 import re
+from typing import Tuple
 
 
 SFTP_CONNECTION_STRING_REGEX_1 = re.compile(r'^([^@:]+)(:[^@]+)?@([^:]+)(:.+)?')
 
 
-def parse_sftp_connection(connection: str, exceptions: bool = True) -> (str, str, str, str):  # noqa
+def parse_sftp_connection(connection: str, exceptions: bool = True) -> Tuple[str, str, str, str]:  # noqa
     """
     Parses SFTP connection string.
     Connection string format 'USERNAME(:PASSWORD)@HOST(:PATH)' or

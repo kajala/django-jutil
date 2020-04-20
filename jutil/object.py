@@ -1,4 +1,7 @@
-def _split_obj_attr_path(obj, key: str, exceptions: bool = True) -> (str, str):
+from typing import Tuple, Any
+
+
+def _split_obj_attr_path(obj, key: str, exceptions: bool = True) -> Tuple[Any, str]:
     obj0 = obj
     key0 = key
     key_parts = key.split('.')
@@ -13,7 +16,7 @@ def _split_obj_attr_path(obj, key: str, exceptions: bool = True) -> (str, str):
     return obj, key_name
 
 
-def set_obj_attr(obj, key: str, val):
+def set_obj_attr(obj, key: str, val: Any):
     """
     Set object property. Support '.' separate path to sub-objects, for example
     set_key_value(user, 'profile.address', 'Lapinrinne 1') sets user.profile.address as 'Lapinrinne 1'.
@@ -26,7 +29,7 @@ def set_obj_attr(obj, key: str, val):
     setattr(obj, key_name, val)
 
 
-def get_obj_attr(obj, key: str, default = None, exceptions: bool = True):
+def get_obj_attr(obj, key: str, default = None, exceptions: bool = True) -> Any:
     """
     Get object property. Support '.' separate path to sub-objects, for example
     get_key_value(user, 'profile.address') gets user.profile.address field value.

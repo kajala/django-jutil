@@ -2,6 +2,8 @@ import logging
 import re
 import traceback
 from datetime import datetime, timedelta
+from typing import Tuple, List
+
 import pytz
 from dateutil import rrule
 from dateutil.parser import parse
@@ -49,7 +51,7 @@ def add_date_range_arguments(parser: CommandParser):
         parser.add_argument('--' + v.replace('_', '-'), action='store_true')
 
 
-def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> (datetime, datetime):
+def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> Tuple[datetime, datetime]:
     """
     :param name: yesterday, last_month
     :param today: Optional current datetime. Default is now().
@@ -87,7 +89,7 @@ def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> (dat
     raise ValueError('Invalid date range name: {}'.format(name))
 
 
-def parse_date_range_arguments(options: dict, default_range: str = 'last_month') -> (datetime, datetime, list):
+def parse_date_range_arguments(options: dict, default_range: str = 'last_month') -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
     """
     :param options:
     :param default_range: Default datetime range to return if no other selected

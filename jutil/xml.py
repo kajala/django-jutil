@@ -66,7 +66,7 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
 
     # set attributes
     for a_key, a_val in attrib.items():
-        obj[attribute_prefix + _xml_tag_filter(a_key, strip_namespaces)] = a_val
+        obj[attribute_prefix + _xml_tag_filter(a_key, strip_namespaces)] = a_val  # pytype: disable=unsupported-operands
 
     # recurse children
     for el2 in list(el):
@@ -229,4 +229,4 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
         el = Element(_xml_filter_tag_name(tag))
         assert isinstance(el, Element)
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
-        return el
+        return el  # pytype: disable=bad-return-type

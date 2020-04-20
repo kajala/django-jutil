@@ -1,0 +1,10 @@
+django/conf/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/core/exceptions /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/utils/timezone /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/utils/translation/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/bank_const_iban /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_iban.pyi
+jutil/bank_const_be /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_be.pyi
+jutil/bank_const_dk /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_dk.pyi
+jutil/bank_const_fi /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_fi.pyi
+jutil/bank_const_se /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/bank_const_se.pyi
+jutil/validators /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/validators.pyi

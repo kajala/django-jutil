@@ -1,0 +1,7 @@
+django/conf/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/core/mail/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+django/utils/timezone /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+rest_framework/request /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+jutil/logs /home/jani/www/kajala/django-jutil/.pytype/pyi/jutil/logs.pyi
+sendgrid/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi
+sendgrid/helpers/mail/__init__ /home/jani/www/kajala/django-jutil/.pytype/imports/default.pyi

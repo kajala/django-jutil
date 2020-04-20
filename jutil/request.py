@@ -1,4 +1,5 @@
 import logging
+from typing import Tuple
 from django.conf import settings
 import requests
 import socket
@@ -42,7 +43,7 @@ def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
         return {}
 
 
-def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> (str, str, str):
+def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[str, str, str]:
     """
     Returns (ip, country_code, host) tuple of the IP address.
     :param ip: IP address
@@ -51,7 +52,7 @@ def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> (str, s
     :return: (ip, country_code, host)
     """
     if not ip:  # localhost
-        return None, '', ''
+        return '', '', ''
     host = ''
     country_code = get_geo_ip(ip, exceptions=exceptions, timeout=timeout).get('country_code', '')
     try:
