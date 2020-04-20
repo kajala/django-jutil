@@ -29,7 +29,7 @@ source venv/bin/activate
 pip install --upgrade codecov -q
 coverage run --source='.' --omit='*/venv/*' manage.py test
 coverage report
-codecov
+codecov -X gcov
 git add -A '*'
 git commit -m 'test coverage update'
 git push
