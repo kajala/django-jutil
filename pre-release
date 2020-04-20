@@ -7,6 +7,7 @@ fi
 echo "Django manage.py test ok, proceeding..."
 
 source venv/bin/activate
+pip install prospector
 prospector
 if [ "$?" != "0" ]; then
     echo "Prospector reported problems, terminating release"
@@ -15,6 +16,7 @@ fi
 echo "Prospector cleared build, proceeding..."
 
 source venv/bin/activate
+pip install pytype
 pytype -V3.6 jutil
 if [ "$?" != "0" ]; then
     echo "pytype reported problems, terminating release"
