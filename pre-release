@@ -14,6 +14,14 @@ if [ "$?" != "0" ]; then
 fi
 echo "Prospector cleared build, proceeding..."
 
+source venv/bin/activate
+pytype -V3.6 jutil
+if [ "$?" != "0" ]; then
+    echo "pytype reported problems, terminating release"
+    exit 1
+fi
+echo "Prospector cleared build, proceeding..."
+
 echo "Updating test coverage"
 source venv/bin/activate
 pip install --upgrade codecov

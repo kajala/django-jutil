@@ -37,10 +37,25 @@ Features
 * XML Element to/from dict conversions (dict_to_element, xml_to_dict)
 * XML file/content pretty formatting (format_xml, format_xml_bytes, format_xml_file, FormattedXmlResponse)
 
+
 Install
 =======
 
 pip install django-jutil
+
+
+Code Static Analysis
+====================
+
+The library passes both prospector and pytype checking. To install:
+
+pip install prospector
+pip install pytype
+
+To analyze:
+
+prospector
+pytype -V3.6 jutil
 
 
 Test Code Coverage
