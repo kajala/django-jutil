@@ -107,12 +107,10 @@ class ModelAdminBase(admin.ModelAdmin):
         :param actions: dict of str: (callable, name, description)
         :return: OrderedDict
         """
-        # pylint:disable=unused-variable
         sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: x[1])
         sorted_actions = OrderedDict()
-        for k, description in sorted_descriptions:
+        for k, description in sorted_descriptions:  # pylint: disable=unused-variable
             sorted_actions[k] = actions[k]
-        # pylint:enable=unused-variable
         return sorted_actions
 
     def get_actions(self, request):
@@ -164,7 +162,6 @@ class ModelAdminBase(admin.ModelAdmin):
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context)
-        # pylint:enable=too-many-arguments,too-many-locals
 
 
 class AdminLogEntryMixin:
@@ -187,10 +184,17 @@ class AdminLogEntryMixin:
 class AdminFileDownloadMixin:
     """
     Model Admin mixin for downloading uploaded files. Checks object permission before allowing download.
+
+    You can control access to file downloads using three different ways:
+    1) Set is_staff_to_download=False to allow also those users who don't have is_staff flag set to download files.
+    2) Set is_authenticated_to_download=False to allow also non-logged in users to download files.
+    3) Define get_queryset(request) for the admin class. This is most fine-grained access method.
     """
     upload_to = 'uploads'
     file_field = 'file'
     file_fields = []
+    is_staff_to_download = True
+    is_authenticated_to_download = True
 
     def get_file_fields(self) -> List[str]:
         if self.file_fields and self.file_field:
@@ -221,6 +225,11 @@ class AdminFileDownloadMixin:
         :param filename: File name of the downloaded object.
         :return: owner object
         """
+        user = request.user
+        if self.is_authenticated_to_download and not user.is_authenticated:
+            raise Http404(_('File {} not found').format(filename))
+        if self.is_staff_to_download and (not user.is_authenticated or not user.is_staff):
+            raise Http404(_('File {} not found').format(filename))
         query = None
         for k in self.get_file_fields():
             query_params = {k: filename}
