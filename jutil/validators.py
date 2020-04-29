@@ -2,7 +2,7 @@ import random
 import re
 import unicodedata
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from random import randint
 from typing import Tuple, Optional
 from django.core.exceptions import ValidationError
