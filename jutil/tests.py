@@ -35,7 +35,7 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer, \
     fi_company_org_id_generator, phone_validator, passport_filter, passport_validator, passport_sanitizer, \
     country_code_validator, validate_country_iban, iban_bic, validate_country_company_org_id, fi_ssn_generator, \
-    fi_ssn_validator, bic_validator
+    fi_ssn_validator, bic_validator, iban_generator
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
 
@@ -661,3 +661,23 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for src, dst in test_paths:
             self.assertEqual(strip_media_root(src), dst)
             self.assertEqual(get_media_full_path(dst), src)
+
+    def test_iban_generator_and_validator(self):
+        test_ibans = [
+            'MD7289912714638112731113',
+            'IS363252851674877586492113',
+            'HR5125000099152386224',
+            'CZ4750515755735423825528',
+            'FI3253811381259333',
+            'FR3212739000501869481882E94',
+        ]
+        for iban in test_ibans:
+            iban_validator(iban)
+        for n in range(100):
+            acc = iban_generator()
+            # print(acc)
+            try:
+                iban_validator(acc)
+            except Exception as e:
+                print('iban_generator() returned', acc, 'but iban_validator() raised exception', e)
+                self.fail('iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))

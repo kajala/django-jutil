@@ -1,10 +1,10 @@
+import random
 import re
 import unicodedata
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from random import randint
 from typing import Tuple, Optional
-
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -164,25 +164,70 @@ def iban_validator(v: str):
     :param v: str
     :return: None
     """
-    # validate IBAN numeric part
+    # validate prefix and length
     v = iban_filter(v)
     if not v:
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(_('Missing value')), code='invalid_iban')
-    digits = '0123456789'
-    num = ''
-    for ch in v[4:] + v[0:4]:
-        if ch not in digits:
-            ch = str(ord(ch) - ord('A') + 10)
-        num += ch
-    x = Decimal(num) % Decimal(97)
-    if x != Decimal(1):
+    country = v[:2].upper()
+    if country not in IBAN_LENGTH_BY_COUNTRY:
+        raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
+    iban_len = IBAN_LENGTH_BY_COUNTRY[country]
+    if iban_len != len(v):
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
 
-    # validate prefix and length
-    country = v[:2]
-    iban_len = IBAN_LENGTH_BY_COUNTRY.get(country, 0)
-    if iban_len != len(v):
-        raise ValidationError(_('Invalid IBAN account number') + ' ({}.1): {}'.format(country, v), code='invalid_iban')
+    # validate IBAN numeric part
+    if iban_len <= 26:  # very long IBANs are unsupported by the numeric part validation
+        digits = '0123456789'
+        num = ''
+        for ch in v[4:] + v[0:4]:
+            if ch not in digits:
+                ch = str(ord(ch) - ord('A') + 10)
+            num += ch
+        x = Decimal(num) % Decimal(97)
+        if x != Decimal(1):
+            raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
+
+
+def iban_generator(country_code: str = '') -> str:
+    """
+    Generates IBAN format bank account number (for testing).
+    :param country_code: 2-character country code (optional)
+    :return: str
+    """
+    # pick random country code if not set (with max IBAN length 27)
+    if not country_code:
+        country_code = random.choice(
+            list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys())))
+    nlen = IBAN_LENGTH_BY_COUNTRY[country_code]
+    if nlen > 26:
+        raise ValidationError(_('IBAN checksum generation does not support >26 character IBANs'), code='invalid_iban')
+
+    # generate BBAN part
+    if country_code not in IBAN_LENGTH_BY_COUNTRY:
+        raise ValidationError(_('Invalid country code') + ': {}'.format(country_code), code='invalid_country_code')
+    digits = '0123456789'
+    bban = ''.join([random.choice(digits) for n in range(nlen - 4)])
+
+    # generate valid IBAN numeric part
+    # (probably not the most efficient way to do this but write a better one if you need faster...)
+    num0 = ''
+    for ch in bban + country_code:
+        if ch not in digits:
+            ch = str(ord(ch) - ord('A') + 10)
+        num0 += ch
+    for checksum in range(1, 100):
+        num = num0
+        checksum_str = '{:02}'.format(checksum)
+        for ch in checksum_str:
+            if ch not in digits:
+                ch = str(ord(ch) - ord('A') + 10)
+            num += ch
+        # print(num, '/', 97, 'nlen', nlen)
+        x = Decimal(num) % Decimal(97)
+        if x == Decimal(1):
+            return country_code + checksum_str + bban
+
+    raise ValidationError(_('Invalid IBAN account number'), code='invalid_iban')  # should not get here
 
 
 def validate_country_iban(v: str, country: str):
