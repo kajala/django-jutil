@@ -85,7 +85,9 @@ class EnsureLanguageCookieMiddleware:
 
         res = self.get_response(request)
         if request.COOKIES[lang_cookie_name] != lang_cookie:
-            res.set_cookie(lang_cookie_name, lang)
+            secure = hasattr(settings, 'LANGUAGE_COOKIE_SECURE') and settings.LANGUAGE_COOKIE_SECURE
+            httponly = hasattr(settings, 'LANGUAGE_COOKIE_HTTPONLY') and settings.LANGUAGE_COOKIE_HTTPONLY
+            res.set_cookie(lang_cookie_name, lang, secure=secure, httponly=httponly)
         return res
 
 
