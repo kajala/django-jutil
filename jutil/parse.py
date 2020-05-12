@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Any
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
@@ -20,7 +21,7 @@ FALSE_VALUES = (
 )
 
 
-def parse_bool(v, default = None, exceptions: bool = True) -> bool:
+def parse_bool(v, default: Optional[bool] = None, exceptions: bool = True) -> bool:
     """
     Parses boolean value
     :param v: Input string
@@ -41,12 +42,12 @@ def parse_bool(v, default = None, exceptions: bool = True) -> bool:
     return default
 
 
-def parse_datetime(v: str, default = None, tz = None, exceptions: bool = True) -> datetime:
+def parse_datetime(v: str, default: Optional[datetime] = None, tz: Any = None, exceptions: bool = True) -> Optional[datetime]:
     """
     Parses str to timezone-aware datetime.
-    :param v: Input string
-    :param default: Default value if exceptions=False
-    :param tz: Default pytz timezone or None if use utc as default
+    :param v: Input string to parse
+    :param default: Default value to return if exceptions=False
+    :param tz: Default pytz timezone or if None then use UTC as default
     :param exceptions: Raise exception on error or not
     :return: datetime
     """

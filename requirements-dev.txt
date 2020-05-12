@@ -1,0 +1,5 @@
+psycopg2-binary==2.8.5
+sendgrid==6.3.0
+pytype
+prospector
+bandit

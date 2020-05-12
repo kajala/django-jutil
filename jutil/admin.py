@@ -91,8 +91,8 @@ def admin_obj_link(obj, label: str = '', route: str = '', base_url: str = '') ->
     """
     if obj is None:
         return ''
-    url = admin_obj_url(obj, route, base_url)
-    return format_html("<a href='{}'>{}</a>", mark_safe(url), str(obj) if not label else label)
+    url = mark_safe(admin_obj_url(obj, route, base_url))  # nosec
+    return format_html("<a href='{}'>{}</a>", url, str(obj) if not label else label)
 
 
 class ModelAdminBase(admin.ModelAdmin):
@@ -241,7 +241,7 @@ class AdminFileDownloadMixin:
         for obj in objs:
             try:
                 return self.get_object(request, obj.id)  # pytype: disable=attribute-error
-            except Exception:
+            except Exception:  # nosec
                 pass
         raise Http404(_('File {} not found').format(filename))
 

@@ -2,11 +2,8 @@ import logging
 import re
 import traceback
 from datetime import datetime, timedelta
-from typing import Tuple, List
-
-import pytz
+from typing import Tuple, List, Any, Optional
 from dateutil import rrule
-from dateutil.parser import parse
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
@@ -15,6 +12,7 @@ from jutil.dates import last_month, yesterday, TIME_RANGE_NAMES, TIME_STEP_NAMES
 from jutil.email import send_email
 import getpass
 from django.utils import translation
+from jutil.parse import parse_datetime
 
 
 logger = logging.getLogger(__name__)
@@ -43,6 +41,42 @@ class SafeCommand(BaseCommand):
 
 
 def add_date_range_arguments(parser: CommandParser):
+    """
+    Adds following arguments to the CommandParser:
+
+    Ranges:
+      --begin BEGIN
+      --end END
+      --last-month
+      --last-year
+      --this-month
+      --last-week
+      --yesterday
+      --today
+      --prev-90d
+      --plus-minus-90d
+      --next-90d
+      --prev-60d
+      --plus-minus-60d
+      --next-60d
+      --prev-30d
+      --plus-minus-30d
+      --next-30d
+      --prev-15d
+      --plus-minus-15d
+      --next-15d
+      --prev-7d
+      --plus-minus-7d
+      --next-7d
+
+    Steps:
+      --daily
+      --weekly
+      --monthly
+
+    :param parser:
+    :return:
+    """
     parser.add_argument('--begin', type=str)
     parser.add_argument('--end', type=str)
     for v in TIME_STEP_NAMES:
@@ -51,9 +85,10 @@ def add_date_range_arguments(parser: CommandParser):
         parser.add_argument('--' + v.replace('_', '-'), action='store_true')
 
 
-def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> Tuple[datetime, datetime]:
+def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
     """
-    :param name: yesterday, last_month
+    Returns a timezone-aware date range by symbolic name.
+    :param name: Name of the date range. See add_date_range_arguments().
     :param today: Optional current datetime. Default is now().
     :param tz: Optional timezone. Default is UTC.
     :return: datetime (begin, end)
@@ -91,7 +126,10 @@ def get_date_range_by_name(name: str, today: datetime = None, tz = None) -> Tupl
 
 def parse_date_range_arguments(options: dict, default_range: str = 'last_month') -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
     """
-    :param options:
+    Parses date range from input and returns timezone-aware date range and
+    interval list according to 'step' name argument (optional).
+    See add_date_range_arguments()
+    :param options: Parsed arguments passed to the command
     :param default_range: Default datetime range to return if no other selected
     :return: begin, end, [(begin1,end1), (begin2,end2), ...]
     """
@@ -100,11 +138,10 @@ def parse_date_range_arguments(options: dict, default_range: str = 'last_month')
         if options.get(range_name):
             begin, end = get_date_range_by_name(range_name)
     if options.get('begin'):
-        t = parse(options['begin'], default=datetime(2000, 1, 1))
-        begin = pytz.utc.localize(t)
+        begin = parse_datetime(options['begin'])
         end = now()
     if options.get('end'):
-        end = pytz.utc.localize(parse(options['end'], default=datetime(2000, 1, 1)))
+        end = parse_datetime(options['end'])
 
     step_type = None
     after_end = end

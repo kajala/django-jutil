@@ -1,6 +1,5 @@
 import json
 from typing import Tuple
-
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
@@ -56,7 +55,7 @@ class DefaultTestSetupMixin:
             raise Exception('HTTP {} {} {}: {} {}'.format('DELETE', status_code, path, data, reply))
         return reply
 
-    def add_test_user(self, email: str = 'test@example.com', password: str = 'test1234'):
+    def add_test_user(self, email: str = 'test@example.com', password: str = 'test1234'):  # nosec
         """
         Add and login test user.
         :param email:

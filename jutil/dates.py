@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Tuple
+from typing import Tuple, Any
 
 import pytz
 from calendar import monthrange
@@ -48,7 +48,7 @@ def get_last_day_of_month(t: datetime) -> int:
     return tt.day
 
 
-def localize_time_range(begin: datetime, end: datetime, tz = None) -> Tuple[datetime, datetime]:
+def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple[datetime, datetime]:
     """
     Localizes time range. Uses pytz.utc if None provided.
     :param begin: Begin datetime

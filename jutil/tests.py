@@ -65,6 +65,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_add_month(self):
         t = parse_datetime('2016-06-12T01:00:00')
+        self.assertTrue(isinstance(t, datetime))
+        assert isinstance(t, datetime)
         self.assertEqual(t.isoformat(), '2016-06-12T01:00:00+00:00')
         t2 = add_month(t)
         self.assertEqual(t2.isoformat(), '2016-07-12T01:00:00+00:00')

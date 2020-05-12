@@ -196,7 +196,7 @@ def iban_generator(country_code: str = '') -> str:
     """
     # pick random country code if not set (with max IBAN length 27)
     if not country_code:
-        country_code = random.choice(
+        country_code = random.choice(  # nosec
             list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys())))
     nlen = IBAN_LENGTH_BY_COUNTRY[country_code]
     if nlen > 26:
@@ -206,7 +206,7 @@ def iban_generator(country_code: str = '') -> str:
     if country_code not in IBAN_LENGTH_BY_COUNTRY:
         raise ValidationError(_('Invalid country code') + ': {}'.format(country_code), code='invalid_country_code')
     digits = '0123456789'
-    bban = ''.join([random.choice(digits) for n in range(nlen - 4)])
+    bban = ''.join([random.choice(digits) for n in range(nlen - 4)])  # nosec
 
     # generate valid IBAN numeric part
     # (probably not the most efficient way to do this but write a better one if you need faster...)
@@ -439,7 +439,7 @@ def fi_company_org_id_generator() -> str:
     remainder = 1
     v = ''
     while remainder < 2:
-        v = str(randint(11111111, 99999999))
+        v = str(randint(11111111, 99999999))  # nosec
         multipliers = (7, 9, 10, 5, 8, 4, 2)
         x = 0
         for i, m in enumerate(multipliers):
@@ -465,10 +465,10 @@ def fi_ssn_validator(v: str):
 
 
 def fi_ssn_generator():
-    day = randint(1, 28)
-    month = randint(1, 12)
-    year = randint(1920, 1999)
-    suffix = randint(100, 999)
+    day = randint(1, 28)  # nosec
+    month = randint(1, 12)  # nosec
+    year = randint(1920, 1999)  # nosec
+    suffix = randint(100, 999)  # nosec
     v = '{:02}{:02}{:02}-{}'.format(day, month, year-1900, suffix)
     d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
     digits = {

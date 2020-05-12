@@ -20,7 +20,7 @@ def send_email(recipients: list, subject: str,  # noqa
                exceptions: bool = False):
     """
     Sends email. Supports both SendGrid API client and SMTP connection.
-    If settings.EMAIL_SENDGRID_API_KEY is set then SendGrid API client is used, otherwise SMTP connection.
+    See send_email_sendgrid() for SendGrid specific requirements.
 
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :param subject: Subject of the email
@@ -46,7 +46,9 @@ def send_email_sendgrid(recipients: list, subject: str,  # noqa
                         bcc_recipients: list or None = None,
                         exceptions: bool = False):
     """
-    Sends email using SendGrid API. settings.EMAIL_SENDGRID_API_KEY must be set.
+    Sends email using SendGrid API. Following requirements:
+    * pip install sendgrid==6.3.0
+    * settings.EMAIL_SENDGRID_API_KEY must be set and
 
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :param subject: Subject of the email

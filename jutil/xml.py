@@ -18,7 +18,7 @@ def _xml_element_value(el: Element, is_int: bool = False):
     try:
         if is_int:
             return int(el.text)
-    except Exception:
+    except Exception:  # nosec
         pass
     # default to str if not empty
     s = str(el.text).strip()
