@@ -1,38 +1,38 @@
+#!/bin/bash
+
 source venv/bin/activate
+
+# update tools
+dt -q
+pip install prospector pytype --upgrade -q
+echo "Updated tools (`dt -q -d`)"
+
+# automatic tests
+dt -q
 python manage.py test
 if [ "$?" != "0" ]; then
     echo "Django manage.py test reported problems, terminating release"
     exit 1
 fi
-echo "Django manage.py test ok, proceeding..."
+echo "Django manage.py test ok (`dt -q -d`), proceeding..."
 
-source venv/bin/activate
-pip install prospector --upgrade -q
+# prospector
+
+dt -q
 prospector
 if [ "$?" != "0" ]; then
     echo "Prospector reported problems, terminating release"
     exit 1
 fi
-echo "Prospector cleared build, proceeding..."
+echo "Prospector cleared build (`dt -q -d`), proceeding..."
 
-source venv/bin/activate
-pip install pytype --upgrade -q
+# pytype
+dt -q
 pytype --config pytype.cfg
 if [ "$?" != "0" ]; then
     echo "Pytype reported problems, terminating release"
     exit 1
 fi
-echo "Pytype cleared build, proceeding..."
-
-echo "Updating test coverage"
-source venv/bin/activate
-pip install --upgrade codecov -q
-coverage run --source='.' --omit='*/venv/*' manage.py test
-coverage report
-codecov -X gcov
-git add -A '*'
-git commit -m 'test coverage update'
-git push
+echo "Pytype cleared build (`dt -q -d`), proceeding..."
 
 exit 0
-
