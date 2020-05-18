@@ -2,7 +2,9 @@ django-jutil
 ============
 
 Collection of small utilities for Django and Django REST framework projects.
-Django 3.0 compatible. [![codecov](https://codecov.io/gh/kajala/django-jutil/branch/master/graph/badge.svg)](https://codecov.io/gh/kajala/django-jutil)
+Django 3.0 compatible. 
+[![codecov](https://codecov.io/gh/kajala/django-jutil/branch/master/graph/badge.svg)](https://codecov.io/gh/kajala/django-jutil)
+[![Build Status](https://travis-ci.org/kajala/django-jutil.svg?branch=master)](https://travis-ci.org/kajala/django-jutil)
 
 Features
 ========
