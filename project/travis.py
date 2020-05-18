@@ -1,4 +1,5 @@
 from .base_settings import *  # noqa
+import sys
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '294xJnzB5UkIJksvV8vU0D4n16MfEw46mJCKn6l7'  # noqa
