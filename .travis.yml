@@ -1,0 +1,14 @@
+language: python
+python:
+  - "3.6"      # current default Python on Travis CI
+services:
+  - postgresql
+env:
+  - DJANGO_SETTINGS_MODULE=project.travis
+install:
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+script:
+  - python manage.py test
+before_script:
+  - psql -c 'create database django_jutil_test;' -U postgres
