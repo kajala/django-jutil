@@ -5,7 +5,7 @@ import tempfile
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Union
 from django.conf import settings
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
@@ -14,7 +14,7 @@ import xml.dom.minidom  # type: ignore
 logger = logging.getLogger(__name__)
 
 
-def format_full_name(first_name: str, last_name: str, max_length: int = 20):
+def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> str:
     """
     Limits name length to specified length. Tries to keep name as human-readable an natural as possible.
     :param first_name: First name
@@ -280,7 +280,7 @@ def ucfirst(v: str) -> str:
 ucfirst_lazy = lazy(ucfirst, str)
 
 
-def dec1(a) -> Decimal:
+def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 1 decimal digits.
     :param a: Number
@@ -289,7 +289,7 @@ def dec1(a) -> Decimal:
     return Decimal(a).quantize(Decimal('1.0'))
 
 
-def dec2(a) -> Decimal:
+def dec2(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 2 decimal digits.
     :param a: Number
@@ -298,7 +298,7 @@ def dec2(a) -> Decimal:
     return Decimal(a).quantize(Decimal('1.00'))
 
 
-def dec3(a) -> Decimal:
+def dec3(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 3 decimal digits.
     :param a: Number
@@ -307,7 +307,7 @@ def dec3(a) -> Decimal:
     return Decimal(a).quantize(Decimal('1.000'))
 
 
-def dec4(a) -> Decimal:
+def dec4(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 4 decimal digits.
     :param a: Number
@@ -316,7 +316,7 @@ def dec4(a) -> Decimal:
     return Decimal(a).quantize(Decimal('1.0000'))
 
 
-def dec5(a) -> Decimal:
+def dec5(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 5 decimal digits.
     :param a: Number
@@ -325,7 +325,7 @@ def dec5(a) -> Decimal:
     return Decimal(a).quantize(Decimal('1.00000'))
 
 
-def dec6(a) -> Decimal:
+def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 6 decimal digits.
     :param a: Number
