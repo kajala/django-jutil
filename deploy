@@ -15,6 +15,7 @@ cd dist
 tar xvf "$FILE.tar.gz"
 rm -f "$FILE/.covera*"
 rm -f "$FILE/coverage.xml"
+rm -rf "$FIR/.mypy_cache"
 rm -rf "$FILE/venv"
 rm -rf "$FILE/data"
 rm -rf "$FILE/linecalc.conf"
