@@ -262,7 +262,7 @@ def iban_bic(v: str) -> str:
     return info[0] if info else ''
 
 
-def calculate_age(born: date, today: date or None = None) -> int:
+def calculate_age(born: date, today: Optional[date] = None) -> int:
     if not today:
         today = now().date()
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -496,7 +496,7 @@ def fi_ssn_birthday(v: str) -> date:
     return date(year, month, day)
 
 
-def fi_ssn_age(ssn: str, today: date or None = None) -> int:
+def fi_ssn_age(ssn: str, today: Optional[date] = None) -> int:
     return calculate_age(fi_ssn_birthday(ssn), today)
 
 

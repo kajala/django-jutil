@@ -1,5 +1,7 @@
 #pylint: disable=too-many-arguments,too-many-locals
 import logging
+from typing import Optional, List, Union, Tuple, Iterable
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils.timezone import now
@@ -11,12 +13,12 @@ from os.path import basename
 logger = logging.getLogger(__name__)
 
 
-def send_email(recipients: list, subject: str,  # noqa
+def send_email(recipients: Optional[Iterable[Union[str, Tuple[str, str]]]], subject: str,  # noqa
                text: str = '', html: str = '',
                sender: str = '',
-               files: list or None = None,
-               cc_recipients: list or None = None,
-               bcc_recipients: list or None = None,
+               files: Optional[Iterable[str]] = None,
+               cc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
+               bcc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
                exceptions: bool = False):
     """
     Sends email. Supports both SendGrid API client and SMTP connection.
@@ -38,12 +40,12 @@ def send_email(recipients: list, subject: str,  # noqa
     return send_email_smtp(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
 
 
-def send_email_sendgrid(recipients: list, subject: str,  # noqa
+def send_email_sendgrid(recipients: Optional[Iterable[Union[str, Tuple[str, str]]]], subject: str,  # noqa
                         text: str = '', html: str = '',
                         sender: str = '',
-                        files: list or None = None,
-                        cc_recipients: list or None = None,
-                        bcc_recipients: list or None = None,
+                        files: Optional[Iterable[str]] = None,
+                        cc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
+                        bcc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
                         exceptions: bool = False):
     """
     Sends email using SendGrid API. Following requirements:
@@ -143,12 +145,12 @@ def send_email_sendgrid(recipients: list, subject: str,  # noqa
     return res.status_code
 
 
-def send_email_smtp(recipients: list, subject: str,  # noqa
+def send_email_smtp(recipients: Optional[Iterable[Union[str, Tuple[str, str]]]], subject: str,  # noqa
                     text: str = '', html: str = '',
                     sender: str = '',
-                    files: list or None = None,
-                    cc_recipients: list or None = None,
-                    bcc_recipients: list or None = None,
+                    files: Optional[Iterable[str]] = None,
+                    cc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
+                    bcc_recipients: Optional[Iterable[Union[str, Tuple[str, str]]]] = None,
                     exceptions: bool = False):
     """
     Sends email using SMTP connection using standard Django email settings.

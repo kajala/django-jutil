@@ -5,7 +5,7 @@ import tempfile
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
-from typing import List, Any
+from typing import List, Any, Optional
 from django.conf import settings
 from django.utils.functional import lazy
 import xml.dom.minidom
@@ -175,10 +175,10 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     return b''
 
 
-def format_table(rows: List[List[Any]], max_col: int or None = 10, max_line: int or None = 200,  # noqa
+def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: Optional[int] = 200,  # noqa
                  col_sep: str = '|', row_sep: str = '-', row_begin: str = '|', row_end: str = '|',
                  has_label_row: bool = False,
-                 left_align: List[int] or None = None, center_align: List[int] or None = None) -> str:
+                 left_align: Optional[List[int]] = None, center_align: Optional[List[int]] = None) -> str:
     """
     Formats "ASCII-table" rows by padding column widths to longest column value, optionally limiting column widths.
     Optionally separates colums with ' | ' character and header row with '-' characters.

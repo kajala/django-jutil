@@ -1,5 +1,5 @@
 import logging
-
+from typing import Optional, Iterable
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ class CachedFieldsMixin:
     """
     cached_fields = []
 
-    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: list or None = None):
+    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Iterable[str]] = None):
         """
         Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
         :param commit: Save update fields to DB

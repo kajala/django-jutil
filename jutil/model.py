@@ -1,4 +1,4 @@
-from typing import Type, List, Tuple, Any
+from typing import Type, List, Tuple, Any, Optional
 
 from django.db.models import Model
 from django.utils.encoding import force_text
@@ -34,7 +34,10 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
             if hasattr(f, 'choices') and f.choices:
                 value = choices_label(f.choices, value)
             break
-    return label, force_text(value)
+    val = force_text(value)
+    if val is None:
+        val = ''
+    return label, val
 
 
 def is_model_field_changed(instance, field_name: str) -> bool:
@@ -53,14 +56,14 @@ def is_model_field_changed(instance, field_name: str) -> bool:
     return qs.filter(**params).first() is None
 
 
-def get_model_keys(instance, cls: Type[Model] or None = None,
+def get_model_keys(instance, cls: Optional[Type[Model]] = None,
                    exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr') -> List[str]:
     if cls is None:
         cls = instance.__class__
     return [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
 
 
-def clone_model(instance, cls: Type[Model] or None = None, commit: bool = True,
+def clone_model(instance, cls: Optional[Type[Model]] = None, commit: bool = True,
                 exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr', **kw):
     """
     Assigns model fields to new object. Ignores exclude_fields list and

@@ -1,5 +1,6 @@
 # pylint: disable=too-many-arguments,too-many-locals
 import re
+from typing import Optional, Iterable, Dict, Any
 from xml import etree
 from xml.etree.ElementTree import Element, SubElement
 
@@ -86,10 +87,12 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
         data[tag] = obj
 
 
-def xml_to_dict(xml_bytes: bytes, tags: list or None = None, array_tags: list or None = None, int_tags: list or None = None,
+def xml_to_dict(xml_bytes: bytes,
+                tags: Optional[Iterable[str]] = None, array_tags: Optional[Iterable[str]] = None,
+                int_tags: Optional[Iterable[str]] = None,
                 strip_namespaces: bool = True, parse_attributes: bool = True,
                 value_key: str = '@', attribute_prefix: str = '@',
-                document_tag: bool = False) -> dict:
+                document_tag: bool = False) -> Dict[str, Any]:
     """
     Parses XML string to dict. In case of simple elements (no children, no attributes) value is stored as is.
     For complex elements value is stored in key '@', attributes '@xxx' and children as sub-dicts.
