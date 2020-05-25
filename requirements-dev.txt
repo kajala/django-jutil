@@ -7,4 +7,4 @@ codecov
 mypy
 djangorestframework-stubs
 django-stubs
-
+twine
