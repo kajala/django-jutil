@@ -1,6 +1,6 @@
 import re
 from collections import OrderedDict
-from typing import List
+from typing import List, Sequence, Tuple
 
 from django.utils.text import capfirst
 
@@ -14,7 +14,7 @@ def sorted_dict(d: dict):
     return OrderedDict(sorted(d.items()))
 
 
-def choices_label(choices: tuple, value) -> str:
+def choices_label(choices: Sequence[Tuple[str, str]], value) -> str:
     """
     Iterates (value,label) list and returns label matching the choice
     :param choices: [(choice1, label1), (choice2, label2), ...]
