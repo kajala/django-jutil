@@ -1,7 +1,6 @@
 import json
 import logging
-from typing import Optional
-
+from typing import Optional, Dict, Any
 from ipware.ip import get_real_ip  # pytype: disable=import-error
 from rest_framework.request import Request
 
@@ -9,7 +8,7 @@ from rest_framework.request import Request
 logger = logging.getLogger(__name__)
 
 
-def log_event(name: str, request: Optional[Request] = None, data: Optional[dict] = None, ip: str = ''):
+def log_event(name: str, request: Optional[Request] = None, data: Optional[Dict[str, Any]] = None, ip: str = ''):
     """
     Logs consistent event for easy parsing/analysis.
     Format: EVENT_<UPPERCASE_NAME>: <JSON object>
@@ -18,7 +17,7 @@ def log_event(name: str, request: Optional[Request] = None, data: Optional[dict]
     :param data: Even data (optional)
     :param ip: Even IP (optional)
     """
-    log_data = {}
+    log_data: Dict[str, Any] = {}
     if not ip and request:
         ip = get_real_ip(request)
     if ip:

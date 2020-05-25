@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Iterable
+from typing import Optional, Iterable, List
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ class CachedFieldsMixin:
     3) Call update_cached_fields() to refresh
     4) Optionally call update_cached_fields_pre_save() on pre_save signal for objects (to automatically refresh on save)
     """
-    cached_fields = []
+    cached_fields: List[str] = []
 
     def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Iterable[str]] = None):
         """
