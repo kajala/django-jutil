@@ -3,7 +3,7 @@ import traceback
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
-from ipware.ip import get_real_ip  # pytype: disable=import-error
+from ipware.ip import get_real_ip  # type: ignore  # pytype: disable=import-error
 from jutil.email import send_email
 
 

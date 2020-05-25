@@ -62,7 +62,7 @@ class DefaultTestSetupMixin:
         :param password:
         :return:
         """
-        self.user = User.objects.create_user(email, email, password)
+        self.user = User.objects.create_user(email, email, password)  # type: ignore
         self.token = Token.objects.get_or_create(user=self.user)[0]
         self.api_client = APIClient()
         self.api_client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.token.key))

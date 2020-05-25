@@ -9,7 +9,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.management import CommandParser
+from django.core.management import CommandParser  # type: ignore
 from django.test import TestCase
 from django.utils import translation
 from django.utils.translation import override, gettext as _, gettext_lazy

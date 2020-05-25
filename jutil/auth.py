@@ -26,4 +26,4 @@ class AuthUserMixin:
         Returns authenticated user.
         :return: User
         """
-        return require_auth(self.request)
+        return require_auth(self.request, exceptions=True)  # type: ignore

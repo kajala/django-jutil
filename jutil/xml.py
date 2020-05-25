@@ -1,11 +1,10 @@
-# pylint: disable=too-many-arguments,too-many-locals
 import re
-from typing import Optional, Iterable, Dict, Any
+from typing import Optional, Iterable, Dict, Any, List
 from xml import etree
 from xml.etree.ElementTree import Element, SubElement
 
 
-def _xml_element_value(el: Element, is_int: bool = False):
+def _xml_element_value(el: Element, is_int: bool = False) -> Any:
     """
     Gets XML Element value.
     :param el: Element
@@ -44,7 +43,8 @@ def _xml_tag_filter(s: str, strip_namespaces: bool) -> str:
     return s
 
 
-def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags: list,
+def _xml_set_element_data_r(data: dict, el: Element,  # pylint: disable=too-many-arguments,too-many-locals
+                            array_tags: Iterable[str], int_tags: Iterable[str],
                             strip_namespaces: bool, parse_attributes: bool,
                             value_key: str, attribute_prefix: str):
 
@@ -87,7 +87,7 @@ def _xml_set_element_data_r(data: dict, el: Element, array_tags: list, int_tags:
         data[tag] = obj
 
 
-def xml_to_dict(xml_bytes: bytes,
+def xml_to_dict(xml_bytes: bytes,  # pylint: disable=too-many-arguments,too-many-locals
                 tags: Optional[Iterable[str]] = None, array_tags: Optional[Iterable[str]] = None,
                 int_tags: Optional[Iterable[str]] = None,
                 strip_namespaces: bool = True, parse_attributes: bool = True,
@@ -139,13 +139,13 @@ def xml_to_dict(xml_bytes: bytes,
         if document_tag:
             raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list '
                             'since selective tag list finds tags from the whole document, not only directly under root document tag')
-        root_elements = []
+        root_elements: List[Element] = []
         for tag in tags:
             root_elements.extend(root.iter(tag))
     else:
         root_elements = list(root)
 
-    data = {}
+    data: Dict[str, Any] = {}
     for el in root_elements:
         _xml_set_element_data_r(data, el, array_tags=array_tags, int_tags=int_tags,
                                 strip_namespaces=strip_namespaces, parse_attributes=parse_attributes,
@@ -233,3 +233,5 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
         assert isinstance(el, Element)
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
         return el  # pytype: disable=bad-return-type
+
+    return Element('empty')

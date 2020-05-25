@@ -2,6 +2,8 @@
 import csv
 import re
 from copy import copy
+from typing import Any
+
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
 from jutil.bank_const_se import SE_BANK_CLEARING_LIST
@@ -52,7 +54,7 @@ def se_iban_load_map(filename: str) -> list:
                             end = begin
 
                     if begin and end:
-                        digits = None
+                        digits: Any = None
                         try:
                             digits = int(acc_digits)
                         except ValueError:

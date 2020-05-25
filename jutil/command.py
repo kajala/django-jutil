@@ -138,10 +138,10 @@ def parse_date_range_arguments(options: dict, default_range: str = 'last_month')
         if options.get(range_name):
             begin, end = get_date_range_by_name(range_name)
     if options.get('begin'):
-        begin = parse_datetime(options['begin'])
+        begin = parse_datetime(options['begin'])  # type: ignore
         end = now()
     if options.get('end'):
-        end = parse_datetime(options['end'])
+        end = parse_datetime(options['end'])  # type: ignore
 
     step_type = None
     after_end = end

@@ -1,5 +1,6 @@
 import re
 from collections import OrderedDict
+from typing import List
 
 from django.utils.text import capfirst
 
@@ -26,13 +27,13 @@ def choices_label(choices: tuple, value) -> str:
     return ''
 
 
-def _dict_to_html_format_key(k: str):
+def _dict_to_html_format_key(k: str) -> str:
     if k.startswith('@'):
         k = k[1:]
     k = k.replace('_', ' ')
     k = re.sub(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r' \1', k)
     parts = k.split(' ')
-    out = [capfirst(parts[0].strip())]
+    out: List[str] = [str(capfirst(parts[0].strip()))]
     for p in parts[1:]:
         p2 = p.strip().lower()
         if p2:

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Iterable, List
+from typing import Optional, Iterable, List, TYPE_CHECKING, Any
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,12 @@ class CachedFieldsMixin:
     4) Optionally call update_cached_fields_pre_save() on pre_save signal for objects (to automatically refresh on save)
     """
     cached_fields: List[str] = []
+
+    if TYPE_CHECKING:
+        pk: Any = None
+
+        def save(self, update_fields: Optional[Iterable[str]]):
+            pass
 
     def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Iterable[str]] = None):
         """
@@ -41,7 +47,7 @@ class CachedFieldsMixin:
         Call on pre_save signal for objects (to automatically refresh on save).
         :param update_fields: list of fields to update
         """
-        if hasattr(self, 'id') and self.id and update_fields is None:
+        if hasattr(self, 'pk') and self.pk and update_fields is None:
             self.update_cached_fields(commit=False, exceptions=False)
 
 

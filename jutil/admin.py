@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import List, Optional
+from typing import List, Optional, Iterable
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -52,7 +52,7 @@ def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
     for instance in instances:
         if instance:
             LogEntry.objects.log_action(
-                user_id=who.pk,
+                user_id=who.pk if who is not None else None,
                 content_type_id=get_content_type_for_model(instance).pk,
                 object_id=instance.pk,  # pytype: disable=attribute-error
                 object_repr=force_text(instance),
@@ -177,7 +177,7 @@ class AdminLogEntryMixin:
             fv_str += '{}={}'.format(label, value) if not fv_str else ', {}={}'.format(label, value)
 
         msg = "{class_name} id={id}: {fv_str}".format(
-            class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)  # pytype: disable=attribute-error
+            class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)  # type: ignore
         admin_log([who, self], msg, who, **kw)
 
 
@@ -192,7 +192,7 @@ class AdminFileDownloadMixin:
     """
     upload_to = 'uploads'
     file_field = 'file'
-    file_fields = []
+    file_fields: Iterable[str] = []
     is_staff_to_download = True
     is_authenticated_to_download = True
 
@@ -248,7 +248,7 @@ class AdminFileDownloadMixin:
     def get_download_url(self, obj, file_field: str = '') -> str:
         obj_id = obj.pk
         filename = getattr(obj, self.single_file_field if not file_field else file_field).name
-        info = self.model._meta.app_label, self.model._meta.model_name  # # pytype: disable=attribute-error
+        info = self.model._meta.app_label, self.model._meta.model_name  # type: ignore
         return reverse('admin:{}_{}_change'.format(*info), args=(str(obj_id),)) + filename
 
     def get_download_link(self, obj, file_field: str = '', label: str = '') -> str:

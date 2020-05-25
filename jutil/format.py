@@ -8,7 +8,7 @@ import subprocess
 from typing import List, Any, Optional
 from django.conf import settings
 from django.utils.functional import lazy
-import xml.dom.minidom
+import xml.dom.minidom  # type: ignore
 
 
 logger = logging.getLogger(__name__)
@@ -100,23 +100,20 @@ def format_xml(content: str, encoding: str = 'UTF-8', exceptions: bool = False) 
     :param exceptions: Raise exceptions on error
     :return: str (Formatted XML str)
     """
+    assert isinstance(content, str)
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
-            if isinstance(content, str):
-                content = content.encode(encoding=encoding)
             with tempfile.NamedTemporaryFile() as fp:
-                fp.write(content)
+                fp.write(content.encode(encoding=encoding))
                 fp.flush()
                 out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
                 return out.decode(encoding=encoding)
-        if isinstance(content, bytes):
-            content = content.decode(encoding=encoding)
         return xml.dom.minidom.parseString(content).toprettyxml()
     except Exception as e:
         logger.error('format_xml failed: %s', e)
         if exceptions:
             raise
-        return content.decode(encoding=encoding) if isinstance(content, bytes) else content
+        return content
 
 
 def format_xml_bytes(content: bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
@@ -128,23 +125,20 @@ def format_xml_bytes(content: bytes, encoding: str = 'UTF-8', exceptions: bool =
     :param exceptions: Raise exceptions on error
     :return: bytes (Formatted XML as bytes)
     """
+    assert isinstance(content, bytes)
     try:
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
-            if isinstance(content, str):
-                content = content.encode(encoding=encoding)
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(content)
                 fp.flush()
                 out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
                 return out
-        if isinstance(content, bytes):
-            content = content.decode(encoding=encoding)
-        return xml.dom.minidom.parseString(content).toprettyxml(encoding=encoding)
+        return xml.dom.minidom.parseString(content.decode(encoding=encoding)).toprettyxml(encoding=encoding)
     except Exception as e:
         logger.error('format_xml_bytes failed: %s', e)
         if exceptions:
             raise
-        return content.encode(encoding=encoding) if isinstance(content, str) else content
+        return content
 
 
 def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
@@ -196,14 +190,14 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
     :param center_align: Indexes of center-aligned columns. By default all are right aligned.
     :return: str
     """
-    assert max_col > 2
+    assert max_col is None or max_col > 2
     if left_align is None:
         left_align = []
     if center_align is None:
         center_align = []
 
     ncols = 0
-    col_lens = []
+    col_lens: List[int] = []
     for row in rows:
         ncols = max(ncols, len(row))
     while len(col_lens) < ncols:

@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import Optional, Dict, Any
-from ipware.ip import get_real_ip  # pytype: disable=import-error
+from ipware.ip import get_real_ip  # type: ignore
 from rest_framework.request import Request
 
 

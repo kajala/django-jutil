@@ -11,8 +11,8 @@ def url_equals(a: str, b: str) -> bool:
     """
     a2 = list(urlparse(a))
     b2 = list(urlparse(b))
-    a2[4] = dict(parse_qsl(a2[4]))
-    b2[4] = dict(parse_qsl(b2[4]))
+    a2[4] = dict(parse_qsl(a2[4]))  # type: ignore
+    b2[4] = dict(parse_qsl(b2[4]))  # type: ignore
     return a2 == b2
 
 

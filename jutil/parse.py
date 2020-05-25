@@ -21,7 +21,7 @@ FALSE_VALUES = (
 )
 
 
-def parse_bool(v, default: Optional[bool] = None, exceptions: bool = True) -> bool:
+def parse_bool(v, default: Optional[bool] = None, exceptions: bool = True) -> Optional[bool]:
     """
     Parses boolean value
     :param v: Input string

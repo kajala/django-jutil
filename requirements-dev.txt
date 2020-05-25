@@ -5,4 +5,6 @@ bandit
 coverage
 codecov
 mypy
-git+https://github.com/mkurnikov/django-stubs#egg=django-stubs
+djangorestframework-stubs
+django-stubs
+

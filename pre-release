@@ -1,10 +1,10 @@
 #!/bin/bash
 
 source venv/bin/activate
+pip install --upgrade -r requirements-dev.txt
 
 # update tools
 dt -q
-pip install prospector pytype --upgrade -q
 echo "Updated tools (`dt -q -d`)"
 
 # automatic tests
@@ -17,7 +17,6 @@ fi
 echo "Django manage.py test ok (`dt -q -d`), proceeding..."
 
 # prospector
-
 dt -q
 prospector
 if [ "$?" != "0" ]; then
@@ -26,14 +25,17 @@ if [ "$?" != "0" ]; then
 fi
 echo "Prospector cleared build (`dt -q -d`), proceeding..."
 
+# mypy
+mypy jutil
+
 # pytype
-dt -q
-pytype --config pytype.cfg
-if [ "$?" != "0" ]; then
-    echo "Pytype reported problems, terminating release"
-    exit 1
-fi
-echo "Pytype cleared build (`dt -q -d`), proceeding..."
+# dt -q
+# pytype --config pytype.cfg
+# if [ "$?" != "0" ]; then
+#     echo "Pytype reported problems, terminating release"
+#     exit 1
+# fi
+# echo "Pytype cleared build (`dt -q -d`), proceeding..."
 
 ./test-coverage --codecov
 
