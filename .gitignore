@@ -13,4 +13,5 @@ __pycache__
 /project/settings.py
 /*.gz
 /.pytype
+/.mypy_cache
 
