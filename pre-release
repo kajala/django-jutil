@@ -45,4 +45,5 @@ echo "Mypy cleared build (`dt -q -d`), proceeding..."
 
 # ./test-coverage --codecov
 
+echo "Pre-release script ok"
 exit 0
