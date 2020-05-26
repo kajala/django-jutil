@@ -1,20 +1,20 @@
 #!/bin/bash
 
 source venv/bin/activate
-pip install --upgrade -r requirements-dev.txt
 
 # update tools
 dt -q
+pip install --upgrade -r requirements-dev.txt
 echo "Updated tools (`dt -q -d`)"
 
 # automatic tests
 dt -q
 python manage.py test
 if [ "$?" != "0" ]; then
-    echo "Django manage.py test reported problems, terminating release"
+    echo "Automatic tests reported problems, terminating release"
     exit 1
 fi
-echo "Django manage.py test ok (`dt -q -d`), proceeding..."
+echo "Automatic tests ok (`dt -q -d`), proceeding..."
 
 # prospector
 dt -q
@@ -43,6 +43,6 @@ echo "Mypy cleared build (`dt -q -d`), proceeding..."
 # fi
 # echo "Pytype cleared build (`dt -q -d`), proceeding..."
 
-./test-coverage --codecov
+# ./test-coverage --codecov
 
 exit 0
