@@ -50,15 +50,15 @@ pip install django-jutil
 Code Static Analysis
 ====================
 
-The library passes both prospector and pytype checking. To install:
+The library passes both prospector and mypy checking. To install:
 
 pip install prospector
-pip install pytype
+pip install mypy
 
 To analyze:
 
 prospector
-pytype -V3.6 jutil
+mypy .
 
 
 Test Code Coverage
