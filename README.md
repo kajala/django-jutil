@@ -7,6 +7,7 @@ Django 3.0 compatible.
 [![codecov](https://codecov.io/gh/kajala/django-jutil/branch/master/graph/badge.svg)](https://codecov.io/gh/kajala/django-jutil)
 [![Build Status](https://travis-ci.org/kajala/django-jutil.svg?branch=master)](https://travis-ci.org/kajala/django-jutil)
 
+
 Features
 ========
 
@@ -40,10 +41,12 @@ Features
 * XML Element to/from dict conversions (dict_to_element, xml_to_dict)
 * XML file/content pretty formatting (format_xml, format_xml_bytes, format_xml_file, FormattedXmlResponse)
 
+
 Install
 =======
 
 pip install django-jutil
+
 
 Static Code Analysis
 ====================
@@ -57,6 +60,7 @@ To analyze:
 
 prospector
 mypy .
+
 
 Test Code Coverage
 ==================
