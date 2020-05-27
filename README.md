@@ -47,7 +47,7 @@ Install
 pip install django-jutil
 
 
-Code Static Analysis
+Static Code Analysis
 ====================
 
 The library passes both prospector and mypy checking. To install:
