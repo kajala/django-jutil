@@ -18,7 +18,7 @@ class CachedFieldsMixin:
     if TYPE_CHECKING:
         pk: Any = None
 
-        def save(self, update_fields: Optional[Iterable[str]]):
+        def save(self, update_fields: Optional[Iterable[str]] = None):
             pass
 
     def update_cached_fields(self, commit: bool = True, exceptions: bool = True,
