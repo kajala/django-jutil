@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Sequence, TYPE_CHECKING
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -170,7 +170,7 @@ class AdminLogEntryMixin:
     Call fields_changed() on change events.
     """
 
-    def fields_changed(self, field_names: list, who: User, **kw):
+    def fields_changed(self, field_names: Sequence[str], who: Optional[User], **kw):
         fv_str = ''
         for k in field_names:
             label, value = get_model_field_label_and_value(self, k)
@@ -195,6 +195,13 @@ class AdminFileDownloadMixin:
     file_fields: Iterable[str] = []
     is_staff_to_download = True
     is_authenticated_to_download = True
+
+    if TYPE_CHECKING:
+        def get_queryset(self, request):
+            pass
+
+        def get_object(self, request, object_id, from_field=None):
+            pass
 
     def get_file_fields(self) -> List[str]:
         if self.file_fields and self.file_field:
@@ -270,7 +277,7 @@ class AdminFileDownloadMixin:
 
         Returns: File download URLs for this model.
         """
-        info = self.model._meta.app_label, self.model._meta.model_name  # pytype: disable=attribute-error
+        info = self.model._meta.app_label, self.model._meta.model_name  # type: ignore  # pytype: disable=attribute-error
         return [
             url(r'^\d+/change/(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download' % info),
             url(r'^(' + self.upload_to + '/.+)/$', self.file_download_view, name='%s_%s_file_download_changelist' % info),
