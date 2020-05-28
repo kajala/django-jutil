@@ -170,7 +170,7 @@ class AdminLogEntryMixin:
     Call fields_changed() on change events.
     """
 
-    def fields_changed(self, field_names: Sequence[str], who: User, **kw):
+    def fields_changed(self, field_names: Sequence[str], who: Optional[User], **kw):
         fv_str = ''
         for k in field_names:
             label, value = get_model_field_label_and_value(self, k)
