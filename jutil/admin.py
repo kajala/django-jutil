@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import List, Optional, Iterable, Sequence, TYPE_CHECKING
+from typing import List, Optional, Sequence, TYPE_CHECKING
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
@@ -192,7 +192,7 @@ class AdminFileDownloadMixin:
     """
     upload_to = 'uploads'
     file_field = 'file'
-    file_fields: Iterable[str] = []
+    file_fields: Sequence[str] = []
     is_staff_to_download = True
     is_authenticated_to_download = True
 
