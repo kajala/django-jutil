@@ -8,3 +8,5 @@ mypy
 djangorestframework-stubs
 django-stubs
 twine
+django-extensions
+

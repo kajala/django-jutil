@@ -1,39 +1,44 @@
 from datetime import datetime, timedelta
 from typing import Tuple, Any, Optional
-
 import pytz
 from calendar import monthrange
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy as _
 
 
-TIME_RANGE_NAMES = [
-    'last_month',
-    'last_year',
-    'this_month',
-    'last_week',
-    'yesterday',
-    'today',
-    'prev_90d',
-    'plus_minus_90d',
-    'next_90d',
-    'prev_60d',
-    'plus_minus_60d',
-    'next_60d',
-    'prev_30d',
-    'plus_minus_30d',
-    'next_30d',
-    'prev_15d',
-    'plus_minus_15d',
-    'next_15d',
-    'prev_7d',
-    'plus_minus_7d',
-    'next_7d',
+TIME_RANGE_CHOICES = [
+    ('last_month', _('last month')),
+    ('last_year', _('last year')),
+    ('this_month', _('this month')),
+    ('last_week', _('last week')),
+    ('yesterday', _('yesterday')),
+    ('today', _('today')),
+    ('prev_90d', format_lazy('-90 {}', _('number.of.days'))),
+    ('plus_minus_90d', format_lazy('+-90 {}', _('number.of.days'))),
+    ('next_90d', format_lazy('+90 {}', _('number.of.days'))),
+    ('prev_60d', format_lazy('-60 {}', _('number.of.days'))),
+    ('plus_minus_60d', format_lazy('+-60 {}', _('number.of.days'))),
+    ('next_60d', format_lazy('+60 {}', _('number.of.days'))),
+    ('prev_30d', format_lazy('-30 {}', _('number.of.days'))),
+    ('plus_minus_30d', format_lazy('+-30 {}', _('number.of.days'))),
+    ('next_30d', format_lazy('+30 {}', _('number.of.days'))),
+    ('prev_15d', format_lazy('-15 {}', _('number.of.days'))),
+    ('plus_minus_15d', format_lazy('+-15 {}', _('number.of.days'))),
+    ('next_15d', format_lazy('+15 {}', _('number.of.days'))),
+    ('prev_7d', format_lazy('-7 {}', _('number.of.days'))),
+    ('plus_minus_7d', format_lazy('+-7 {}', _('number.of.days'))),
+    ('next_7d', format_lazy('+7 {}', _('number.of.days'))),
 ]
 
-TIME_STEP_NAMES = [
-    'daily',
-    'weekly',
-    'monthly'
+TIME_STEP_CHOICES = [
+    ('daily', _('daily')),
+    ('weekly', _('weekly')),
+    ('monthly', _('monthly')),
 ]
+
+TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
+
+TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
 
 
 def get_last_day_of_month(t: datetime) -> int:
