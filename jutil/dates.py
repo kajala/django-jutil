@@ -61,7 +61,7 @@ def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple
     :param tz: pytz timezone or None (default UTC)
     :return: begin, end
     """
-    if not tz:
+    if tz is None:
         tz = pytz.utc
     return tz.localize(begin), tz.localize(end)
 
@@ -93,6 +93,32 @@ def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
     end = begin + timedelta(days=32)
     end = datetime(day=1, month=end.month, year=end.year)
     return localize_time_range(begin, end, tz)
+
+
+def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -> datetime:
+    """
+    Returns end-of-month (last microsecond) of given datetime (or current datetime UTC if no parameter is passed).
+    :param today: Some date in the month (defaults current datetime)
+    :param n: +- number of months to offset from current month. Default 0.
+    :param tz: Timezone (defaults pytz UTC)
+    :return: datetime
+    """
+    if today is None:
+        today = datetime.utcnow()
+    last_day = monthrange(today.year, today.month)[1]
+    end = today.replace(day=last_day, hour=0, minute=0, second=0, microsecond=0) + timedelta(hours=24)
+    while n > 0:
+        last_day = monthrange(end.year, end.month)[1]
+        end = end.replace(day=last_day, hour=0, minute=0, second=0, microsecond=0) + timedelta(hours=24)
+        n -= 1
+    while n < 0:
+        end -= timedelta(days=1)
+        end = end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        n += 1
+    end_incl = end - timedelta(microseconds=1)
+    if tz is None:
+        tz = pytz.utc
+    return tz.localize(end_incl)
 
 
 def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -188,14 +214,13 @@ def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 def add_month(t: datetime, n: int = 1) -> datetime:
     """
     Adds +- n months to datetime.
-    Clamps to number of days in given month.
+    Clamps days to number of days in given month.
     :param t: datetime
-    :param n: count
+    :param n: +- number of months to offset from current month. Default 1.
     :return: datetime
     """
-    #pylint: disable=unused-variable
     t2 = t
-    for count in range(abs(n)):
+    for count in range(abs(n)):  # pylint: disable=unused-variable
         if n > 0:
             t2 = datetime(year=t2.year, month=t2.month, day=1) + timedelta(days=32)
         else:
@@ -203,9 +228,8 @@ def add_month(t: datetime, n: int = 1) -> datetime:
         try:
             t2 = t.replace(year=t2.year, month=t2.month)
         except Exception:
-            last = monthrange(t2.year, t2.month)[1]
-            t2 = t.replace(year=t2.year, month=t2.month, day=last)
-    #pylint: enable=unused-variable
+            last_day = monthrange(t2.year, t2.month)[1]
+            t2 = t.replace(year=t2.year, month=t2.month, day=last_day)
     return t2
 
 

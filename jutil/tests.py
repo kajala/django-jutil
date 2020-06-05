@@ -5,13 +5,9 @@ from os.path import join
 import pytz
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.management import CommandParser  # type: ignore
 from django.test import TestCase
-from django.utils import translation
 from django.utils.translation import override, gettext as _, gettext_lazy
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
@@ -22,9 +18,8 @@ from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
-from rest_framework.test import APIClient
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
-    last_year, last_week, yesterday
+    last_year, last_week, yesterday, end_of_month
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path
 from jutil.parse import parse_datetime, parse_bool
@@ -74,6 +69,10 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(t3.isoformat(), '2017-01-12T01:00:00+00:00')
         t4 = add_month(t, -1)
         self.assertEqual(t4.isoformat(), '2016-05-12T01:00:00+00:00')
+        time_now = datetime(2020, 6, 30, 15, 47, 23, 818646)
+        self.assertEqual(add_month(time_now, -4).isoformat(), '2020-02-29T15:47:23.818646')
+        self.assertEqual(add_month(time_now, 8).isoformat(), '2021-02-28T15:47:23.818646')
+        self.assertEqual(add_month(time_now, 0).isoformat(), '2020-06-30T15:47:23.818646')
 
     def test_se_ssn(self):
         se_ssn_validator('811228-9874')
@@ -663,6 +662,29 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for src, dst in test_paths:
             self.assertEqual(strip_media_root(src), dst)
             self.assertEqual(get_media_full_path(dst), src)
+
+    def test_end_of_month(self):
+        helsinki = pytz.timezone('Europe/Helsinki')
+        # 1
+        time_now = datetime(2020, 6, 5, 15, 47, 23, 818646)
+        eom = end_of_month(time_now, tz=helsinki)
+        eom_ref = helsinki.localize(datetime(2020, 6, 30, 23, 59, 59, 999999))
+        self.assertEqual(eom, eom_ref)
+        # 2
+        time_now = datetime(2020, 7, 5, 15, 47, 23, 818646)
+        eom = end_of_month(time_now, tz=helsinki)
+        eom_ref = helsinki.localize(datetime(2020, 7, 31, 23, 59, 59, 999999))
+        self.assertEqual(eom, eom_ref)
+        # 3
+        time_now = datetime(2020, 6, 5, 15, 47, 23, 818646)
+        eom = end_of_month(time_now, n=1, tz=helsinki)
+        eom_ref = helsinki.localize(datetime(2020, 7, 31, 23, 59, 59, 999999))
+        self.assertEqual(eom, eom_ref)
+        # 4
+        time_now = datetime(2020, 7, 5, 15, 47, 23, 818646)
+        eom = end_of_month(time_now, n=-2, tz=helsinki)
+        eom_ref = helsinki.localize(datetime(2020, 5, 31, 23, 59, 59, 999999))
+        self.assertEqual(eom, eom_ref)
 
     def test_iban_generator_and_validator(self):
         test_ibans = [
