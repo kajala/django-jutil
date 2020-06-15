@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
+from email.utils import parseaddr
 from os.path import join
 import pytz
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.utils.translation import override, gettext as _, gettext_lazy
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html
+from jutil.email import make_email_recipient_list
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
 from jutil.sftp import parse_sftp_connection
@@ -705,3 +707,24 @@ class Tests(TestCase, DefaultTestSetupMixin):
             except Exception as e:
                 print('iban_generator() returned', acc, 'but iban_validator() raised exception', e)
                 self.fail('iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))
+
+    def test_make_email_recipient(self):
+        email_tests = [
+            {
+                'list': [
+                    ('Jani Kajala', 'kajala@example.com'),
+                    '"Jani Kajala" <kajala@example.com>',
+                    '<kajala@example.com>',
+                    'kajala@example.com',
+                ],
+                'result': [
+                    ('Jani Kajala', 'kajala@example.com'),
+                    ('Jani Kajala', 'kajala@example.com'),
+                    ('kajala@example.com', 'kajala@example.com'),
+                    ('kajala@example.com', 'kajala@example.com'),
+                ]
+            }
+        ]
+        for et in email_tests:
+            res = make_email_recipient_list(et['list'])
+            self.assertListEqual(res, et['result'])

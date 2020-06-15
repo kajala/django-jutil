@@ -1,9 +1,11 @@
 import logging
+from email.utils import parseaddr
 from typing import Optional, Union, Tuple, Sequence, List
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.utils.timezone import now
+from django.utils.translation import gettext as _
 from jutil.logs import log_event
 from base64 import b64encode
 from os.path import basename
@@ -12,30 +14,42 @@ from os.path import basename
 logger = logging.getLogger(__name__)
 
 
-def make_email_recipient(val: Union[str, Tuple[str, str]]) -> str:
+def make_email_recipient(val: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
+    """
+    Returns (name, email) tuple.
+    :param val:
+    :return: (name, email)
+    """
     if isinstance(val, str):
-        return val
+        res = parseaddr(val.strip())
+        if len(res) != 2 or not res[1]:
+            raise ValidationError(_('Invalid email recipient: {}'.format(val)))
+        return res[0] or res[1], res[1]
     if len(val) != 2:
-        raise ValidationError('Email recipient invalid format: {}'.format(val))
-    return '"{}" <{}>'.format(*val)
+        raise ValidationError(_('Invalid email recipient: {}'.format(val)))
+    return val
 
 
-def make_email_recipient_list(recipients: Optional[Union[str, Sequence[Union[str, Tuple[str, str]]]]]) -> List[str]:
-    if recipients is None:
-        return []
-    if isinstance(recipients, str):
-        return [str(r).strip() for r in recipients.split(',')]
-    out: List[str] = []
-    for val in recipients:
-        if not val:
-            continue
-        out.append(make_email_recipient(val))
+def make_email_recipient_list(recipients: Optional[Union[str, Sequence[Union[str, Tuple[str, str]]]]]) -> List[Tuple[str, str]]:
+    """
+    Returns list of (name, email) tuples.
+    :param recipients:
+    :return: list of (name, email)
+    """
+    out: List[Tuple[str, str]] = []
+    if recipients is not None:
+        if isinstance(recipients, str):
+            recipients = recipients.split(',')
+        for val in recipients:
+            if not val:
+                continue
+            out.append(make_email_recipient(val))
     return out
 
 
-def send_email(recipients: Sequence[Union[str, Tuple[str, str]]], subject: str,  # noqa
-               text: str = '', html: str = '',
-               sender: str = '',
+def send_email(recipients: Sequence[Union[str, Tuple[str, str]]],  # noqa
+               subject: str, text: str = '', html: str = '',
+               sender: Union[str, Tuple[str, str]] = '',
                files: Optional[Sequence[str]] = None,
                cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
                bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
@@ -62,14 +76,14 @@ def send_email(recipients: Sequence[Union[str, Tuple[str, str]]], subject: str, 
 
 def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subject: str,  # noqa
                         text: str = '', html: str = '',
-                        sender: str = '',
+                        sender: Union[str, Tuple[str, str]] = '',
                         files: Optional[Sequence[str]] = None,
                         cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
                         bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
                         exceptions: bool = False):
     """
     Sends email using SendGrid API. Following requirements:
-    * pip install sendgrid==6.3.0
+    * pip install sendgrid==6.3.1
     * settings.EMAIL_SENDGRID_API_KEY must be set and
 
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
@@ -88,36 +102,31 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
     from sendgrid import ClickTracking, FileType, FileName, TrackingSettings  # type: ignore  # pylint: disable=import-outside-toplevel
     from sendgrid import Personalization, FileContent, ContentId, Disposition  # type: ignore  # pylint: disable=import-outside-toplevel
 
+    if not hasattr(settings, 'EMAIL_SENDGRID_API_KEY') or not settings.EMAIL_SENDGRID_API_KEY:
+        raise Exception('EMAIL_SENDGRID_API_KEY not defined in Django settings')
+
     if files is None:
         files = []
+    from_clean = make_email_recipient(sender or settings.DEFAULT_FROM_EMAIL)
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
     bcc_recipients_clean = make_email_recipient_list(bcc_recipients)
 
     try:
         sg = sendgrid.SendGridAPIClient(api_key=settings.EMAIL_SENDGRID_API_KEY)
-        from_email = sendgrid.Email(sender or settings.DEFAULT_FROM_EMAIL)
         text_content = Content('text/plain', text) if text else None
         html_content = Content('text/html', html) if html else None
 
-        sg_email_list = []
-        to_emails_data = []
-        for recipient in recipients_clean:
-            sg_email_list.append(sendgrid.To())
-            to_emails_data.append(recipient)
-        for recipient in cc_recipients_clean:
-            sg_email_list.append(sendgrid.Cc())
-            to_emails_data.append(recipient)
-        for recipient in bcc_recipients_clean:
-            sg_email_list.append(sendgrid.Bcc())
-            to_emails_data.append(recipient)
-        for ix, to_email in enumerate(sg_email_list):
-            to_email.email = to_emails_data[ix]
         personalization = Personalization()
-        for sg_email in sg_email_list:
-            personalization.add_email(sg_email)
+        for recipient in recipients_clean:
+            personalization.add_email(sendgrid.To(email=recipient[1], name=recipient[0]))
+        for recipient in cc_recipients_clean:
+            personalization.add_email(sendgrid.Cc(email=recipient[1], name=recipient[0]))
+        for recipient in bcc_recipients_clean:
+            personalization.add_email(sendgrid.Bcc(email=recipient[1], name=recipient[0]))
 
-        mail = Mail(from_email=from_email, subject=subject, plain_text_content=text_content, html_content=html_content)
+        mail = Mail(from_email=sendgrid.From(email=from_clean[1], name=from_clean[0]),
+                    subject=subject, plain_text_content=text_content, html_content=html_content)
         mail.add_personalization(personalization)
 
         # stop SendGrid from replacing all links in the email
@@ -134,7 +143,10 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
                 mail.add_attachment(attachment)
 
         send_time = now()
-        res = sg.client.mail.send.post(request_body=mail.get())
+        mail_body = mail.get()
+        if not hasattr(settings, 'EMAIL_SENDGRID_API_DEBUG') and settings.EMAIL_SENDGRID_API_DEBUG:
+            logger.info('SendGrid API payload: %s', mail_body)
+        res = sg.client.mail.send.post(request_body=mail_body)
         send_dt = (now() - send_time).total_seconds()
 
         if res.status_code == 202:
@@ -152,9 +164,9 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
     return res.status_code
 
 
-def send_email_smtp(recipients: Sequence[Union[str, Tuple[str, str]]], subject: str,  # noqa
-                    text: str = '', html: str = '',
-                    sender: str = '',
+def send_email_smtp(recipients: Sequence[Union[str, Tuple[str, str]]],  # noqa
+                    subject: str, text: str = '', html: str = '',
+                    sender: Union[str, Tuple[str, str]] = '',
                     files: Optional[Sequence[str]] = None,
                     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
                     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
@@ -184,19 +196,19 @@ def send_email_smtp(recipients: Sequence[Union[str, Tuple[str, str]]], subject: 
     """
     if files is None:
         files = []
+    from_clean = make_email_recipient(sender or settings.DEFAULT_FROM_EMAIL)
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
     bcc_recipients_clean = make_email_recipient_list(bcc_recipients)
-    sender_clean = make_email_recipient(sender or settings.DEFAULT_FROM_EMAIL)
 
     try:
         mail = EmailMultiAlternatives(
             subject=subject,
             body=text,
-            from_email=sender_clean,
-            to=recipients_clean,
-            bcc=bcc_recipients_clean,
-            cc=cc_recipients_clean,
+            from_email='"{}" <{}>'.format(*from_clean),
+            to=['"{}" <{}>'.format(*r) for r in recipients_clean],
+            bcc=['"{}" <{}>'.format(*r) for r in bcc_recipients_clean],
+            cc=['"{}" <{}>'.format(*r) for r in cc_recipients_clean],
         )
         for filename in files:
             mail.attach_file(filename)
