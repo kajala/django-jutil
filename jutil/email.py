@@ -144,7 +144,7 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
 
         send_time = now()
         mail_body = mail.get()
-        if not hasattr(settings, 'EMAIL_SENDGRID_API_DEBUG') and settings.EMAIL_SENDGRID_API_DEBUG:
+        if hasattr(settings, 'EMAIL_SENDGRID_API_DEBUG') and settings.EMAIL_SENDGRID_API_DEBUG:
             logger.info('SendGrid API payload: %s', mail_body)
         res = sg.client.mail.send.post(request_body=mail_body)
         send_dt = (now() - send_time).total_seconds()
