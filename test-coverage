@@ -8,5 +8,5 @@ if [ "$1" == "--codecov" ]; then
     git commit -m 'test coverage update'
     git push
 fi
-coverage report
+coverage report --skip-empty --skip-covered
 git checkout .coverage
