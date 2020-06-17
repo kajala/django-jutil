@@ -59,7 +59,7 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> s
 
 
 def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h',
-                     minutes_label: str = 'min', seconds_label: str = 's', **kwargs) -> str:
+                     minutes_label: str = 'min', seconds_label: str = 's') -> str:
     """
     Formats timedelta to readable format, e.g. 1h30min15s.
     :param dt: timedelta
