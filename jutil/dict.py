@@ -1,11 +1,14 @@
 import re
 from collections import OrderedDict
-from typing import List, Sequence, Tuple
-
+from typing import List, Sequence, Tuple, Any, Dict, TypeVar
 from django.utils.text import capfirst
 
 
-def sorted_dict(d: dict):
+R = TypeVar('R')
+S = TypeVar('S')
+
+
+def sorted_dict(d: Dict[Any, R]) -> Dict[Any, R]:
     """
     Returns OrderedDict sorted by ascending key
     :param d: dict
@@ -14,7 +17,7 @@ def sorted_dict(d: dict):
     return OrderedDict(sorted(d.items()))
 
 
-def choices_label(choices: Sequence[Tuple[str, str]], value) -> str:
+def choices_label(choices: Sequence[Tuple[S, str]], value: S) -> str:
     """
     Iterates (value,label) list and returns label matching the choice
     :param choices: [(choice1, label1), (choice2, label2), ...]
@@ -41,7 +44,7 @@ def _dict_to_html_format_key(k: str) -> str:
     return ' '.join(out)
 
 
-def _dict_to_html_r(data: dict, margin: str = '', format_keys: bool = True) -> str:
+def _dict_to_html_r(data: Dict[str, Any], margin: str = '', format_keys: bool = True) -> str:
     if not isinstance(data, dict):
         return '{}{}\n'.format(margin, data)
     out = ''
@@ -60,7 +63,7 @@ def _dict_to_html_r(data: dict, margin: str = '', format_keys: bool = True) -> s
     return out
 
 
-def dict_to_html(data: dict, format_keys: bool = True) -> str:
+def dict_to_html(data: Dict[str, Any], format_keys: bool = True) -> str:
     """
     Formats dict to simple pre-formatted html (<pre> tag).
     :param data: dict

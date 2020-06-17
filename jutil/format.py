@@ -69,12 +69,6 @@ def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h
     :param seconds_label: Label for seconds. Leave empty '' if value should be skipped / ignored.
     :return: str
     """
-    if 'include_seconds' in kwargs:
-        logger.warning('format_timedelta: include_seconds deprecated and will be removed in future versions')
-        include_seconds = kwargs.pop('include_seconds')
-        if not include_seconds:
-            seconds_label = ''
-
     parts = (
         (86400, days_label),
         (3600, hours_label),

@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
-from email.utils import parseaddr
 from os.path import join
 import pytz
 from django.conf import settings
@@ -12,7 +11,7 @@ from django.test import TestCase
 from django.utils.translation import override, gettext as _, gettext_lazy
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
-from jutil.dict import dict_to_html
+from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
@@ -37,6 +36,14 @@ from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
 
 
+MY_CHOICE_1 = '1'
+MY_CHOICE_2 = '2'
+MY_CHOICES = (
+    (MY_CHOICE_1, 'MY_CHOICE_1'),
+    (MY_CHOICE_2, 'MY_CHOICE_2'),
+)
+
+
 class Tests(TestCase, DefaultTestSetupMixin):
     def setUp(self):
         self.add_test_user()
@@ -59,6 +66,13 @@ class Tests(TestCase, DefaultTestSetupMixin):
             limited = format_full_name(v[0], v[1], 20)
             # print('{} {} -> {} (was: {})'.format(v[0], v[1], v[2], limited))
             self.assertEqual(v[2], limited)
+        try:
+            long_name = '19280309812083091829038190823081208301280381092830182038018203810283021'
+            format_full_name(long_name, long_name)
+            self.fail('format_full_name failed with long name')
+        except Exception:
+            pass
+
 
     def test_add_month(self):
         t = parse_datetime('2016-06-12T01:00:00')
@@ -728,3 +742,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for et in email_tests:
             res = make_email_recipient_list(et['list'])
             self.assertListEqual(res, et['result'])
+
+    def test_choices(self):
+        val = choices_label(MY_CHOICES, MY_CHOICE_1)
+        self.assertEqual(val, 'MY_CHOICE_1')
