@@ -359,3 +359,28 @@ def get_media_full_path(file_path: str) -> str:
     if file_path and not os.path.isabs(file_path):
         return os.path.join(settings.MEDIA_ROOT, file_path)
     return file_path
+
+
+def camel_case_to_underscore(s: str) -> str:
+    """
+    Converts camelCaseWord to camel_case_word.
+    :param s: str
+    :return: str
+    """
+    if s:
+        s = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', s)
+        s = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', s)
+        s = s.replace("-", "_")
+    return s.lower()
+
+
+def underscore_to_camel_case(s: str) -> str:
+    """
+    Converts under_score_word to underScoreWord.
+    :param s: str
+    :return: str
+    """
+    if s:
+        p = s.split('_')
+        s = p[0] + ''.join([ucfirst(w) for w in p[1:]])
+    return s

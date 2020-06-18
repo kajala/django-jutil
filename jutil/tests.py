@@ -22,7 +22,8 @@ from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday, end_of_month
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
-    dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path
+    dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
+    underscore_to_camel_case
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -746,3 +747,14 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_choices(self):
         val = choices_label(MY_CHOICES, MY_CHOICE_1)
         self.assertEqual(val, 'MY_CHOICE_1')
+
+    def test_camel_case(self):
+        pairs = [
+            ('camelCaseWord', 'camel_case_word'),
+            ('camelCase', 'camel_case'),
+            ('camel', 'camel'),
+            ('camelCCase', 'camel_c_case'),
+        ]
+        for cc, us in pairs:
+            self.assertEqual(camel_case_to_underscore(cc), us)
+            self.assertEqual(cc, underscore_to_camel_case(us))
