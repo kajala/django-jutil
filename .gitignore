@@ -15,4 +15,4 @@ __pycache__
 /.pytype
 /.mypy_cache
 /htmlcov
-
+/.coverage
