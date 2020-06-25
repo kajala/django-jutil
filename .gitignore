@@ -7,8 +7,10 @@ __pycache__
 /dist
 /uploads
 /dowloads
+/certs
+/static
 /logs
-/django_jutil.egg-info
+/*.egg-info
 /db.sqlite3
 /project/settings.py
 /*.gz
@@ -16,3 +18,4 @@ __pycache__
 /.mypy_cache
 /htmlcov
 /.coverage
+/local.*
