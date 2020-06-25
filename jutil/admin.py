@@ -76,9 +76,8 @@ def admin_obj_url(obj: Optional[Union[Type[Model], Model]], route: str = '', bas
     if obj is None:
         return ''
     if not route:
-        path = obj.get_admin_url()  # type: ignore
-    else:
-        path = reverse(route, args=[obj.id])  # type: ignore
+        route = 'admin:{}_{}_change'.format(obj._meta.app_label, obj._meta.model_name)  # type: ignore
+    path = reverse(route, args=[obj.id])  # type: ignore
     return base_url + path
 
 
