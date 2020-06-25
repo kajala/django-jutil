@@ -2,19 +2,29 @@ import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from os.path import join
+from pprint import pprint
+
 import pytz
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.management import CommandParser  # type: ignore
+from django.core.management.base import CommandParser  # type: ignore
+from django.db import models
 from django.test import TestCase
+from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
-from jutil.admin import admin_log, admin_obj_url, admin_obj_link
+from rest_framework.exceptions import NotAuthenticated
+
+from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin, \
+    AdminFileDownloadMixin
+from jutil.auth import require_auth, AuthUserMixin
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
+from jutil.responses import FileSystemFileResponse
 from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
@@ -35,6 +45,7 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     fi_ssn_validator, bic_validator, iban_generator
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
+from django.contrib import admin
 
 
 MY_CHOICE_1 = '1'
@@ -44,13 +55,45 @@ MY_CHOICES = (
     (MY_CHOICE_2, 'MY_CHOICE_2'),
 )
 
+request_factory = RequestFactory()
+
+
+def dummy_admin_func_a(modeladmin, request, qs):
+    print('dummy_admin_func_a')
+dummy_admin_func_a.short_description = 'A'  # type: ignore
+
+
+def dummy_admin_func_b(modeladmin, request, qs):
+    print('dummy_admin_func_b')
+dummy_admin_func_b.short_description = 'B'  # type: ignore
+
+
+class MyCustomAdmin(ModelAdminBase, AdminFileDownloadMixin):
+    max_history_length = 5
+    actions = (
+        dummy_admin_func_b,
+        dummy_admin_func_a,
+    )
+
+    def get_object(self, request, obj_id):
+        return self.model.objects.get(id=obj_id)
+
+    def get_object_by_filename(self, request, filename):
+        return User.objects.first()  # dummy return for test_admin_file_download_mixin
+
 
 class Tests(TestCase, DefaultTestSetupMixin):
     def setUp(self):
-        self.add_test_user()
+        super().setUp()
+        user = self.add_test_user('test@example.com', 'test1234')
+        assert isinstance(user, User)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        self.client = Client()
 
     def tearDown(self):
-        pass
+        super().setUp()
 
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
@@ -525,11 +568,16 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_admin(self):
         obj = self.user
         admin_log([obj], 'Hello, world')
+        admin_log([obj], 'Hello, world', user=self.user, ip='127.0.0.1')
+        admin_log(obj, 'Hello, world', user=self.user, ip='127.0.0.1')
         e = LogEntry.objects.all().filter(object_id=obj.id).last()
         self.assertIsNotNone(e)
         assert isinstance(e, LogEntry)
         self.assertEqual(e.change_message, 'Hello, world')
         self.assertEqual(admin_obj_url(obj, 'admin:auth_user_change'), '/admin/auth/user/{}/change/'.format(obj.id))
+        self.assertEqual(admin_obj_url(None, 'admin:auth_user_change'), '')
+        self.assertEqual(admin_obj_link(None, 'admin:auth_user_change'), '')
+        self.assertEqual(admin_obj_url(e), '/admin/auth/user/{}/change/'.format(obj.id))
         link = admin_obj_link(obj, 'User', 'admin:auth_user_change')
         self.assertEqual(link, "<a href='/admin/auth/user/{}/change/'>User</a>".format(obj.id))
 
@@ -758,3 +806,75 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for cc, us in pairs:
             self.assertEqual(camel_case_to_underscore(cc), us)
             self.assertEqual(cc, underscore_to_camel_case(us))
+
+    def create_dummy_request(self, path: str = '/admin/login/'):
+        request = request_factory.get('/admin/login/')
+        request.user = self.user  # type: ignore
+        return request
+
+    def test_model_admin_base(self):
+        # test that actions sorting by name works
+        request = self.create_dummy_request()
+        user = self.user
+        model_admin = MyCustomAdmin(LogEntry, admin.site)
+        res = model_admin.get_actions(request)
+        self.assertEqual(list(res.items())[0][0], 'dummy_admin_func_a', 'ModelAdminBase.get_actions sorting failed')
+        self.assertEqual(list(res.items())[1][0], 'dummy_admin_func_b', 'ModelAdminBase.get_actions sorting failed')
+
+        # create 10 LogEntry for test user, 5 with text "VisibleLogMessage" and 5 "InvisibleLogMessage"
+        # then check that "VisibleLogMessage" log entries are not visible since max_history_length = 5
+        LogEntry.objects.filter(object_id=user.id).delete()
+        for n in range(5):
+            admin_log([user], 'VisibleLogMessage')
+        for n in range(5):
+            admin_log([user], 'InvisibleLogMessage')
+        self.assertEqual(LogEntry.objects.filter(object_id=user.id).count(), 10)
+        history_url = '/admin/auth/user/{}/history/'.format(user.id)
+        c = self.client
+        c.get(history_url, follow=True)
+        c.post('/admin/login/', {'username': 'test@example.com', 'password': 'test1234'})
+        res = c.get(history_url)
+        content = res.content.decode()
+        assert isinstance(content, str)
+        self.assertEqual(content.count('VisibleLogMessage'), 5)
+        self.assertEqual(content.count('InvisibleLogMessage'), 0)
+
+    def test_admin_log_entry_mixin(self):
+        user = self.user
+        AdminLogEntryMixin.fields_changed(user, ['username'], who=None)
+        e = LogEntry.objects.filter(object_id=user.id).last()
+        assert isinstance(e, LogEntry)
+        self.assertEqual(e.change_message, 'User id={}: username=test@example.com'.format(user.id))
+
+    def test_admin_file_download_mixin(self):
+        class MyModel(models.Model):
+            file = models.FileField(upload_to='uploads')
+        model_admin = MyCustomAdmin(MyModel, admin.site)
+        self.assertListEqual(model_admin.get_file_fields(), ['file'])
+        self.assertEqual(model_admin.single_file_field, 'file')
+        self.assertEqual(len(model_admin.get_download_urls()), 2)
+        res = model_admin.file_download_view(self.create_dummy_request(), 'requirements.txt')
+        self.assertTrue(isinstance(res, FileSystemFileResponse))
+
+    def test_auth(self):
+        req = self.create_dummy_request()
+        require_auth(req)  # type: ignore
+        req.user = None
+        self.assertIsNone(require_auth(req, exceptions=False))
+        try:
+            require_auth(req)  # type: ignore
+            self.fail('require_auth fail')
+        except NotAuthenticated:
+            pass
+        try:
+            model_admin = AuthUserMixin()
+            model_admin.request = req
+            user = model_admin.auth_user
+            self.fail('require_auth fail')
+        except NotAuthenticated:
+            pass
+
+
+admin.site.unregister(User)
+admin.site.register(User, MyCustomAdmin)
+admin.site.register(LogEntry, MyCustomAdmin)

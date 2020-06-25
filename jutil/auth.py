@@ -1,11 +1,12 @@
-from typing import Optional
+from typing import Union, Optional
 
 from django.contrib.auth.models import User
+from django.http.request import HttpRequest
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.request import Request
 
 
-def require_auth(request: Request, exceptions: bool = True) -> Optional[User]:
+def require_auth(request: Union[Request, HttpRequest], exceptions: bool = True) -> Optional[User]:
     """
     Returns authenticated User.
     :param request: HttpRequest
@@ -16,7 +17,7 @@ def require_auth(request: Request, exceptions: bool = True) -> Optional[User]:
         if exceptions:
             raise NotAuthenticated()
         return None
-    return request.user
+    return request.user  # type: ignore
 
 
 class AuthUserMixin:

@@ -1,11 +1,11 @@
 import os
 from collections import OrderedDict
-from typing import List, Optional, Sequence, TYPE_CHECKING
+from typing import List, Optional, Sequence, TYPE_CHECKING, Union, Type
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Model
 from django.http import HttpRequest, Http404
 from django.urls import reverse
 from django.utils.html import format_html
@@ -17,13 +17,14 @@ from django.contrib.admin.models import CHANGE
 from django.template.response import TemplateResponse
 from django.contrib.admin.options import get_content_type_for_model
 from django.contrib.admin.utils import unquote
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.utils.text import capfirst
 from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
 
-def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
+def admin_log(instances: Sequence[Union[Type[Model], Model]],
+              msg: str, who: Optional[User] = None, **kw):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances
@@ -33,9 +34,13 @@ def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
     :return: None
     """
     # use system user if 'who' is missing
-    if not who:
+    if who is None:
         username = settings.DJANGO_SYSTEM_USER if hasattr(settings, 'DJANGO_SYSTEM_USER') else 'system'
         who = User.objects.get_or_create(username=username)[0]
+
+    # allow passing individual instance
+    if not isinstance(instances, list) and not isinstance(instances, tuple):
+        instances = [instances]  # type: ignore
 
     # append extra keyword attributes if any
     att_str = ''
@@ -47,8 +52,6 @@ def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
         att_str = ' [{}]'.format(att_str)
     msg = str(msg) + att_str
 
-    if not isinstance(instances, list) and not isinstance(instances, tuple):
-        instances = [instances]
     for instance in instances:
         if instance:
             LogEntry.objects.log_action(
@@ -61,7 +64,7 @@ def admin_log(instances, msg: str, who: Optional[User] = None, **kw):
             )
 
 
-def admin_obj_url(obj, route: str = '', base_url: str = '') -> str:
+def admin_obj_url(obj: Optional[Union[Type[Model], Model]], route: str = '', base_url: str = '') -> str:
     """
     Returns admin URL to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
@@ -73,13 +76,13 @@ def admin_obj_url(obj, route: str = '', base_url: str = '') -> str:
     if obj is None:
         return ''
     if not route:
-        o = type(obj)
-        model_path = o.__module__.split('.')
-        route = 'admin:' + ".".join(['.'.join(model_path[:-1]), o.__name__]).lower().replace('.', '_') + '_change'
-    return base_url + reverse(route, args=[obj.id])
+        path = obj.get_admin_url()  # type: ignore
+    else:
+        path = reverse(route, args=[obj.id])  # type: ignore
+    return base_url + path
 
 
-def admin_obj_link(obj, label: str = '', route: str = '', base_url: str = '') -> str:
+def admin_obj_link(obj: Optional[Union[Type[Model], Model]], label: str = '', route: str = '', base_url: str = '') -> str:
     """
     Returns safe-marked admin link to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
@@ -127,13 +130,15 @@ class ModelAdminBase(admin.ModelAdmin):
         return self.changelist_view(request, extra_context)
 
     def history_view(self, request, object_id, extra_context=None):
+        "The 'history' admin view for this model."
+        from django.contrib.admin.models import LogEntry
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
 
-        if not self.has_change_permission(request, obj):
+        if not self.has_view_or_change_permission(request, obj):
             raise PermissionDenied
 
         # Then get the history for this object.
@@ -142,18 +147,18 @@ class ModelAdminBase(admin.ModelAdmin):
         action_list = LogEntry.objects.filter(
             object_id=unquote(object_id),
             content_type=get_content_type_for_model(model)
-        ).select_related().order_by('-action_time')[:self.max_history_length]
+        ).select_related().order_by('action_time')[:self.max_history_length]
 
-        context = dict(
-            self.admin_site.each_context(request),
-            title=_('Change history: %s') % force_text(obj),
-            action_list=action_list,
-            module_name=capfirst(force_text(opts.verbose_name_plural)),
-            object=obj,
-            opts=opts,
-            preserved_filters=self.get_preserved_filters(request),
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.admin_site.each_context(request),
+            'title': _('Change history: %s') % obj,
+            'action_list': action_list,
+            'module_name': str(capfirst(opts.verbose_name_plural)),
+            'object': obj,
+            'opts': opts,
+            'preserved_filters': self.get_preserved_filters(request),
+            **(extra_context or {}),
+        }
 
         request.current_app = self.admin_site.name
 
@@ -178,7 +183,7 @@ class AdminLogEntryMixin:
 
         msg = "{class_name} id={id}: {fv_str}".format(
             class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)  # type: ignore
-        admin_log([who, self], msg, who, **kw)
+        admin_log([who, self], msg, who, **kw)  # type: ignore
 
 
 class AdminFileDownloadMixin:
@@ -205,23 +210,23 @@ class AdminFileDownloadMixin:
 
     def get_file_fields(self) -> List[str]:
         if self.file_fields and self.file_field:
-            raise AssertionError('AdminFileDownloadMixin cannot have both file_fields and '
-                                 'file_field set ({})'.format(self.__class__))
+            raise ImproperlyConfigured('AdminFileDownloadMixin cannot have both file_fields and '
+                                       'file_field set ({})'.format(self.__class__))
         out = set()
         for f in self.file_fields or [self.file_field]:
             if f:
                 out.add(f)
         if not out:
-            raise AssertionError('AdminFileDownloadMixin must have either file_fields or '
-                                 'file_field set ({})'.format(self.__class__))
+            raise ImproperlyConfigured('AdminFileDownloadMixin must have either file_fields or '
+                                       'file_field set ({})'.format(self.__class__))
         return list(out)
 
     @property
     def single_file_field(self) -> str:
         out = self.get_file_fields()
         if len(out) != 1:
-            raise AssertionError('AdminFileDownloadMixin has multiple file fields, '
-                                 'you need to specify field explicitly ({})'.format(self.__class__))
+            raise ImproperlyConfigured('AdminFileDownloadMixin has multiple file fields, '
+                                       'you need to specify field explicitly ({})'.format(self.__class__))
         return out[0]
 
     def get_object_by_filename(self, request, filename):
