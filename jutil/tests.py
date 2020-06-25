@@ -577,7 +577,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(admin_obj_url(obj, 'admin:auth_user_change'), '/admin/auth/user/{}/change/'.format(obj.id))
         self.assertEqual(admin_obj_url(None, 'admin:auth_user_change'), '')
         self.assertEqual(admin_obj_link(None, 'admin:auth_user_change'), '')
-        self.assertEqual(admin_obj_url(e), '/admin/auth/user/{}/change/'.format(obj.id))
+        self.assertEqual(admin_obj_url(obj), '/admin/auth/user/{}/change/'.format(obj.id))
+        self.assertEqual(admin_obj_url(e), '/admin/admin/logentry/1/change/'.format(e.id))
         link = admin_obj_link(obj, 'User', 'admin:auth_user_change')
         self.assertEqual(link, "<a href='/admin/auth/user/{}/change/'>User</a>".format(obj.id))
 
