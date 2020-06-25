@@ -131,7 +131,7 @@ class ModelAdminBase(admin.ModelAdmin):
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
-        from django.contrib.admin.models import LogEntry
+        from django.contrib.admin.models import LogEntry  # noqa
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
