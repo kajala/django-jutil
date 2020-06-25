@@ -23,11 +23,11 @@ from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
 
-def admin_log(instances: Sequence[Union[Type[Model], Model]],
+def admin_log(instances: Sequence[Optional[Union[Type[Model], Model]]],
               msg: str, who: Optional[User] = None, **kw):
     """
     Logs an entry to admin logs of model(s).
-    :param instances: Model instance or list of instances
+    :param instances: Model instance or list of instances (None values are ignored)
     :param msg: Message to log
     :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
     :param kw: Optional key-value attributes to append to message
