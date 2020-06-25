@@ -4,9 +4,5 @@ source venv/bin/activate
 coverage run --source='.' --omit='*/venv/*' manage.py test
 if [ "$1" == "--codecov" ]; then
     codecov -X gcov
-    git add -A '.coverage'
-    git commit -m 'test coverage update'
-    git push
 fi
 coverage report --skip-empty --skip-covered $*
-git checkout .coverage
