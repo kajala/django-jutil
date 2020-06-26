@@ -5,4 +5,5 @@ coverage run --source='.' --omit='*/venv/*' manage.py test
 if [ "$1" == "--codecov" ]; then
     codecov -X gcov
 fi
-coverage report --skip-empty --skip-covered $*
+coverage report --skip-empty --skip-covered -m
+
