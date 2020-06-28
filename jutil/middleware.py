@@ -1,5 +1,6 @@
 import logging
 import traceback
+from typing import Dict, Optional
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
@@ -70,13 +71,22 @@ class EnsureLanguageCookieMiddleware:
     Allows changing settings by passing querystring parameter named settings.LANGUAGE_COOKIE_NAME
     (default: django_language).
 
-    Order of preference for the language:
+    Order of preference for the language (must be one of settings.LANGUAGES to be used):
     1) Explicit querystring GET parameter (e.g. ?lang=en)
     2) Previously stored cookie
     3) settings.LANGUAGE_CODE
     """
+    _languages: Optional[Dict[str, str]]
+
     def __init__(self, get_response=None):
         self.get_response = get_response
+        self._languages = None
+
+    @property
+    def languages(self) -> Dict[str, str]:
+        if self._languages is None:
+            self._languages = dict(settings.LANGUAGES)
+        return self._languages
 
     def __call__(self, request):
         lang_cookie_name = settings.LANGUAGE_COOKIE_NAME if hasattr(settings, 'LANGUAGE_COOKIE_NAME') else 'django_language'
@@ -84,12 +94,13 @@ class EnsureLanguageCookieMiddleware:
         lang = request.GET.get(lang_cookie_name)
         if not lang:
             lang = lang_cookie
-        if not lang or lang not in [lang[0] for lang in settings.LANGUAGES]:
+        if not lang or lang not in self.languages:
             lang = settings.LANGUAGE_CODE if hasattr(settings, 'LANGUAGE_CODE') else 'en'
         request.COOKIES[lang_cookie_name] = lang
 
         res = self.get_response(request)
-        if request.COOKIES[lang_cookie_name] != lang_cookie:
+
+        if lang_cookie is None or lang != lang_cookie:
             secure = hasattr(settings, 'LANGUAGE_COOKIE_SECURE') and settings.LANGUAGE_COOKIE_SECURE
             httponly = hasattr(settings, 'LANGUAGE_COOKIE_HTTPONLY') and settings.LANGUAGE_COOKIE_HTTPONLY
             res.set_cookie(lang_cookie_name, lang, secure=secure, httponly=httponly)
@@ -115,9 +126,9 @@ class ActivateUserProfileTimezoneMiddleware:
                     timezone.activate(up.timezone)
                     activated = True
                 else:
-                    logger.warning('User profile timezone missing / user.profile.timezone could not be activated')
+                    logger.warning('User profile timezone missing so user.profile.timezone could not be activated')
             else:
-                logger.warning('User profile missing / user.profile.timezone could not be activated')
+                logger.warning('User profile missing so user.profile.timezone could not be activated')
 
         # get response
         response = self.get_response(request)

@@ -1,9 +1,12 @@
+import logging
 import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from os.path import join
 from pprint import pprint
-
+from django.utils import timezone
+from typing import List
+from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
@@ -11,17 +14,18 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.management.base import CommandParser  # type: ignore
 from django.db import models
+from django.http.response import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
-
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin, \
     AdminFileDownloadMixin
 from jutil.auth import require_auth, AuthUserMixin
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
+from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
 from jutil.responses import FileSystemFileResponse
@@ -58,14 +62,37 @@ MY_CHOICES = (
 request_factory = RequestFactory()
 
 
+class DummyLogHandler(logging.Handler):
+    msgs: List[str]
+
+    def __init__(self):
+        super().__init__()
+        self.msgs = []
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.msgs.append(msg)
+
+
+def dummy_time_zone_response(obj) -> HttpResponse:
+    tz = timezone.get_current_timezone()
+    return HttpResponse(str(tz).encode())
+
+
 def dummy_admin_func_a(modeladmin, request, qs):
     print('dummy_admin_func_a')
-dummy_admin_func_a.short_description = 'A'  # type: ignore
 
 
 def dummy_admin_func_b(modeladmin, request, qs):
     print('dummy_admin_func_b')
-dummy_admin_func_b.short_description = 'B'  # type: ignore
+
+
+def dummy_middleware_get_response(obj) -> HttpResponse:
+    return HttpResponse(b'hello content')
+
+
+class DummyUserProfile:
+    timezone = 'Europe/Helsinki'
 
 
 class MyCustomAdmin(ModelAdminBase, AdminFileDownloadMixin):
@@ -116,7 +143,6 @@ class Tests(TestCase, DefaultTestSetupMixin):
             self.fail('format_full_name failed with long name')
         except Exception:
             pass
-
 
     def test_add_month(self):
         t = parse_datetime('2016-06-12T01:00:00')
@@ -176,7 +202,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
             validate_country_iban('FI15616515616156', 'SE')
 
     def test_fi_ssn_generator(self):
-        self.assertEqual(len(fi_ssn_generator()), 6+1+4)
+        self.assertEqual(len(fi_ssn_generator()), 6 + 1 + 4)
         for n in range(10):
             ssn = fi_ssn_generator()
             try:
@@ -208,8 +234,10 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_urls(self):
         url = 'http://yle.fi/uutiset/3-8045550?a=123&b=456'
         self.assertEqual(url_host(url), 'yle.fi')
-        self.assertTrue(url_equals('http://yle.fi/uutiset/3-8045550?a=123&b=456', 'http://yle.fi/uutiset/3-8045550?b=456&a=123'))
-        self.assertTrue(url_equals(url_mod('http://yle.fi/uutiset/3-8045550?a=123&b=456', {'b': '123', 'a': '456'}), 'http://yle.fi/uutiset/3-8045550?b=123&a=456'))
+        self.assertTrue(
+            url_equals('http://yle.fi/uutiset/3-8045550?a=123&b=456', 'http://yle.fi/uutiset/3-8045550?b=456&a=123'))
+        self.assertTrue(url_equals(url_mod('http://yle.fi/uutiset/3-8045550?a=123&b=456', {'b': '123', 'a': '456'}),
+                                   'http://yle.fi/uutiset/3-8045550?b=123&a=456'))
 
     def test_email_filter_and_validation(self):
         emails = [
@@ -275,8 +303,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
         data = xml_to_dict(xml_str.encode(), ['VastausLoki', 'LuottoTietoMerkinnat'], parse_attributes=False)
         # pprint(data)
         ref_data = {'VastausLoki': {'KysyttyHenkiloTunnus': '020685-1234',
-                    'PaluuKoodi': 'Palveluvastaus onnistui',
-                    'SyyKoodi': '1'}}
+                                    'PaluuKoodi': 'Palveluvastaus onnistui',
+                                    'SyyKoodi': '1'}}
         self.assertEqual(ref_data, data)
 
     def test_dict_to_xml(self):
@@ -288,7 +316,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
                 'C': 'value node',
                 'D': 123,
                 'E': ['abc'],
-             }
+            }
         }
         el = dict_to_element(data)
         assert isinstance(el, Element)
@@ -356,7 +384,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_per_month(self):
         begin = datetime(2017, 9, 1, 0, 0)
-        res = list(per_month(begin, begin+timedelta(days=32)))
+        res = list(per_month(begin, begin + timedelta(days=32)))
         ref = [(datetime(2017, 9, 1, 0, 0), datetime(2017, 10, 1, 0, 0)),
                (datetime(2017, 10, 1, 0, 0), datetime(2017, 11, 1, 0, 0))]
         self.assertEqual(list(res), ref)
@@ -386,7 +414,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
         ]
         day_ranges = [7, 15, 30, 60, 90]
         for days in day_ranges:
-            named_ranges.append(('plus_minus_{}d'.format(days), (t_tz - timedelta(days=days), t_tz + timedelta(days=days))))
+            named_ranges.append(
+                ('plus_minus_{}d'.format(days), (t_tz - timedelta(days=days), t_tz + timedelta(days=days))))
             named_ranges.append(('prev_{}d'.format(days), (t_tz - timedelta(days=days), t_tz)))
             named_ranges.append(('next_{}d'.format(days), (t_tz, t_tz + timedelta(days=days))))
         for name, res in named_ranges:
@@ -404,15 +433,15 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(inf[0], '')
         self.assertEqual(inf[1], '')
 
-        ac= 'BE75270187592710'
+        ac = 'BE75270187592710'
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'GEBABEBB')
         self.assertEqual(inf[1], 'BNP Paribas Fortis')
-        ac= 'BE58465045170210'
+        ac = 'BE58465045170210'
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'KREDBEBB')
         self.assertEqual(inf[1], 'KBC Bank')
-        ac= 'BE11000123456748'
+        ac = 'BE11000123456748'
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], 'BPOTBEB1')
         self.assertEqual(inf[1], 'bpost bank')
@@ -481,7 +510,9 @@ class Tests(TestCase, DefaultTestSetupMixin):
             (date(2018, 12, 24), '231298-965X', 20),
         ]
         for date_now, ssn, age in samples:
-            self.assertEqual(fi_ssn_age(ssn, date_now), age, msg='{} age is {} on {} but fi_ssn_age result was {}'.format(ssn, age, date_now, fi_ssn_age(ssn, date_now)))
+            self.assertEqual(fi_ssn_age(ssn, date_now), age,
+                             msg='{} age is {} on {} but fi_ssn_age result was {}'.format(ssn, age, date_now,
+                                                                                          fi_ssn_age(ssn, date_now)))
 
     def test_se_banks(self):
         self.assertEqual(se_clearing_code_bank_info('6789'), ('Handelsbanken', 9))
@@ -490,7 +521,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
         an = '957033025420'
         bank_name, acc_digits = se_clearing_code_bank_info(an)
         self.assertEqual(bank_name, 'Sparbanken Syd')
-        self.assertGreaterEqual(len(an)-4, acc_digits)
+        self.assertGreaterEqual(len(an) - 4, acc_digits)
 
     def test_dk_banks(self):
         an = 'DK50 0040 0440 1162 43'
@@ -525,7 +556,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
             try:
                 parse_bool('hello')
             except ValidationError as e:
-                self.assertEqual(str(e), "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]")
+                self.assertEqual(str(e),
+                                 "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]")
 
     def test_sanitizers(self):
         self.assertEqual(country_code_sanitizer('kods'), '')
@@ -559,11 +591,13 @@ class Tests(TestCase, DefaultTestSetupMixin):
             ('user=jani;host=kajala.com', ['jani', '', 'kajala.com', '']),
             ('user=jani.kajala;pass=1231!;host=kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
             ('user=jani;pass=1231!;host=kajala.com;path=/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
-            ('user=jani.kajala;pass=1231!;host=kajala.com;path=my/dir', ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
+            ('user=jani.kajala;pass=1231!;host=kajala.com;path=my/dir',
+             ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
         ]
         for connection, ref_res in test_cases:
             res = parse_sftp_connection(connection)
-            self.assertListEqual(list(res), ref_res, 'SFTP connection string "{}" parsed incorrectly'.format(connection))
+            self.assertListEqual(list(res), ref_res,
+                                 'SFTP connection string "{}" parsed incorrectly'.format(connection))
 
     def test_admin(self):
         obj = self.user
@@ -593,9 +627,11 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_format_timedelta(self):
         self.assertEqual(format_timedelta(timedelta(seconds=90)), '1min30s')
-        self.assertEqual(format_timedelta(timedelta(seconds=3600+90)), '1h1min30s')
+        self.assertEqual(format_timedelta(timedelta(seconds=3600 + 90)), '1h1min30s')
         self.assertEqual(format_timedelta(timedelta(seconds=90), minutes_label='min ', seconds_label='s '), '1min 30s')
-        self.assertEqual(format_timedelta(timedelta(seconds=3600+90), hours_label='h ', minutes_label='min ', seconds_label='s '), '1h 1min 30s')
+        self.assertEqual(
+            format_timedelta(timedelta(seconds=3600 + 90), hours_label='h ', minutes_label='min ', seconds_label='s '),
+            '1h 1min 30s')
         self.assertEqual(format_timedelta(timedelta(seconds=90), seconds_label=''), '1min')
 
     def test_dec123456(self):
@@ -694,7 +730,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
             """.strip()
         self.assertEqual(out, out_ref)
 
-        out = format_table(a, left_align=[1], center_align=[0,2,3,4], max_col=50)
+        out = format_table(a, left_align=[1], center_align=[0, 2, 3, 4], max_col=50)
         out_ref = """
 -----------------------------------------------------
 |   date   |description|count|unit price|total price|
@@ -770,7 +806,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
                 iban_validator(acc)
             except Exception as e:
                 print('iban_generator() returned', acc, 'but iban_validator() raised exception', e)
-                self.fail('iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))
+                self.fail(
+                    'iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))
 
     def test_make_email_recipient(self):
         email_tests = [
@@ -809,8 +846,9 @@ class Tests(TestCase, DefaultTestSetupMixin):
             self.assertEqual(cc, underscore_to_camel_case(us))
 
     def create_dummy_request(self, path: str = '/admin/login/'):
-        request = request_factory.get('/admin/login/')
+        request = request_factory.get(path)
         request.user = self.user  # type: ignore
+        request.user.profile = DummyUserProfile()
         return request
 
     def test_model_admin_base(self):
@@ -850,6 +888,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_admin_file_download_mixin(self):
         class MyModel(models.Model):
             file = models.FileField(upload_to='uploads')
+
         model_admin = MyCustomAdmin(MyModel, admin.site)
         self.assertListEqual(model_admin.get_file_fields(), ['file'])
         self.assertEqual(model_admin.single_file_field, 'file')
@@ -875,6 +914,56 @@ class Tests(TestCase, DefaultTestSetupMixin):
         except NotAuthenticated:
             pass
 
+    def test_middleware(self):
+        # EnsureOriginMiddleware
+        request = self.create_dummy_request('/admin/login/')
+        EnsureOriginMiddleware(dummy_middleware_get_response)(request)
+        self.assertIn('HTTP_ORIGIN', request.META)
+        self.assertEqual(request.META['HTTP_ORIGIN'], request.get_host())
+
+        # LogExceptionMiddleware
+        dummy_log = DummyLogHandler()
+        jutil_middleware_logger.addHandler(dummy_log)
+        try:
+            raise Exception('Dummy exception, ignore this')
+        except Exception as e:
+            mw = LogExceptionMiddleware(dummy_middleware_get_response)
+            mw.process_exception(request, e)
+        msg = dummy_log.msgs.pop()
+        self.assertIn('Exception: Dummy exception, ignore this', msg)
+        self.assertIn('user=test@example.com', msg)
+        jutil_middleware_logger.removeHandler(dummy_log)
+
+        # EnsureLanguageCookieMiddleware
+        lang_cookie_tests = [
+            ('/admin/login/', settings.LANGUAGE_CODE),
+            ('/admin/login/?django_language=fi', 'fi'),
+        ]
+        for request_path, lang_code in lang_cookie_tests:
+            request = self.create_dummy_request(request_path)
+            mw = EnsureLanguageCookieMiddleware(dummy_middleware_get_response)
+            res = mw(request)
+            assert isinstance(res, HttpResponse)
+            self.assertEqual(res.status_code, 200)
+            self.assertIn('django_language', request.COOKIES)
+            self.assertIn(request.COOKIES['django_language'], lang_code)
+            self.assertIn('django_language', res.cookies)
+            self.assertEqual(str(res.cookies['django_language']), 'Set-Cookie: django_language={}; Path=/'.format(lang_code))
+
+        # ActivateUserProfileTimezoneMiddleware
+        user = self.user
+        self.assertTrue(user.is_authenticated)
+        user.profile.timezone = 'Europe/Helsinki'
+        with timezone.override(pytz.timezone('America/Chicago')):
+            request = self.create_dummy_request('/admin/login/')
+            mw = ActivateUserProfileTimezoneMiddleware(dummy_time_zone_response)
+            res = mw(request)
+            content = res.content.decode()
+            self.assertEqual(content, user.profile.timezone)
+
+
+dummy_admin_func_a.short_description = 'A'  # type: ignore
+dummy_admin_func_b.short_description = 'B'  # type: ignore
 
 admin.site.unregister(User)
 admin.site.register(User, MyCustomAdmin)
