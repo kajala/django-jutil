@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class EnsureOriginMiddleware:
     """
-    Ensures that META HTTP_ORIGIN is set.
+    Ensures that request META 'HTTP_ORIGIN' is set.
     """
 
     def __init__(self, get_response=None):
@@ -69,6 +69,11 @@ class EnsureLanguageCookieMiddleware:
     Sets it as settings.LANGUAGE_CODE if missing.
     Allows changing settings by passing querystring parameter named settings.LANGUAGE_COOKIE_NAME
     (default: django_language).
+
+    Order of preference for the language:
+    1) Explicit querystring GET parameter (e.g. ?lang=en)
+    2) Previously stored cookie
+    3) settings.LANGUAGE_CODE
     """
     def __init__(self, get_response=None):
         self.get_response = get_response
@@ -101,13 +106,24 @@ class ActivateUserProfileTimezone:
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
+        activated = False
         if request.user.is_authenticated:
-            timezone.activate(request.user.profile.timezone)
+            user = request.user
+            if hasattr(user, 'profile') and user.profile:
+                up = user.profile
+                if hasattr(up, 'timezone') and up.timezone:
+                    timezone.activate(up.timezone)
+                    activated = True
+                else:
+                    logger.warning('User profile.timezone missing / user.profile.timezone could not be activated')
+            else:
+                logger.warning('User profile missing / user.profile.timezone could not be activated')
 
         # get response
         response = self.get_response(request)
 
         # Code to be executed for each request/response after
         # the view is called.
-        timezone.deactivate()
+        if activated:
+            timezone.deactivate()
         return response

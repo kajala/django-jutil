@@ -29,7 +29,7 @@ def set_obj_attr(obj, key: str, val: Any):
     setattr(obj, key_name, val)
 
 
-def get_obj_attr(obj, key: str, default = None, exceptions: bool = True) -> Any:
+def get_obj_attr(obj, key: str, default: Any = None, exceptions: bool = True) -> Any:
     """
     Get object property. Support '.' separate path to sub-objects, for example
     get_key_value(user, 'profile.address') gets user.profile.address field value.
