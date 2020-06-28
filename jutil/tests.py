@@ -848,7 +848,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def create_dummy_request(self, path: str = '/admin/login/'):
         request = request_factory.get(path)
         request.user = self.user  # type: ignore
-        request.user.profile = DummyUserProfile()
+        request.user.profile = DummyUserProfile()  # type: ignore
         return request
 
     def test_model_admin_base(self):
