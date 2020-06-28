@@ -115,7 +115,7 @@ class ActivateUserProfileTimezone:
                     timezone.activate(up.timezone)
                     activated = True
                 else:
-                    logger.warning('User profile.timezone missing / user.profile.timezone could not be activated')
+                    logger.warning('User profile timezone missing / user.profile.timezone could not be activated')
             else:
                 logger.warning('User profile missing / user.profile.timezone could not be activated')
 
