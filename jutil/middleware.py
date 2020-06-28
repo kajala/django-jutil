@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class EnsureOriginMiddleware:
     """
     Ensures that request META 'HTTP_ORIGIN' is set.
+    Uses request get_host() to set it if missing.
     """
 
     def __init__(self, get_response=None):
@@ -21,9 +22,8 @@ class EnsureOriginMiddleware:
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
-        hostname = request.get_host()
         if not request.META.get('HTTP_ORIGIN', None):
-            request.META['HTTP_ORIGIN'] = hostname
+            request.META['HTTP_ORIGIN'] = request.get_host()
 
         # get response
         response = self.get_response(request)
@@ -96,7 +96,7 @@ class EnsureLanguageCookieMiddleware:
         return res
 
 
-class ActivateUserProfileTimezone:
+class ActivateUserProfileTimezoneMiddleware:
     """
     Uses 'timezone' string in request.user.profile to activate user-specific timezone.
     """
