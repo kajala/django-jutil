@@ -208,7 +208,7 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
             col_lens0[ix] = max(col_lens0[ix], len(v))
 
     # adjust max_col if needed
-    if max_col is None and sum(col_lens0) > max_line:
+    if max_line and (not max_col or sum(col_lens0) > max_line):
         max_col = max_line // ncols
 
     # length limited lines and final column lengths
