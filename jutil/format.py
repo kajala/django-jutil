@@ -7,6 +7,7 @@ from decimal import Decimal
 import subprocess
 from typing import List, Any, Optional, Union
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
 
@@ -163,7 +164,7 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     return b''
 
 
-def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: Optional[int] = 200,  # noqa
+def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line: Optional[int] = 200,  # noqa
                  col_sep: str = '|', row_sep: str = '-', row_begin: str = '|', row_end: str = '|',
                  has_label_row: bool = False,
                  left_align: Optional[List[int]] = None, center_align: Optional[List[int]] = None) -> str:
@@ -184,25 +185,40 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
     :param center_align: Indexes of center-aligned columns. By default all are right aligned.
     :return: str
     """
+    # validate parameters
     assert max_col is None or max_col > 2
     if left_align is None:
         left_align = []
     if center_align is None:
         center_align = []
+    if left_align:
+        if set(left_align) & set(center_align):
+            raise ValidationError('Left align columns {} overlap with center align {}'.format(left_align, center_align))
 
+    # find out number of columns
     ncols = 0
-    col_lens: List[int] = []
     for row in rows:
         ncols = max(ncols, len(row))
-    while len(col_lens) < ncols:
-        col_lens.append(0)
 
-    lines = []
+    # find out full-width column lengths
+    col_lens0: List[int] = [0] * ncols
+    for row in rows:
+        for ix, v in enumerate(row):
+            v = str(v)
+            col_lens0[ix] = max(col_lens0[ix], len(v))
+
+    # adjust max_col if needed
+    if max_col is None and sum(col_lens0) > max_line:
+        max_col = max_line // ncols
+
+    # length limited lines and final column lengths
+    col_lens = [0] * ncols
+    lines: List[List[str]] = []
     for row in rows:
         line = []
         for ix, v in enumerate(row):
             v = str(v)
-            if max_col is not None and len(v) > max_col:
+            if max_col and len(v) > max_col:
                 v = v[:max_col-2] + '..'
             line.append(v)
             col_lens[ix] = max(col_lens[ix], len(v))
@@ -210,7 +226,8 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
             line.append('')
         lines.append(line)
 
-    lines2 = []
+    # padded lines
+    lines2: List[List[str]] = []
     for line in lines:
         line2 = []
         for ix, v in enumerate(line):
@@ -228,6 +245,7 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
             line2.append(v)
         lines2.append(line2)
 
+    # calculate max number of columns and max line length
     max_line_len = 0
     col_sep_len = len(col_sep)
     ncols0 = ncols
@@ -239,12 +257,14 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
                 line_len = len(row_begin) + sum(len(v)+col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
             max_line_len = max(max_line_len, line_len)
 
+    # find out how we should terminate lines/rows
     line_term = ''
     row_sep_term = ''
     if ncols0 > ncols:
         line_term = '..'
         row_sep_term = row_sep * int(2 / len(row_sep))
 
+    # final output with row and column separators
     lines3 = []
     if row_sep:
         lines3.append(row_sep * max_line_len + row_sep_term)
@@ -255,8 +275,6 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = 10, max_line: O
         lines3.append(row_begin + line_out + row_end + line_term)
         if line_ix == 0 and row_sep and has_label_row:
             lines3.append(row_sep * max_line_len + row_sep_term)
-        if line_ix >= ncols:
-            break
     if row_sep:
         lines3.append(row_sep * max_line_len + row_sep_term)
     return '\n'.join(lines3)
