@@ -6,10 +6,7 @@ from os.path import join
 from pprint import pprint
 from django.utils import timezone
 from typing import List
-
-from django.utils.html import strip_tags
-
-from jutil.fields import SafeCharField, SafeTextField
+from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
 from django.conf import settings
