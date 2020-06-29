@@ -1,5 +1,4 @@
 from typing import Type, List, Tuple, Any, Optional
-
 from django.db.models import Model
 from django.utils.encoding import force_text
 from jutil.dict import choices_label

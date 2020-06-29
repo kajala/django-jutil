@@ -6,6 +6,10 @@ from os.path import join
 from pprint import pprint
 from django.utils import timezone
 from typing import List
+
+from django.utils.html import strip_tags
+
+from jutil.fields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
 from django.conf import settings
@@ -960,6 +964,20 @@ class Tests(TestCase, DefaultTestSetupMixin):
             res = mw(request)
             content = res.content.decode()
             self.assertEqual(content, user.profile.timezone)
+
+    def test_safe_fields(self):
+        class TestModel(models.Model):
+            cf = SafeCharField(max_length=256)
+            tf = SafeTextField()
+
+        obj = TestModel()
+        data = 'hello world <script>alert("popup")<script>'
+        data_ref = 'hello world '
+        for f in obj._meta.fields:
+            if f.name in ['cf', 'tf']:
+                f.save_form_data(obj, data)
+        self.assertEqual(obj.cf, data_ref)
+        self.assertEqual(obj.tf, data_ref)
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
