@@ -23,7 +23,7 @@ from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
 
-def admin_log(instances: Sequence[Optional[Union[Type[Model], Model, User]]],
+def admin_log(instances: Sequence[object],
               msg: str, who: Optional[User] = None, **kw):
     """
     Logs an entry to admin logs of model(s).
