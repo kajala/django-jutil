@@ -1,3 +1,4 @@
+import csv
 import logging
 import os
 import re
@@ -5,6 +6,7 @@ import tempfile
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
+from io import StringIO
 from typing import List, Any, Optional, Union
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -164,6 +166,20 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     return b''
 
 
+def format_csv(rows: List[List[Any]], dialect: str = 'excel') -> str:
+    """
+    Formats rows to CSV string content.
+    :param rows: List[List[Any]]
+    :param dialect: See csv.writer dialect
+    :return: str
+    """
+    f = StringIO()
+    writer = csv.writer(f, dialect=dialect)
+    for row in rows:
+        writer.writerow(row)
+    return f.getvalue()
+
+
 def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line: Optional[int] = 200,  # noqa
                  col_sep: str = '|', row_sep: str = '-', row_begin: str = '|', row_end: str = '|',
                  has_label_row: bool = False,
@@ -173,7 +189,7 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
     Optionally separates colums with ' | ' character and header row with '-' characters.
     Supports left, right and center alignment. Useful for console apps / debugging.
 
-    :param rows: List[str]
+    :param rows: List[List[Any]]
     :param max_col: Max column value width. Pass None for unlimited length.
     :param max_line: Maximum single line length. Exceeding columns truncated. Pass None for unlimited length.
     :param col_sep: Column separator string.

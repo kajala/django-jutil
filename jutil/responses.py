@@ -1,11 +1,9 @@
 import mimetypes
 import os
-from io import StringIO
 from typing import Any, List
 from django.http import HttpResponse, FileResponse, Http404
 from django.utils.translation import gettext as _
-from jutil.format import format_xml_file, format_xml_bytes
-import csv
+from jutil.format import format_xml_file, format_xml_bytes, format_csv
 
 
 class FileSystemFileResponse(FileResponse):
@@ -36,15 +34,10 @@ class CsvResponse(HttpResponse):
         Returns CSV response.
         :param rows: List of column lists
         :param filename: Download response file name
-        :param dialect: csv.writer dialect
+        :param dialect: See csv.writer dialect
         :param kw: Parameters to be passed to HttpResponse __init__
         """
-        f = StringIO()
-        writer = csv.writer(f, dialect=dialect)
-        for row in rows:
-            writer.writerow(row)
-
-        buf = f.getvalue().encode('utf-8')
+        buf = format_csv(rows, dialect=dialect).encode('utf-8')
         super().__init__(content=buf, content_type='text/csv', **kw)
         self['Content-Disposition'] = 'attachment;filename="{}"'.format(filename)
 

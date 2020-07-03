@@ -29,7 +29,7 @@ from jutil.email import make_email_recipient_list
 from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
-from jutil.responses import FileSystemFileResponse
+from jutil.responses import FileSystemFileResponse, CsvResponse
 from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
@@ -975,6 +975,18 @@ class Tests(TestCase, DefaultTestSetupMixin):
                 f.save_form_data(obj, data)
         self.assertEqual(obj.cf, data_ref)
         self.assertEqual(obj.tf, data_ref)
+
+    def test_responses(self):
+        a = [
+            ['date', 'description', 'count', 'unit price', 'total price'],
+            [date(2019, 12, 15), 'oranges', 1000, dec2('0.99'), dec2('990.00')],
+            [date(2020, 1, 3), 'apples', 4, dec2('1.10'), dec2('4.40')],
+            [date(2020, 11, 3), 'apples', 5, dec2('10.10'), dec2('50.50')],
+        ]
+        res = CsvResponse(a, 'test.csv')
+        content_ref = b'date,description,count,unit price,total price\r\n2019-12-15,oranges,1000,0.99,990.00\r\n2020-01-03,apples,4,1.10,4.40\r\n2020-11-03,apples,5,10.10,50.50\r\n'
+        self.assertEqual(content_ref, res.content)
+        print(res.content.decode())
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
