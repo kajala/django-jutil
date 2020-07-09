@@ -4,8 +4,7 @@ from typing import Dict, Optional
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
-from ipware import get_client_ip
-
+from ipware import get_client_ip  # type: ignore
 from jutil.email import send_email
 
 

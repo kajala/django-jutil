@@ -1,8 +1,7 @@
 import json
 import logging
 from typing import Optional, Dict, Any
-
-from ipware import get_client_ip
+from ipware import get_client_ip  # type: ignore
 from rest_framework.request import Request
 
 
