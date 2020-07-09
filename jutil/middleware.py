@@ -4,7 +4,8 @@ from typing import Dict, Optional
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
-from ipware.ip import get_real_ip  # type: ignore  # pytype: disable=import-error
+from ipware import get_client_ip
+
 from jutil.email import send_email
 
 
@@ -56,7 +57,7 @@ class LogExceptionMiddleware:
         full_path = request.get_full_path()
         user = request.user
         msg = '{full_path}\n{err} (IP={ip}, user={user}) {trace}'.format(full_path=full_path, user=user,
-                                                                         ip=get_real_ip(request), err=e,
+                                                                         ip=get_client_ip(request)[0], err=e,
                                                                          trace=str(traceback.format_exc()))
         logger.error(msg)
         hostname = request.get_host()

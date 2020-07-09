@@ -1,7 +1,8 @@
 import json
 import logging
 from typing import Optional, Dict, Any
-from ipware.ip import get_real_ip  # type: ignore
+
+from ipware import get_client_ip
 from rest_framework.request import Request
 
 
@@ -19,7 +20,7 @@ def log_event(name: str, request: Optional[Request] = None, data: Optional[Dict[
     """
     log_data: Dict[str, Any] = {}
     if not ip and request:
-        ip = get_real_ip(request)
+        ip = get_client_ip(request)[0]
     if ip:
         log_data['ip'] = ip
     if data:
