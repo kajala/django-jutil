@@ -3,7 +3,7 @@ from typing import Tuple, Any
 from django.conf import settings
 import requests
 import socket
-from ipware import get_client_ip
+from ipware import get_client_ip  # type: ignore
 
 
 logger = logging.getLogger(__name__)
