@@ -16,10 +16,11 @@ def get_ip(request: Union[HttpRequest, Request]) -> str:
     Returns best-guess IP for given request.
     Uses ipware library get_client_ip.
     If you need to know is IP routable or not, use ipware get_client_ip directly.
+    See ipware documentation for more info.
     :param request: Djangos HttpRequest or DRF Request
-    :return: IP-address or '' if IP-address could not be resolved (localhost)
+    :return: IP-address or None
     """
-    return get_client_ip(request)[0] or ''
+    return get_client_ip(request)[0]
 
 
 def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
