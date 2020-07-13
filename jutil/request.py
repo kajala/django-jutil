@@ -17,6 +17,12 @@ def get_ip(request: Union[HttpRequest, Request]) -> str:
     Uses ipware library get_client_ip.
     If you need to know is IP routable or not, use ipware get_client_ip directly.
     See ipware documentation for more info.
+
+    Note: Why such a simple function wrapper? I'm generally against wrappers like this,
+    but in this case made an exceptions: I used to use ipware get_real_ip() everywhere before
+    it was deprecated and had quite big update process to change all code to use ipware get_client_ip.
+    I want to avoid such process again so added this wrapper.
+
     :param request: Djangos HttpRequest or DRF Request
     :return: IP-address or None
     """
