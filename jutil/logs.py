@@ -1,14 +1,16 @@
 import json
 import logging
-from typing import Optional, Dict, Any
-from ipware import get_client_ip  # type: ignore
+from typing import Optional, Dict, Any, Union
+from django.http.request import HttpRequest
 from rest_framework.request import Request
+from jutil.request import get_ip
 
 
 logger = logging.getLogger(__name__)
 
 
-def log_event(name: str, request: Optional[Request] = None, data: Optional[Dict[str, Any]] = None, ip: str = ''):
+def log_event(name: str, request: Optional[Union[HttpRequest, Request]] = None,
+              data: Optional[Dict[str, Any]] = None, ip: str = ''):
     """
     Logs consistent event for easy parsing/analysis.
     Format: EVENT_<UPPERCASE_NAME>: <JSON object>
@@ -19,7 +21,7 @@ def log_event(name: str, request: Optional[Request] = None, data: Optional[Dict[
     """
     log_data: Dict[str, Any] = {}
     if not ip and request:
-        ip = get_client_ip(request)[0]
+        ip = get_ip(request)[0]
     if ip:
         log_data['ip'] = ip
     if data:

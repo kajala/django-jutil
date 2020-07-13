@@ -1,23 +1,25 @@
 import logging
-from typing import Tuple, Any
+from typing import Tuple, Union
 from django.conf import settings
 import requests
 import socket
+from django.http.request import HttpRequest
 from ipware import get_client_ip  # type: ignore
+from rest_framework.request import Request
 
 
 logger = logging.getLogger(__name__)
 
 
-def get_ip(request: Any) -> str:
+def get_ip(request: Union[HttpRequest, Request]) -> str:
     """
     Returns best-guess IP for given request.
     Uses ipware library get_client_ip.
     If you need to know is IP routable or not, use ipware get_client_ip directly.
     :param request: Djangos HttpRequest or DRF Request
-    :return: IP-address
+    :return: IP-address or '' if IP-address could not be resolved (localhost)
     """
-    return get_client_ip(request)[0]
+    return get_client_ip(request)[0] or ''
 
 
 def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
