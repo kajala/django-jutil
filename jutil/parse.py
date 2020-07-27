@@ -1,8 +1,6 @@
 import logging
-import re
 from datetime import datetime
-from typing import Optional, Any, Dict
-from urllib.parse import ParseResult, urlparse
+from typing import Optional, Any
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
