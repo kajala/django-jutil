@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, date
 from decimal import Decimal
 from os.path import join
 from pprint import pprint
+from urllib.parse import urlparse
+
 from django.utils import timezone
 from typing import List
 from jutil.modelfields import SafeCharField, SafeTextField
@@ -30,7 +32,6 @@ from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, Ens
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
 from jutil.request import get_ip_info
 from jutil.responses import FileSystemFileResponse, CsvResponse
-from jutil.sftp import parse_sftp_connection
 from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
@@ -585,19 +586,15 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_parse_sftp(self):
         test_cases = [
-            ('jani@kajala.com', ['jani', '', 'kajala.com', '']),
-            ('jani.kajala:1231!@kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
-            ('jani:1231!@kajala.com:/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
-            ('jani.kajala:1231!@kajala.com:my/dir', ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
-            ('user=jani;host=kajala.com', ['jani', '', 'kajala.com', '']),
-            ('user=jani.kajala;pass=1231!;host=kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
-            ('user=jani;pass=1231!;host=kajala.com;path=/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
-            ('user=jani.kajala;pass=1231!;host=kajala.com;path=my/dir',
-             ['jani.kajala', '1231!', 'kajala.com', 'my/dir']),
+            ('sftp://jani@kajala.com', ['jani', None, 'kajala.com', '']),
+            ('sftp://jani.kajala:1231!@kajala.com', ['jani.kajala', '1231!', 'kajala.com', '']),
+            ('sftp://jani:1231!@kajala.com/my/dir', ['jani', '1231!', 'kajala.com', '/my/dir']),
+            ('sftp://jani.kajala:1231!@kajala.com/my/dir', ['jani.kajala', '1231!', 'kajala.com', '/my/dir']),
         ]
         for connection, ref_res in test_cases:
-            res = parse_sftp_connection(connection)
-            self.assertListEqual(list(res), ref_res,
+            res = urlparse(connection)
+            res_list = [res.username, res.password, res.hostname, res.path]
+            self.assertListEqual(res_list, ref_res,
                                  'SFTP connection string "{}" parsed incorrectly'.format(connection))
 
     def test_admin(self):

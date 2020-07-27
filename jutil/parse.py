@@ -1,9 +1,15 @@
+import logging
+import re
 from datetime import datetime
-from typing import Optional, Any
+from typing import Optional, Any, Dict
+from urllib.parse import ParseResult, urlparse
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
 from dateutil.parser import parse as dateutil_parse
+
+
+logger = logging.getLogger(__name__)
 
 
 TRUE_VALUES = (
