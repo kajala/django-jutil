@@ -64,7 +64,7 @@ def admin_log(instances: Sequence[object],
             )
 
 
-def admin_obj_url(obj: Optional[Union[Type[Model], Model]], route: str = '', base_url: str = '') -> str:
+def admin_obj_url(obj: Optional[object], route: str = '', base_url: str = '') -> str:
     """
     Returns admin URL to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
@@ -81,7 +81,7 @@ def admin_obj_url(obj: Optional[Union[Type[Model], Model]], route: str = '', bas
     return base_url + path
 
 
-def admin_obj_link(obj: Optional[Union[Type[Model], Model]], label: str = '', route: str = '', base_url: str = '') -> str:
+def admin_obj_link(obj: Optional[object], label: str = '', route: str = '', base_url: str = '') -> str:
     """
     Returns safe-marked admin link to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
