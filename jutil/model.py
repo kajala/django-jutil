@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from time import sleep
-from typing import Type, List, Tuple, Any, Optional, Callable
+from typing import Type, List, Tuple, Any, Optional
 from django.db.models import Model
 from django.utils.encoding import force_text
 from django.utils.timezone import now
@@ -35,7 +35,7 @@ def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 
     t0: Optional[datetime] = None
     t1: Optional[datetime] = None
     qs0 = cls._default_manager if hasattr(cls, '_default_manager') else cls  # pylint: disable=protected-access
-    while t0 is None or t0 < t1:
+    while t0 is None or t0 < t1:  # type: ignore
         obj = qs0.all().filter(**kwargs).first()
         if obj is not None:
             return obj

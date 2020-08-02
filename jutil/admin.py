@@ -1,11 +1,11 @@
 import os
 from collections import OrderedDict
-from typing import List, Optional, Sequence, TYPE_CHECKING, Union, Type
+from typing import List, Optional, Sequence, TYPE_CHECKING
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.db.models import Q, Model
+from django.db.models import Q
 from django.http import HttpRequest, Http404
 from django.urls import reverse
 from django.utils.html import format_html
