@@ -5,9 +5,11 @@ from decimal import Decimal
 from os.path import join
 from pprint import pprint
 from urllib.parse import urlparse
-
 from django.utils import timezone
 from typing import List
+
+from django.utils.timezone import now
+
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -29,7 +31,8 @@ from jutil.command import get_date_range_by_name, add_date_range_arguments, pars
 from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
 from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
-from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none
+from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none, \
+    wait_object_or_none
 from jutil.request import get_ip_info
 from jutil.responses import FileSystemFileResponse, CsvResponse
 from jutil.testing import DefaultTestSetupMixin
@@ -984,6 +987,20 @@ class Tests(TestCase, DefaultTestSetupMixin):
         content_ref = b'date,description,count,unit price,total price\r\n2019-12-15,oranges,1000,0.99,990.00\r\n2020-01-03,apples,4,1.10,4.40\r\n2020-11-03,apples,5,10.10,50.50\r\n'
         self.assertEqual(content_ref, res.content)
         print(res.content.decode())
+
+    def test_wait_object_or_none(self):
+        admin_log([self.user], 'Hello, world')
+        e = LogEntry.objects.all().filter(object_id=self.user.id).last()
+        assert isinstance(e, LogEntry)
+        e_id = e.id
+        obj = wait_object_or_none(LogEntry, id=e_id)
+        self.assertIsNotNone(obj)
+        self.assertEqual(obj.id, e_id)
+        t0 = now()
+        obj = wait_object_or_none(LogEntry, timeout=1.0, sleep_interval=0.1, id=e_id+1)
+        t1 = now()
+        self.assertIsNone(obj)
+        self.assertGreater(t1-t0, timedelta(seconds=0.99))
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore

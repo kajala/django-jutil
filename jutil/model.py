@@ -1,6 +1,9 @@
-from typing import Type, List, Tuple, Any, Optional
+from datetime import timedelta, datetime
+from time import sleep
+from typing import Type, List, Tuple, Any, Optional, Callable
 from django.db.models import Model
 from django.utils.encoding import force_text
+from django.utils.timezone import now
 from jutil.dict import choices_label
 
 
@@ -16,6 +19,31 @@ def get_object_or_none(cls: Any, **kwargs) -> Any:
         return qs.get(**kwargs)
     except Exception:
         return None
+
+
+def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 1.0, **kwargs) -> Any:
+    """
+    Returns model instance or None if not found after specified timeout.
+    Waits timeout before returning if no object available.
+    Waiting is done by sleeping specified intervals.
+    :param cls: Class or queryset
+    :param timeout: Timeout in seconds
+    :param sleep_interval: Sleep interval in seconds
+    :param kwargs: Filters for get() call
+    :return: Object or None
+    """
+    t0: Optional[datetime] = None
+    t1: Optional[datetime] = None
+    qs0 = cls._default_manager if hasattr(cls, '_default_manager') else cls  # pylint: disable=protected-access
+    while t0 is None or t0 < t1:
+        obj = qs0.all().filter(**kwargs).first()
+        if obj is not None:
+            return obj
+        t0 = now()
+        if t1 is None:
+            t1 = t0 + timedelta(seconds=timeout)
+        sleep(sleep_interval)
+    return qs0.all().filter(**kwargs).first()
 
 
 def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str]:
