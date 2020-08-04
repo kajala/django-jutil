@@ -475,7 +475,6 @@ def fi_ssn_generator(min_year: int = 1920, max_year: int = 1999):
     day = randint(1, 28)  # nosec
     month = randint(1, 12)  # nosec
     year = randint(min_year, max_year)  # nosec
-    year2 = ''
     suffix = randint(100, 999)  # nosec
     sep = '-'
     if year < 1900:
