@@ -1,5 +1,5 @@
 import json
-from typing import Tuple
+from typing import Tuple, Optional
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
@@ -21,7 +21,7 @@ class DefaultTestSetupMixin:
         if kw.pop('verbose', self.verbose):
             print(*args)
 
-    def request(self, method: str, path: str, data: dict, **kw) -> Tuple[dict, int]:
+    def request(self, method: str, path: str, data: Optional[dict] = None, **kw) -> Tuple[dict, int]:
         """
         API client request.
         :param method:
@@ -34,12 +34,13 @@ class DefaultTestSetupMixin:
         self.debug_print('HTTP {} {} {}'.format(method.upper(), path, data), verbose=verbose)
         # print('HTTP {method} {data}'.format(method=method.upper(), data=data))
         # res = getattr(self.api_client, method.lower())(path, data=data)
-        res = getattr(self.api_client, method.lower())(path, data=json.dumps(data), content_type='application/json')
+        content = json.dumps(data) if data is not None else None
+        res = getattr(self.api_client, method.lower())(path, data=content, content_type='application/json')
         reply = res.json()
         self.debug_print('HTTP {} {} {}: {}'.format(method.upper(), res.status_code, path, reply), verbose=verbose)
         return reply, res.status_code
 
-    def post(self, path: str, data: dict, **kw) -> dict:
+    def post(self, path: str, data: Optional[dict] = None, **kw) -> dict:
         """
         API client POST
         :param path:
@@ -52,7 +53,7 @@ class DefaultTestSetupMixin:
             raise Exception('HTTP {} {} {}: {} {}'.format('POST', status_code, path, data, reply))
         return reply
 
-    def get(self, path: str, data: dict, **kw) -> dict:
+    def get(self, path: str, data: Optional[dict] = None, **kw) -> dict:
         """
         API client GET
         :param path:
