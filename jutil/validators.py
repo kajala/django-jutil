@@ -170,7 +170,7 @@ def iban_validator(v: str):
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(_('Missing value')), code='invalid_iban')
     country = v[:2].upper()
     if country not in IBAN_LENGTH_BY_COUNTRY:
-        raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
+        raise ValidationError(_('Invalid country code') + ': {}'.format(country), code='invalid_country_code')
     iban_len = IBAN_LENGTH_BY_COUNTRY[country]
     if iban_len != len(v):
         raise ValidationError(_('Invalid IBAN account number') + ': {}'.format(v), code='invalid_iban')
@@ -198,13 +198,13 @@ def iban_generator(country_code: str = '') -> str:
     if not country_code:
         country_code = random.choice(  # nosec
             list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys())))
+    if country_code not in IBAN_LENGTH_BY_COUNTRY:
+        raise ValidationError(_('Invalid country code') + ': {}'.format(country_code), code='invalid_country_code')
     nlen = IBAN_LENGTH_BY_COUNTRY[country_code]
     if nlen > 26:
         raise ValidationError(_('IBAN checksum generation does not support >26 character IBANs'), code='invalid_iban')
 
     # generate BBAN part
-    if country_code not in IBAN_LENGTH_BY_COUNTRY:
-        raise ValidationError(_('Invalid country code') + ': {}'.format(country_code), code='invalid_country_code')
     digits = '0123456789'
     bban = ''.join([random.choice(digits) for n in range(nlen - 4)])  # nosec
 
@@ -340,7 +340,7 @@ def ee_iban_validator(v: str):
 # Finland
 # ----------------------------------------------------------------------------
 
-FI_SSN_FILTER = re.compile(r'[^-A-Z0-9]')
+FI_SSN_FILTER = re.compile(r'[^0-9A-Z+-]')
 FI_SSN_VALIDATOR = re.compile(r'^\d{6}[+-A]\d{3}[\d\w]$')
 FI_COMPANY_ORG_ID_FILTER = re.compile(r'[^0-9]')
 
@@ -415,9 +415,11 @@ def fi_company_org_id_filter(v: str) -> str:
 
 
 def fi_company_org_id_validator(v0: str):
+    prefix = re.sub(r'\s+', '', v0)[:2]  # retain prefix: either numeric or FI is ok
     v = fi_company_org_id_filter(v0)
-    prefix = v[:2]
-    if v[-2:-1] != '-' and prefix != 'FI':
+    if v[:2] == prefix:
+        prefix = 'FI'
+    if v[-2:-1] != '-' or prefix != 'FI':
         raise ValidationError(_('Invalid company organization ID')+' (FI.1): {}'.format(v0), code='invalid_company_org_id')
     v = v.replace('-', '', 1)
     if len(v) != 8:
@@ -464,12 +466,27 @@ def fi_ssn_validator(v: str):
         raise ValidationError(_('Invalid personal identification number')+' (FI.2): {}'.format(v), code='invalid_ssn')
 
 
-def fi_ssn_generator():
+def fi_ssn_generator(min_year: int = 1920, max_year: int = 1999):
+    if not (1800 <= min_year < 2100):
+        raise ValidationError(_('Unsupported year') + ': {}'.format(min_year))
+    if not (1800 <= max_year < 2100):
+        raise ValidationError(_('Unsupported year') + ': {}'.format(max_year))
+
     day = randint(1, 28)  # nosec
     month = randint(1, 12)  # nosec
-    year = randint(1920, 1999)  # nosec
+    year = randint(min_year, max_year)  # nosec
+    year2 = ''
     suffix = randint(100, 999)  # nosec
-    v = '{:02}{:02}{:02}-{}'.format(day, month, year-1900, suffix)
+    sep = '-'
+    if year < 1900:
+        sep = '+'
+        year2 = year - 1800
+    elif year >= 2000:
+        sep = 'A'
+        year2 = year - 2000
+    else:
+        year2 = year - 1900
+    v = '{:02}{:02}{:02}{}{}'.format(day, month, year2, sep, suffix)
     d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
     digits = {
         10: 'A', 	11: 'B', 	12: 'C', 	13: 'D', 	14: 'E', 	15: 'F', 	16: 'H',

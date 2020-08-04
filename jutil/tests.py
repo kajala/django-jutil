@@ -51,7 +51,7 @@ from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_s
     dk_iban_bank_info, dk_clearing_code_bank_name, country_code_sanitizer, phone_sanitizer, email_sanitizer, \
     fi_company_org_id_generator, phone_validator, passport_filter, passport_validator, passport_sanitizer, \
     country_code_validator, validate_country_iban, iban_bic, validate_country_company_org_id, fi_ssn_generator, \
-    fi_ssn_validator, bic_validator, iban_generator
+    fi_ssn_validator, bic_validator, iban_generator, bic_sanitizer, filter_country_company_org_id
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
 from django.contrib import admin
@@ -182,17 +182,23 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_passport(self):
         self.assertEqual(passport_filter('?ADsd-12312dsds'), 'ADSD-12312DSDS')
+        passport_validator('21412312312')
         with self.assertRaisesMessage(ValidationError, _('Invalid passport number')):
             passport_validator('214')
         self.assertEqual(passport_sanitizer('214'), '')
+        self.assertEqual(passport_sanitizer('21412312312'), '21412312312')
 
     def test_country_code(self):
+        for cc in ['FI', 'DK', 'ES', 'SE', 'VN']:
+            country_code_validator(cc)
         with self.assertRaisesMessage(ValidationError, _('Invalid country code')):
             country_code_validator('Finland')
 
     def test_bic(self):
         bic = iban_bic('FI21 1234 5600 0007 85')
         self.assertEqual(bic, 'NDEAFIHH')
+        self.assertEqual(bic_sanitizer('NDEAFIHH'), 'NDEAFIHH')
+        self.assertEqual(bic_sanitizer('NDEAFIH'), '')
 
     def test_org_id(self):
         try:
@@ -208,21 +214,38 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_fi_ssn_generator(self):
         self.assertEqual(len(fi_ssn_generator()), 6 + 1 + 4)
-        for n in range(10):
-            ssn = fi_ssn_generator()
-            try:
-                fi_ssn_age(ssn)
+        for min_year, max_year in [(1800, 1900), (1900, 2000), (2000, 2050)]:
+            for n in range(10):
+                ssn = fi_ssn_generator(min_year, max_year)
+                try:
+                    fi_ssn_age(ssn)
+                    fi_ssn_validator(ssn)
+                except Exception:
+                    self.fail('{} is valid SSN'.format(ssn))
+        fi_ssn_validator('110305+283X')
+        for ssn in ['9999-123F', '271138-670X', '090228+256X']:
+            with self.assertRaisesMessage(ValidationError, _('Invalid personal identification number')):
                 fi_ssn_validator(ssn)
-            except Exception:
-                self.fail('{} is valid SSN'.format(ssn))
+        with self.assertRaises(ValidationError):
+            fi_ssn_generator(1700, 1799)
+        with self.assertRaises(ValidationError):
+            fi_ssn_generator(2100, 2200)
 
     def test_iban(self):
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            iban_validator('')
+        with self.assertRaisesMessage(ValidationError, _('Invalid country code')):
+            iban_validator('XX')
         with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
             iban_validator('FI2112345600000786')
         bic_validator('HELSFIHH')
         bic_validator('HELSFIHHXXX')
         with self.assertRaisesMessage(ValidationError, _('Invalid bank BIC/SWIFT code')):
             bic_validator('HELSFIH')
+        with self.assertRaisesMessage(ValidationError, _('Invalid bank BIC/SWIFT code')):
+            bic_validator('')
+        with self.assertRaisesMessage(ValidationError, _('Invalid bank BIC/SWIFT code')):
+            bic_validator('XX123123123112')
         iban_validator('FI2112345600000785')
         iban_validator('SE4550000000058398257466')
         fi_iban_validator('FI2112345600000785')
@@ -235,6 +258,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
             se_iban_validator('SE4550000000058398257465')
         iban = 'FI8847304720017517'
         self.assertEqual(iban_filter_readable(iban), 'FI88 4730 4720 0175 17')
+        self.assertEqual(iban_filter_readable(''), '')
 
     def test_urls(self):
         url = 'http://yle.fi/uutiset/3-8045550?a=123&b=456'
@@ -460,16 +484,25 @@ class Tests(TestCase, DefaultTestSetupMixin):
         ]
         invalids = [
             '2084069-1',
+            'SE2084069-1',
         ]
+        co_filtered = [
+            ('FI', 'FI01098230', '0109823-0'),
+            ('FI', 'FI-01098230', '0109823-0'),
+            ('FI', '0109823-0', '0109823-0'),
+            ('FI', '2084069-9', '2084069-9'),
+            ('SE', '01098230', '01098230'),
+            ('SE', '20840699', '20840699'),
+        ]
+        for cc, org, val in co_filtered:
+            self.assertEqual(filter_country_company_org_id(cc, org), val)
+            validate_country_company_org_id(cc, org)
         for valid in valids:
-            # print('test_org_id_fi:', valid, 'should be valid...', end=' ')
             fi_company_org_id_validator(valid)
-            # print('ok')
         for invalid in invalids:
             try:
-                # print('test_org_id_fi:', invalid, 'should be invalid', end=' ')
                 fi_company_org_id_validator(invalid)
-                self.assertTrue(False)
+                self.fail('{} passed as valid FI-org'.format(invalid))
             except ValidationError:
                 # print('ok')
                 pass
@@ -507,6 +540,13 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for ref_no in valid_iso_refs:
             iso_payment_reference_validator(ref_no)
 
+        invalid_iso_refs = [
+            'RF92 1229}',
+        ]
+        for ref_no in invalid_iso_refs:
+            with self.assertRaisesMessage(ValidationError, 'Invalid payment reference'):
+                iso_payment_reference_validator(ref_no)
+
     def test_fi_ssn_age(self):
         samples = [
             (date(2018, 12, 20), '231298-965X', 19),
@@ -522,6 +562,12 @@ class Tests(TestCase, DefaultTestSetupMixin):
     def test_se_banks(self):
         self.assertEqual(se_clearing_code_bank_info('6789'), ('Handelsbanken', 9))
         se_iban_validator('SE45 5000 0000 0583 9825 7466')
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            se_iban_validator('')
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            se_iban_validator('XX45 5000 0000 0583 9825 7466')
+        with self.assertRaisesMessage(ValidationError, _('Invalid IBAN account number')):
+            se_iban_validator('SE45 5000 0000 0583 9825')
         self.assertEqual(se_clearing_code_bank_info('9500'), ('Nordea AB', 10))
         an = '957033025420'
         bank_name, acc_digits = se_clearing_code_bank_info(an)
@@ -800,15 +846,18 @@ class Tests(TestCase, DefaultTestSetupMixin):
         ]
         for iban in test_ibans:
             iban_validator(iban)
-        for n in range(100):
-            acc = iban_generator()
-            # print(acc)
-            try:
-                iban_validator(acc)
-            except Exception as e:
-                print('iban_generator() returned', acc, 'but iban_validator() raised exception', e)
-                self.fail(
-                    'iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))
+        for cc in ['', 'FI', 'SE']:
+            for n in range(100):
+                acc = iban_generator(cc)
+                try:
+                    iban_validator(acc)
+                except Exception as e:
+                    print('iban_generator() returned', acc, 'but iban_validator() raised exception', e)
+                    self.fail('iban_validator(iban_generator()) should not raise Exception, account number was {}'.format(acc))
+        with self.assertRaisesMessage(ValidationError, _('Invalid country code')):
+            iban_generator('XX')
+        with self.assertRaisesMessage(ValidationError, _('IBAN checksum generation does not support >26 character IBANs')):
+            iban_generator('AL')
 
     def test_make_email_recipient(self):
         email_tests = [
