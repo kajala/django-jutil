@@ -14,12 +14,9 @@ echo $FILE
 cd dist
 tar xvf "$FILE.tar.gz"
 rm -f "$FILE/.covera*"
-rm -f "$FILE/coverage.xml"
-rm -rf "$FIR/.mypy_cache"
-rm -rf "$FILE/venv"
-rm -rf "$FILE/data"
-rm -rf "$FILE/.idea"
-rm -rf "$FILE/linecalc.conf"
+for X in coverage.xml project logs .mypy_cache venv data .idea linecalc.conf; do
+    rm -rf "$FILE/$X"
+done
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
 rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
