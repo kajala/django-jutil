@@ -79,13 +79,20 @@ def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h
         (1, seconds_label),
     )
     out = ""
-    seconds = int(dt.total_seconds())
+    seconds_f = dt.total_seconds()
+    seconds = int(seconds_f)
     for n_secs, label in parts:
         n, remainder = divmod(seconds, n_secs)
         if n > 0 and label:
             out += str(n) + label
             seconds = remainder
-    return out.strip()
+    out_str = out.strip()
+    if not out_str:
+        if seconds_f >= 0.001:
+            out_str = '{:0.3f}'.format(int(seconds_f * 1000.0) * 0.001) + seconds_label
+        else:
+            out_str = '0' + seconds_label
+    return out_str.strip()
 
 
 def format_xml(content: str, encoding: str = 'UTF-8', exceptions: bool = False) -> str:

@@ -680,6 +680,7 @@ class Tests(TestCase, DefaultTestSetupMixin):
             format_timedelta(timedelta(seconds=3600 + 90), hours_label='h ', minutes_label='min ', seconds_label='s '),
             '1h 1min 30s')
         self.assertEqual(format_timedelta(timedelta(seconds=90), seconds_label=''), '1min')
+        self.assertEqual(format_timedelta(timedelta(seconds=0.090), seconds_label='s'), '0.090s')
 
     def test_dec123456(self):
         self.assertEqual(dec1(Decimal('1.2345678')), Decimal('1.2'))
