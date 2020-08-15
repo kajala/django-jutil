@@ -36,7 +36,10 @@ class DefaultTestSetupMixin:
         # res = getattr(self.api_client, method.lower())(path, data=data)
         content = json.dumps(data) if data is not None else None
         res = getattr(self.api_client, method.lower())(path, data=content, content_type='application/json')
-        reply = res.json()
+        try:
+            reply = res.json()
+        except TypeError:
+            reply = {'content': res.content}
         self.debug_print('HTTP {} {} {}: {}'.format(method.upper(), res.status_code, path, reply), verbose=verbose)
         return reply, res.status_code
 
