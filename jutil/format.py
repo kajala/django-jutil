@@ -1,4 +1,6 @@
 import csv
+import html
+import json
 import logging
 import os
 import re
@@ -13,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
 
+from django.utils.safestring import mark_safe
 
 logger = logging.getLogger(__name__)
 
@@ -171,6 +174,15 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     except Exception as e:
         logger.error('format_xml_file failed (2): %s', e)
     return b''
+
+
+def format_as_html_json(value: Any) -> str:
+    """
+    Returns value as JSON-formatted value in HTML.
+    :param value: Any value which can be converted to JSON by json.dumps
+    :return: str
+    """
+    return mark_safe(html.escape(json.dumps(value, indent=4)).replace('\n', '<br/>').replace(' ', '&nbsp;'))
 
 
 def format_csv(rows: List[List[Any]], dialect: str = 'excel') -> str:

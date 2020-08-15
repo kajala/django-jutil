@@ -42,7 +42,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
     last_year, last_week, yesterday, end_of_month
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
-    underscore_to_camel_case
+    underscore_to_camel_case, format_as_html_json
 from jutil.parse import parse_datetime, parse_bool
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -1051,6 +1051,16 @@ class Tests(TestCase, DefaultTestSetupMixin):
         t1 = now()
         self.assertIsNone(obj)
         self.assertGreater(t1-t0, timedelta(seconds=0.99))
+
+    def test_format_as_html_json(self):
+        pairs = [
+            (None, 'null'),
+            ({'a': 1}, '{<br/>&nbsp;&nbsp;&nbsp;&nbsp;&quot;a&quot;:&nbsp;1<br/>}'),
+            ({"script": "<script>window.alert()</script>"},
+             '{<br/>&nbsp;&nbsp;&nbsp;&nbsp;&quot;script&quot;:&nbsp;&quot;&lt;script&gt;window.alert()&lt;/script&gt;&quot;<br/>}'),
+        ]
+        for val, html in pairs:
+            self.assertEqual(format_as_html_json(val), html)
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
