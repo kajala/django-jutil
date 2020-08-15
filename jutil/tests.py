@@ -1062,6 +1062,28 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for val, html in pairs:
             self.assertEqual(format_as_html_json(val), html)
 
+    def test_parse_bool(self):
+        refs_true = [
+            True,
+            'True',
+            '1',
+            1,
+            'true',
+            'yes',
+        ]
+        refs_false = [
+            False,
+            'False',
+            '0',
+            0,
+            'false',
+            'no',
+        ]
+        for ref in refs_true:
+            self.assertTrue(parse_bool(ref))
+        for ref in refs_false:
+            self.assertFalse(parse_bool(ref))
+
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
 dummy_admin_func_b.short_description = 'B'  # type: ignore
