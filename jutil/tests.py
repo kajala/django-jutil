@@ -38,7 +38,7 @@ from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
-    last_year, last_week, yesterday, end_of_month, this_year
+    last_year, last_week, yesterday, end_of_month, this_year, get_time_steps, TIME_STEP_DAILY
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
     underscore_to_camel_case, format_as_html_json
@@ -144,6 +144,31 @@ class Tests(TestCase, DefaultTestSetupMixin):
             self.fail('format_full_name failed with long name')
         except Exception:
             pass
+
+    def test_parse_datetime(self):
+        pairs = [
+            ('2016-06-12', '2016-06-12T00:00:00+00:00'),
+            ('2016-06-12T01:00:00', '2016-06-12T01:00:00+00:00'),
+            ('2016-06-12 01:00:00', '2016-06-12T01:00:00+00:00'),
+            ('2016-06-12T01:00:00+00:00', '2016-06-12T01:00:00+00:00'),
+            ('2016-06-12 01:00:00+00:00', '2016-06-12T01:00:00+00:00'),
+        ]
+        for t_str_input, t_ref_str in pairs:
+            t = parse_datetime(t_str_input)
+            self.assertTrue(isinstance(t, datetime))
+            assert isinstance(t, datetime)
+            self.assertEqual(t.isoformat(), t_ref_str)
+
+        invalids = [
+            '12312313ew',
+            '2016-13-05',
+        ]
+        for t_str_input in invalids:
+            try:
+                parse_datetime(t_str_input)
+                self.fail('{} is not valid input for parse_datetime()'.format(t_str_input))
+            except Exception:
+                pass
 
     def test_add_month(self):
         t = parse_datetime('2016-06-12T01:00:00')
@@ -448,6 +473,22 @@ class Tests(TestCase, DefaultTestSetupMixin):
         for name, res in named_ranges:
             # print('testing', name)
             self.assertEqual(get_date_range_by_name(name, t), res)
+
+    def test_time_steps(self):
+        t = parse_datetime('2020-08-24 23:28:36.503174')
+        this_week_daily = [
+            '2020-08-24T00:00:00+00:00 2020-08-25T00:00:00+00:00',
+            '2020-08-25T00:00:00+00:00 2020-08-26T00:00:00+00:00',
+            '2020-08-26T00:00:00+00:00 2020-08-27T00:00:00+00:00',
+            '2020-08-27T00:00:00+00:00 2020-08-28T00:00:00+00:00',
+            '2020-08-28T00:00:00+00:00 2020-08-29T00:00:00+00:00',
+            '2020-08-29T00:00:00+00:00 2020-08-30T00:00:00+00:00',
+            '2020-08-30T00:00:00+00:00 2020-08-31T00:00:00+00:00',
+        ]
+        ix = 0
+        for begin, end in get_time_steps(TIME_STEP_DAILY, *this_week(t)):
+            self.assertEqual('{} {}'.format(begin.isoformat(), end.isoformat()), this_week_daily[ix])
+            ix += 1
 
     def test_bank_info(self):
         ac = 'FI8847304720017517'

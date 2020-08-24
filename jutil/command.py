@@ -3,12 +3,12 @@ import re
 import traceback
 from datetime import datetime, timedelta
 from typing import Tuple, List, Any, Optional
-from dateutil import rrule
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
 from jutil.dates import last_month, yesterday, TIME_RANGE_NAMES, TIME_STEP_NAMES, this_month, last_year, last_week, \
-    localize_time_range, this_year, this_week
+    localize_time_range, this_year, this_week, TIME_STEP_TYPES, TIME_STEP_DAILY, add_month, TIME_STEP_WEEKLY, \
+    TIME_STEP_MONTHLY, get_time_steps
 from jutil.email import send_email
 import getpass
 from django.utils import translation
@@ -149,21 +149,14 @@ def parse_date_range_arguments(options: dict, default_range: str = 'last_month')
     if options.get('end'):
         end = parse_datetime(options['end'])  # type: ignore
 
-    step_type = None
-    after_end = end
+    step_type = ''
     for step_name in TIME_STEP_NAMES:
         if options.get(step_name):
-            step_type = getattr(rrule, step_name.upper())
-            if rrule.DAILY == step_type:
-                after_end += timedelta(days=1)
-            if rrule.WEEKLY == step_type:
-                after_end += timedelta(days=7)
-            if rrule.MONTHLY == step_type:
-                after_end += timedelta(days=31)
-    steps = None
+            if step_type:
+                raise ValueError('Cannot use --{} and --{} simultaneously'.format(step_type, step_name))
+            step_type = step_name
     if step_type:
-        begins = list(rrule.rrule(step_type, dtstart=begin, until=after_end))
-        steps = [(begins[i], begins[i+1]) for i in range(len(begins)-1)]
-    if steps is None:
+        steps = get_time_steps(step_type, begin, end)
+    else:
         steps = [(begin, end)]
     return begin, end, steps

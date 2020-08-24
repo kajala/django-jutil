@@ -1,10 +1,11 @@
 import logging
-from datetime import datetime
+from datetime import datetime, time, date
 from typing import Optional, Any
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 import pytz
-from dateutil.parser import parse as dateutil_parse
+from django.utils.dateparse import parse_datetime as django_parse_datetime
+from django.utils.dateparse import parse_date as django_parse_date
 
 
 logger = logging.getLogger(__name__)
@@ -48,20 +49,28 @@ def parse_bool(v, default: Optional[bool] = None, exceptions: bool = True) -> Op
 
 def parse_datetime(v: str, default: Optional[datetime] = None, tz: Any = None, exceptions: bool = True) -> Optional[datetime]:
     """
-    Parses str to timezone-aware datetime.
+    Parses ISO date/datetime string to timezone-aware datetime.
+    Supports YYYY-MM-DD date strings where time part is missing.
+    Returns always timezone-aware datetime (assumes UTC if timezone missing).
     :param v: Input string to parse
     :param default: Default value to return if exceptions=False
     :param tz: Default pytz timezone or if None then use UTC as default
     :param exceptions: Raise exception on error or not
-    :return: datetime
+    :return: datetime with timezone
     """
     try:
-        t = dateutil_parse(v, default=datetime(2000, 1, 1))
+        t = django_parse_datetime(v)
+        if t is None:
+            t_date: Optional[date] = django_parse_date(v)
+            if t_date is None:
+                raise ValidationError(_(
+                    "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {
+                                          'value': v})
+            t = datetime.combine(t_date, time())
         if tz is None:
             tz = pytz.utc
         return t if t.tzinfo else tz.localize(t)
     except Exception:
         if exceptions:
-            msg = _("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {'value': v}
-            raise ValidationError(msg)
+            raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {'value': v})
         return default

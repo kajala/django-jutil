@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Tuple, Any, Optional
+from typing import Tuple, Any, Optional, List
 import pytz
 from calendar import monthrange
 from django.utils.text import format_lazy
@@ -32,13 +32,23 @@ TIME_RANGE_CHOICES = [
     ('next_7d', format_lazy('+7 {}', _('number.of.days'))),
 ]
 
-TIME_STEP_CHOICES = [
-    ('daily', _('daily')),
-    ('weekly', _('weekly')),
-    ('monthly', _('monthly')),
+TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
+
+TIME_STEP_DAILY = 'daily'
+TIME_STEP_WEEKLY = 'weekly'
+TIME_STEP_MONTHLY = 'monthly'
+
+TIME_STEP_TYPES = [
+    TIME_STEP_DAILY,
+    TIME_STEP_WEEKLY,
+    TIME_STEP_MONTHLY,
 ]
 
-TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
+TIME_STEP_CHOICES = [
+    (TIME_STEP_DAILY, _('daily')),
+    (TIME_STEP_WEEKLY, _('weekly')),
+    (TIME_STEP_MONTHLY, _('monthly')),
+]
 
 TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
 
@@ -284,3 +294,37 @@ def per_month(start: datetime, end: datetime, n: int = 1):
         curr_end = add_month(curr, n)
         yield curr, curr_end
         curr = curr_end
+
+
+def get_time_steps(step_type: str, begin: datetime, end: datetime) -> List[Tuple[datetime, datetime]]:
+    """
+    Returns time stamps by time step type [TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY].
+    For example daily steps for a week returns 7 [begin, end) ranges for each day of the week.
+    :param step_type: One of TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY
+    :param begin: datetime
+    :param end: datetime
+    :return: List of [begin, end), one for reach time step unit
+    """
+    after_end = end
+    if TIME_STEP_DAILY == step_type:
+        after_end += timedelta(days=1)
+    elif TIME_STEP_WEEKLY == step_type:
+        after_end += timedelta(days=7)
+    elif TIME_STEP_MONTHLY == step_type:
+        after_end = add_month(end)
+    else:
+        raise ValueError('Time step "{}" not one of {}'.format(step_type, TIME_STEP_TYPES))
+
+    begins: List[datetime] = []
+    t0 = t = begin
+    n = 1
+    while t < after_end:
+        begins.append(t)
+        if step_type == TIME_STEP_DAILY:
+            t = t0 + timedelta(days=n)
+        elif step_type == TIME_STEP_WEEKLY:
+            t = t0 + timedelta(days=7*n)
+        elif step_type == TIME_STEP_MONTHLY:
+            t = add_month(t0, n)
+        n += 1
+    return [(begins[i], begins[i+1]) for i in range(len(begins)-1)]
