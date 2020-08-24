@@ -381,6 +381,13 @@ def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
     return Decimal(a).quantize(Decimal('1.000000'))
 
 
+def is_media_path(file_path: str) -> bool:
+    """
+    Checks if file path starts with (settings) MEDIA_ROOT,
+    """
+    return hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and file_path.startswith(settings.MEDIA_ROOT)
+
+
 def strip_media_root(file_path: str) -> str:
     """
     If file path starts with (settings) MEDIA_ROOT,
@@ -392,7 +399,7 @@ def strip_media_root(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    if hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and file_path.startswith(settings.MEDIA_ROOT):
+    if is_media_path(file_path):
         file_path = file_path[len(settings.MEDIA_ROOT):]
         if file_path.startswith('/'):
             return file_path[1:]
