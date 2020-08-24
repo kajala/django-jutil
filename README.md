@@ -71,65 +71,651 @@ Test Code Coverage
 Changes
 =======
 
-3.0.0:
-+ Django 3.0.4 compatibility
+3.6.10:
+* Unit test fix
+* Log entry ordering fix
+
+3.6.9:
+* Minor refactoring
+
+3.6.8:
+* API testing client to support non-json content
+* Parse bool unit test
+
+3.6.7:
+* Added format as html json and unit tests
+
+3.6.6:
+* Millisecond handling to format timedelta
+* Deploy cleanup
+* Python-dotenv
+
+3.6.5:
+* API testing tweaks
+
+3.6.4:
+* Mypy fix
+* Unit test improvements, added support for FI ssns before 1900 and after 2000
+* Test-coverage tweak
+
+3.6.3:
+* Code QA / Prospector fixes
+* Added wait object or none and unit test
+
+3.6.2:
+* Added .env to ignore
+
+3.6.1:
+* Cleanup
+* Dropped parse sftp connection (as redundant)
+* Docs
+
+3.5.3:
+* Tweaks to usage of ipware
+
+3.5.2:
+* Minor refactoring
+
+3.5.1:
+* Upgrade of ipware to newer version
+* Dev requirements change of psycopg2
+
+3.4.9:
+* Mypy fix
+* Added get_ip() wrapper for ipware
+
+3.4.8:
+* Usage cleanup of ipware
+
+3.4.7:
+* Minor refactoring, added unit tests
+
+3.4.6:
+* More relaxed typing to admin log
+* DB check to build process
+
+3.4.5:
+* Format table max col setting fix
+* Fixed format table bug, added docs
+
+3.4.4:
+* Added User as explicit opt parameter to admin log
+
+3.4.3:
+* Minor refactoring
+
+3.4.2:
+* Added strip tag fields and unit tests
+
+3.4.1:
+* Type checking fixes
+* Added middleware unit tests
+* Changed ActivateUserProfileTimezone -> ActivateUserProfileTimezoneMiddleware to conform Django naming conventions
+* Cleanup, docs
+* Test-coverage script tweaks
+* Added dependency-check to requirements-dev.txt
+* .gitignore tweaks
+
+3.3.6:
+* Unit test fix
+* Build process cleanup
+* Cleanup
+* Test-coverage script update
+* Added htmlcov to ignore
+
+3.3.5:
+* Test fixes
+* Admin obj url fix
+
+3.3.4:
+* Admin log type fix
+
+3.3.3:
+* Code QA
+* Unit test improvements
+* Updated travis test to python 3.8
+
+3.3.2:
+* Added camel case conversion funcs
+
+3.3.1:
+* Format timedelta cleanup
+* Test-coverage script update
+* Unit test fixes
+* Re-enabled pytype
+
+3.2.21:
+* Email fix
+
+3.2.20:
+* Unit test coverage update
+* Sendgrid email format fix
+
+3.2.19:
+* Added end_of_month() (as in Excel) and unit tests
+* L10n
+
+3.2.18:
+* Type checking fixes
+
+3.2.17:
+* Type checking fixes
+
+3.2.16:
+* Type checking fixes
+
+3.2.15:
+* CachedFieldsMixin save() TYPE CHECKING fix
+
+3.2.14:
+* Type checking fix
+* Readme updates
+* MANIFEST tweaks
+* Pre-release script tweaks
+
+3.2.13:
+* Added py.typed marker file
+
+3.2.12:
+* Mypy / cleanup
+
+3.2.11:
+* Test coverage update
+* Added twine to dev reqs
+* Deploy script update
+
+3.2.10:
+* Test coverage update
+* Mypy support
+
+3.2.9:
+* Test coverage update
+* Pre-release script tweaks
+* Test coverage script tweaks
+
+3.2.8:
+* Travis sys import
+* Added vanity icons to readme
+
+3.2.7:
+* Added sudo apt-get install -y libxml2-utils to travis
+
+3.2.6:
+* Travis log changes
+
+3.2.5:
+* Added travis config
+
+3.2.4:
+* Codecov tests
+
+3.2.3:
+* Added codecov.yml
+
+3.2.2:
+* Test coverage update
+
+3.2.1:
+* Dependency cleanup
+
+3.1.4:
+* Test coverage update
+* Language cookie to use secure and httponly settings
+* Updated LICENSE.txt
+
+3.1.3:
+* Test coverage update
+* Cleanup
+* IBAN generation
+
+3.1.2:
+* Test coverage update
+* Config tweaks / pytype
+
+3.1.1:
+* Test coverage update
+
+3.0.16:
+* Test coverage update
+* Code QA pytype tool integration to build process
+
+3.0.15:
+* Formatting options to format timedelta as 3h40min14s
+
+3.0.14:
+* Test coverage update
+* Added helpers for media path handling
+
+3.0.13:
+* BIC validator
+* Added body and subject to test email
+
+3.0.12:
+* Test coverage update
+* CsvFileResponse -> CsvResponse to be consistent with naming of other responses
+* Separate XmlResponse and XmlFileResponse
+
+3.0.11:
+* Test coverage update
+* Cleanup
+
+3.0.10:
+* Test coverage update
+* Cleanup
+* Xml formatting error reporting
+
+3.0.9:
+* Test coverage update
+* Xml content decoding fix on error
+* L10n
+* Email unit tests
+
+3.0.8:
+* Test coverage update
+* Test email sending tweaks
+* More unit tests
+
+3.0.7:
+* Test coverage update
+* Pre-release step update
+
+3.0.6:
+* Deploy tweaks
+* Added coverage report
+* Cleanup, deleted format xml (unnecessary since multiple tools for that)
+
+3.0.5:
+* Changed SafeCommand to be compatible with BaseCommand on Exception return
+
+3.0.4:
+* Unit tests, refactoring
+
+3.0.3:
+* Added ucfirst and ucfirst lazy
+
+3.0.2:
+* Added format table
+* Added test-coverage script
+* Docs
+
+3.0.1:
+* Prospector 1.2.0 fixes
+* Django 3.0 compatibility
 
 2.4.14:
-+ Unit test improvements etc.
+* Unit tests, model changed check
+
+2.4.13:
+* Assert tweaks
+* File download admin tweaks
+* Admin download link fix
+
+2.4.12:
+* Support for multiple file fields in AdminFileDownloadMixin
+
+2.4.11:
+* Prospector / code QA fixes
+* Added SMTP based email support, logging
+
+2.4.10:
+* Deploy fix
+
+2.4.9:
+* Deploy cleanup and tweaks
+
+2.4.8:
+* Improved testing coverage
+* Coverage tweaks
+* Added .coverage to .gitignore
+* Removed coverage
+
+2.4.7:
+* Noqa fixes (prospector)
+* Added .coveragerc
+* Doc tweaks
+* Sftp connection string parsing cleanup
+
+2.4.6:
+* Sftp connection string parsing
+
+2.4.5:
+* Sendgrid api usage fix
+
+2.4.4:
+* Added base url support to admin links
+
+2.4.3:
+* Disabled sendgrid click tracking by default
+
+2.4.2:
+* Updated to use sendgrid v3 api, added cc and bcc support
+
+2.4.1:
+* Reg id -> org id name refactoring
+
+2.3.5:
+* Format keys option to dict to html
+
+2.3.4:
+* Added fi company reg id generator
+
+2.3.3:
+* Admin helper stweaks
+* Admin file download tweak
+* Pre-release process
+* Docs
 
 2.3.2:
-+ Prospector clean & checked when making new release
+* Deploy tweaks
+* Prospector check to build
+* Prospector clean
 
 2.3.1:
-+ Cleanup related to prospector results (https://pypi.org/project/prospector/)
+* Code cleanup
+
+2.2.43:
+* Etree related refactoring
 
 2.2.42:
-+ ElementTree usage cleanup
+* ElementTree usage fix
+
+2.2.41:
+* Updated requirements
+* Cleaned up ugettext usage 
+
+2.2.40:
+* ElementTree cleanup, issues related to isinstance() usage
+
+2.2.39:
+* Separate FormattedXmlResponse and FormattedXmlFileResponse
 
 2.2.38:
-+ Added FormattedXmlResponse
+* Added FormattedXmlResponse
 
 2.2.37:
-+ Added format_xml_bytes
+* Format xml bytes
+
+2.2.36:
+* Format xml file improvements
+* Advanced xml formatting using xmllint
 
 2.2.35:
-+ Some clearing code fixes for Sweden
+* Sweden clearing code fixes
+
+2.2.34:
+* Localized actions list sorting
+
+2.2.33:
+* Dict to html unit test
+* Dict to html fix
+
+2.2.32:
+* Improved dict formatting
 
 2.2.31:
-+ Added various sanitizer-functions where simple validation is too strict
+* Added some sanitizers to validators.py
+
+2.2.30:
+* Admin obj link None handling
+
+2.2.29:
+* Nordea Sweden clearing code additions
+
+2.2.28:
+* Minor refactoring
+
+2.2.27:
+* Added obj tools
+
+2.2.26:
+* Debug code cleanup
 
 2.2.25:
-+ Added fi_ssn_generator (fake/test Finnish social security numbers)
+* Fi ssn generator fix
+
+2.2.24:
+* Added fi ssn generator
+
+2.2.23:
+* Nordea/SE clearing number addition
+* Deploy cleanup
 
 2.2.22:
-+ Some localization improvements
+* Added changelist view download support to AdminFileDownloadMixin
+
+2.2.21:
+* Unit tests
+* L10n check
+* Cleanup
+
+2.2.20:
+* Generic country filtering
+* Docs
+
+2.2.19:
+* Added one NordeaAB clearing code range
+
+2.2.18:
+* Fixed non-xmllint xml data formatting
+* Added format xml command
 
 2.2.17:
-+ Added format_xml_file, format_xml
+* Added format xml file helper
 
-2.2.14:
-+ More unit tests
+2.2.16:
+* Media path stripping
+
+2.2.15:
+* Int conversion fix / validators
+* Unit test tweaks
+* Better unit tests
+
+2.2.13:
+* Added missing Nordea AB / Sweden clearing number
+* Clarification / swedish clearing code
 
 2.2.12:
-+ Added admin_obj_link and admin_obj_url
+* Added admin obj link and admin obj url
 
 2.2.11:
-+ Sweden bank info fixes
+* Sweden clearing code filtering
+
+2.2.10:
+* Reduced Swedbank account number length requirement
+
+2.2.9:
+* Unit tests
 
 2.2.8:
-+ Denmark bank info
+* Dk bank info
 
 2.2.7:
-+ More unit tests
+* Unit test
+* Sparbanken Syd account number length
 
 2.2.6:
-+ IBAN validation of more or less all IBAN countries
+* Belgium iban data to 4 spaces instead of 8
+* Validation of all iban countries
 
 2.2.5:
-+ Belgium IBAN validator
+* Added be iban validator, refactoring validator code a bit
+* Doc cleanup
+
+2.2.4:
+* Docs
 
 2.2.3:
-+ ElementTree import cleanup (thanks to https://github.com/kutera)
+* Element tree cleanup
 
-2.2.0:
-+ Belgium IBAN validation support (thanks to https://github.com/kutera)
+2.2.2:
+* Unified xml.etree.ElementTree.Element usage
+
+2.2.1:
+* Adding BE (Belgium) bic bank to iban bic validators (thanks kutera/master)
+
+2.1.24:
+* Sweden bank const fix
+
+2.1.23:
+* Unit test fixes
+* Swedish bank const cleanup
+
+2.1.22:
+* Swedish bank clearing code fixes
+
+2.1.21:
+* Validator return space fix
+
+2.1.20:
+* Added ascii filter and unit tests
+
+2.1.19:
+* Refactoring
+* Swedish bank const php generation
+
+2.1.18:
+* Cleanup
+
+2.1.17:
+* Updated bank constants, added Sweden
+
+2.1.16:
+* Added ActivateUserProfileTimezone middleware
+
+2.1.15:
+* Upgraded external dependencies, added days to time delta
+
+2.1.14:
+* Upgraded external dependencies
+
+2.1.13:
+* Age calculation
+
+2.1.12:
+* Upgraded django
+
+2.1.11:
+* Iso payment ref validator
+
+2.1.10:
+* Email filtering tweaks
+
+2.1.9:
+* Email filter tweak
+
+2.1.8:
+* Dependency upgrade
+
+2.1.7:
+* Error message improvements
+
+2.1.6:
+* Selective cached fields update
+
+2.1.5:
+* Added simple email validator
+
+2.1.4:
+* Company reg id validator tweak
+
+2.1.3:
+* Dropped separate read/write views since Django supports this natively
+
+2.1.2:
+* Dependency upgrade
+
+2.1.1:
+* Upgraded version to match django version
+
+1.2.11:
+* Bank info unit test fix, upgraded libs
+
+1.2.10:
+* Admin log convention change: user system username instead of the first user in the system
+
+1.2.9:
+* Iban bank info convention change
+* Tests
+* Version bump
+* Iban bank info to return None, None to be more consistent with normal output
+
+1.2.7:
+* Replaced freegeoip.net API with ipstack.com
+
+1.2.6:
+* Unit tests and cleanup
+
+1.2.5:
+* Prev 30d, 60d and 90d time ranges
+
+1.2.4:
+* 404 check
+
+1.2.3:
+* Docs and cleanup
+
+1.2.2:
+* Minor version bump
+* Admin file download cleanup
+
+1.1.12:
+* File download response cleanup
+
+1.1.11:
+* SafeCommand return value
+
+1.1.10:
+* Parse requirements compatibility
+
+1.1.9:
+* Gz .gitignore
+* Cleanup
+* Parse requirements fix
+
+1.1.8:
+* Cleanup
+* Replaced parse requirements (fix)
+
+1.1.7:
+* Replaced parse requirements
+
+1.1.6:
+* FI company reg id check filtering
+
+1.1.5:
+* Extended FI company reg id acceptance
+
+1.1.4:
+* Permissions fix
+
+1.1.3:
+* Renamed passwd -> setpass to avoid name collision with django extensions project
+
+1.1.2:
+* Tests
+
+1.1.1:
+* Cleanup
+
+1.0.5:
+* Removed obsolete SimpleJsonDecoder since Django has better one now
+* Language cookie fix
+
+1.0.4:
+* Unit test fix
+
+1.0.3:
+* Fi bank const update
+
+1.0.2:
+* Unit tests
+* Dependency fix
+* Twine up
+
+1.0.1:
+* Cleanup
+* Docs
+
+1.0.0:
+* Docs
+* Github repository init
