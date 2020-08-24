@@ -5,7 +5,6 @@ from django.http.request import HttpRequest
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.request import Request
 
-
 logger = logging.getLogger(__name__)
 
 
