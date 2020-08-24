@@ -38,7 +38,7 @@ from jutil.testing import DefaultTestSetupMixin
 from jutil.urls import url_equals, url_mod, url_host
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
-    last_year, last_week, yesterday, end_of_month
+    last_year, last_week, yesterday, end_of_month, this_year
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
     underscore_to_camel_case, format_as_html_json
@@ -430,10 +430,12 @@ class Tests(TestCase, DefaultTestSetupMixin):
         t = datetime(2018, 5, 31)
         t_tz = pytz.utc.localize(t)
         named_ranges = [
-            ('last_month', last_month(t)),
             ('last_year', last_year(t)),
-            ('this_month', this_month(t)),
+            ('last_month', last_month(t)),
             ('last_week', last_week(t)),
+            ('this_year', this_year(t)),
+            ('this_month', this_month(t)),
+            ('this_week', this_week(t)),
             ('yesterday', yesterday(t)),
             ('today', yesterday(t + timedelta(hours=24))),
         ]

@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
 from jutil.dates import last_month, yesterday, TIME_RANGE_NAMES, TIME_STEP_NAMES, this_month, last_year, last_week, \
-    localize_time_range
+    localize_time_range, this_year, this_week
 from jutil.email import send_email
 import getpass
 from django.utils import translation
@@ -47,10 +47,12 @@ def add_date_range_arguments(parser: CommandParser):
     Ranges:
       --begin BEGIN
       --end END
-      --last-month
       --last-year
-      --this-month
+      --last-month
       --last-week
+      --this-year
+      --this-month
+      --this-week
       --yesterday
       --today
       --prev-90d
@@ -95,14 +97,18 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     """
     if today is None:
         today = datetime.utcnow()
-    if name == 'last_month':
-        return last_month(today, tz)
     if name == 'last_week':
         return last_week(today, tz)
-    if name == 'this_month':
-        return this_month(today, tz)
+    if name == 'last_month':
+        return last_month(today, tz)
     if name == 'last_year':
         return last_year(today, tz)
+    if name == 'this_week':
+        return this_week(today, tz)
+    if name == 'this_month':
+        return this_month(today, tz)
+    if name == 'this_year':
+        return this_year(today, tz)
     if name == 'yesterday':
         return yesterday(today, tz)
     if name == 'today':

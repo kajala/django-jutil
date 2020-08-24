@@ -10,7 +10,9 @@ TIME_RANGE_CHOICES = [
     ('last_month', _('last month')),
     ('last_year', _('last year')),
     ('this_month', _('this month')),
+    ('this_year', _('this year')),
     ('last_week', _('last week')),
+    ('this_week', _('this week')),
     ('yesterday', _('yesterday')),
     ('today', _('today')),
     ('prev_90d', format_lazy('-90 {}', _('number.of.days'))),
@@ -41,18 +43,6 @@ TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
 TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
 
 
-def get_last_day_of_month(t: datetime) -> int:
-    """
-    Returns day number of the last day of the month
-    :param t: datetime
-    :return: int
-    """
-    tn = t + timedelta(days=32)
-    tn = datetime(year=tn.year, month=tn.month, day=1)
-    tt = tn - timedelta(hours=1)
-    return tt.day
-
-
 def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple[datetime, datetime]:
     """
     Localizes time range. Uses pytz.utc if None provided.
@@ -66,33 +56,16 @@ def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple
     return tz.localize(begin), tz.localize(end)
 
 
-def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+def get_last_day_of_month(t: datetime) -> int:
     """
-    Returns this week begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    Returns day number of the last day of the month
+    :param t: datetime
+    :return: int
     """
-    if today is None:
-        today = datetime.utcnow()
-    begin = today - timedelta(days=today.weekday())
-    begin = datetime(year=begin.year, month=begin.month, day=begin.day)
-    return localize_time_range(begin, begin + timedelta(days=7), tz)
-
-
-def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns current month begin (inclusive) and end (exclusive).
-    :param today: Some date in the month (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
-    """
-    if today is None:
-        today = datetime.utcnow()
-    begin = datetime(day=1, month=today.month, year=today.year)
-    end = begin + timedelta(days=32)
-    end = datetime(day=1, month=end.month, year=end.year)
-    return localize_time_range(begin, end, tz)
+    tn = t + timedelta(days=32)
+    tn = datetime(year=tn.year, month=tn.month, day=1)
+    tt = tn - timedelta(hours=1)
+    return tt.day
 
 
 def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -> datetime:
@@ -119,6 +92,51 @@ def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -
     if tz is None:
         tz = pytz.utc
     return tz.localize(end_incl)
+
+
+def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+    """
+    Returns this week begin (inclusive) and end (exclusive).
+    Week is assumed to start from Monday (ISO).
+    :param today: Some date (defaults current datetime)
+    :param tz: Timezone (defaults pytz UTC)
+    :return: begin (inclusive), end (exclusive)
+    """
+    if today is None:
+        today = datetime.utcnow()
+    begin = today - timedelta(days=today.weekday())
+    begin = datetime(year=begin.year, month=begin.month, day=begin.day)
+    return localize_time_range(begin, begin + timedelta(days=7), tz)
+
+
+def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+    """
+    Returns current month begin (inclusive) and end (exclusive).
+    :param today: Some date in the month (defaults current datetime)
+    :param tz: Timezone (defaults pytz UTC)
+    :return: begin (inclusive), end (exclusive)
+    """
+    if today is None:
+        today = datetime.utcnow()
+    begin = datetime(day=1, month=today.month, year=today.year)
+    end = begin + timedelta(days=32)
+    end = datetime(day=1, month=end.month, year=end.year)
+    return localize_time_range(begin, end, tz)
+
+
+def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+    """
+    Returns this year begin (inclusive) and end (exclusive).
+    :param today: Some date (defaults current datetime)
+    :param tz: Timezone (defaults pytz UTC)
+    :return: begin (inclusive), end (exclusive)
+    """
+    if today is None:
+        today = datetime.utcnow()
+    begin = datetime(day=1, month=1, year=today.year)
+    next_year = today + timedelta(days=365)
+    end = datetime(day=1, month=1, year=next_year.year)
+    return localize_time_range(begin, end, tz)
 
 
 def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
