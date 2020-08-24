@@ -11,4 +11,3 @@ django-stubs
 twine
 django-extensions
 python-dotenv
-

@@ -83,7 +83,7 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
                         exceptions: bool = False):
     """
     Sends email using SendGrid API. Following requirements:
-    * pip install sendgrid==6.3.1
+    * pip install sendgrid>=6.3.1,<7.0.0
     * settings.EMAIL_SENDGRID_API_KEY must be set and
 
     :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
@@ -97,10 +97,13 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
     :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :return: Status code 202 if emails were sent successfully
     """
-    import sendgrid  # type: ignore  # pylint: disable=import-outside-toplevel
-    from sendgrid.helpers.mail import Content, Mail, Attachment  # type: ignore  # pylint: disable=import-outside-toplevel
-    from sendgrid import ClickTracking, FileType, FileName, TrackingSettings  # type: ignore  # pylint: disable=import-outside-toplevel
-    from sendgrid import Personalization, FileContent, ContentId, Disposition  # type: ignore  # pylint: disable=import-outside-toplevel
+    try:
+        import sendgrid  # type: ignore  # pylint: disable=import-outside-toplevel
+        from sendgrid.helpers.mail import Content, Mail, Attachment  # type: ignore  # pylint: disable=import-outside-toplevel
+        from sendgrid import ClickTracking, FileType, FileName, TrackingSettings  # type: ignore  # pylint: disable=import-outside-toplevel
+        from sendgrid import Personalization, FileContent, ContentId, Disposition  # type: ignore  # pylint: disable=import-outside-toplevel
+    except Exception:
+        raise Exception('Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0')
 
     if not hasattr(settings, 'EMAIL_SENDGRID_API_KEY') or not settings.EMAIL_SENDGRID_API_KEY:
         raise Exception('EMAIL_SENDGRID_API_KEY not defined in Django settings')
