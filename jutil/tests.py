@@ -24,8 +24,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
-from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin, \
-    AdminFileDownloadMixin
+from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin
 from jutil.auth import require_auth, AuthUserMixin
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html, choices_label
@@ -100,7 +99,7 @@ class DummyUserProfile:
     timezone = 'Europe/Helsinki'
 
 
-class MyCustomAdmin(ModelAdminBase, AdminFileDownloadMixin):
+class MyCustomAdmin(ModelAdminBase):
     max_history_length = 5
     actions = (
         dummy_admin_func_b,
@@ -109,9 +108,6 @@ class MyCustomAdmin(ModelAdminBase, AdminFileDownloadMixin):
 
     def get_object(self, request, obj_id):
         return self.model.objects.get(id=obj_id)
-
-    def get_object_by_filename(self, request, filename):
-        return User.objects.first()  # dummy return for test_admin_file_download_mixin
 
 
 class Tests(TestCase, DefaultTestSetupMixin):
@@ -935,17 +931,6 @@ class Tests(TestCase, DefaultTestSetupMixin):
         e = LogEntry.objects.filter(object_id=user.id).last()
         assert isinstance(e, LogEntry)
         self.assertEqual(e.change_message, 'User id={}: username=test@example.com'.format(user.id))
-
-    def test_admin_file_download_mixin(self):
-        class MyModel(models.Model):
-            file = models.FileField(upload_to='uploads')
-
-        model_admin = MyCustomAdmin(MyModel, admin.site)
-        self.assertListEqual(model_admin.get_file_fields(), ['file'])
-        self.assertEqual(model_admin.single_file_field, 'file')
-        self.assertEqual(len(model_admin.get_download_urls()), 2)
-        res = model_admin.file_download_view(self.create_dummy_request(), 'requirements.txt')
-        self.assertTrue(isinstance(res, FileSystemFileResponse))
 
     def test_auth(self):
         req = self.create_dummy_request()
