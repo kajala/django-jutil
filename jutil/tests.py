@@ -42,7 +42,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
     underscore_to_camel_case, format_as_html_json
-from jutil.parse import parse_datetime, parse_bool
+from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
     email_validator, fi_payment_reference_validator, iso_payment_reference_validator, fi_ssn_age, \
@@ -154,7 +154,13 @@ class Tests(TestCase, DefaultTestSetupMixin):
             ('2016-06-12 01:00:00+00:00', '2016-06-12T01:00:00+00:00'),
         ]
         for t_str_input, t_ref_str in pairs:
+            # parse_datetime
             t = parse_datetime(t_str_input)
+            self.assertTrue(isinstance(t, datetime))
+            assert isinstance(t, datetime)
+            self.assertEqual(t.isoformat(), t_ref_str)
+            # parse_datetime_or_none
+            t = parse_datetime_or_none(t_str_input)
             self.assertTrue(isinstance(t, datetime))
             assert isinstance(t, datetime)
             self.assertEqual(t.isoformat(), t_ref_str)
@@ -164,11 +170,15 @@ class Tests(TestCase, DefaultTestSetupMixin):
             '2016-13-05',
         ]
         for t_str_input in invalids:
+            # parse_datetime
             try:
                 parse_datetime(t_str_input)
                 self.fail('{} is not valid input for parse_datetime()'.format(t_str_input))
             except Exception:
                 pass
+            # parse_datetime_or_none
+            t = parse_datetime_or_none(t_str_input)
+            assert t is None
 
     def test_add_month(self):
         t = parse_datetime('2016-06-12T01:00:00')
