@@ -915,9 +915,9 @@ class Tests(TestCase, DefaultTestSetupMixin):
         # then check that "VisibleLogMessage" log entries are not visible since max_history_length = 5
         LogEntry.objects.filter(object_id=user.id).delete()
         for n in range(5):
-            admin_log([user], 'VisibleLogMessage')
-        for n in range(5):
             admin_log([user], 'InvisibleLogMessage')
+        for n in range(5):
+            admin_log([user], 'VisibleLogMessage')
         self.assertEqual(LogEntry.objects.filter(object_id=user.id).count(), 10)
         history_url = '/admin/auth/user/{}/history/'.format(user.id)
         c = self.client
