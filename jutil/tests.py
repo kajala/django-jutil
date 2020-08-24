@@ -25,7 +25,7 @@ from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin
-from jutil.auth import require_auth, AuthUserMixin
+from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
 from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
@@ -934,19 +934,19 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_auth(self):
         req = self.create_dummy_request()
-        require_auth(req)  # type: ignore
+        get_auth_user(req)  # type: ignore
         req.user = None
-        self.assertIsNone(require_auth(req, exceptions=False))
+        self.assertIsNone(get_auth_user_or_none(req))
         try:
-            require_auth(req)  # type: ignore
-            self.fail('require_auth fail')
+            get_auth_user(req)  # type: ignore
+            self.fail('get_auth_user fail')
         except NotAuthenticated:
             pass
         try:
             model_admin = AuthUserMixin()
             model_admin.request = req
             user = model_admin.auth_user
-            self.fail('require_auth fail')
+            self.fail('get_auth_user fail')
         except NotAuthenticated:
             pass
 
