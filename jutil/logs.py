@@ -19,6 +19,7 @@ def log_event(name: str, request: Optional[Union[HttpRequest, Request]] = None,
     :param data: Even data (optional)
     :param ip: Even IP (optional)
     """
+    logger.warning('jutil.logs.log_event is deprecated, the function provides very little value')
     log_data: Dict[str, Any] = {}
     if not ip and request:
         ip = get_ip(request)[0]
