@@ -146,7 +146,7 @@ class ModelAdminBase(admin.ModelAdmin):
         action_list = LogEntry.objects.filter(
             object_id=unquote(object_id),
             content_type=get_content_type_for_model(model)
-        ).select_related().order_by('action_time')[:self.max_history_length]
+        ).select_related().order_by('-action_time')[:self.max_history_length]
 
         context = {
             **self.admin_site.each_context(request),
