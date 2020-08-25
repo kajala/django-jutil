@@ -71,6 +71,9 @@ Test Code Coverage
 Changes
 =======
 
+3.7.2:
+* Cleanup
+
 3.7.1:
 * Requirements.txt: deleted optional dependency sendgrid, add sendgrid on project level sendgrid>=6.3.1,<7.0.0
 * Deleted deprecated auth.require_auth, use auth.get_auth_user and auth.get_auth_user_or_none
