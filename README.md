@@ -76,7 +76,7 @@ Changes
 * deleted deprecated auth.require_auth, use auth.get_auth_user and auth.get_auth_user_or_none
 * deleted deprecated dict.choices_label and dict.dict_to_html, use format.choices_label and format.format_dict_as_html
 * deleted deprecated logs.*, use logging directly
-* deleted deprecated objects.*, use type-safer alternatives
+* deleted deprecated object.*, use type-safer alternatives
 
 3.6.11:
 * Deprecated object.get/set obj attr functions
