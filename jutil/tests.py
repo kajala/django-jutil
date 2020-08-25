@@ -7,6 +7,8 @@ from urllib.parse import urlparse
 from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
+from rest_framework.test import APIClient
+
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -114,6 +116,10 @@ class Tests(TestCase, TestSetupMixin):
         user.is_staff = True
         user.save()
         self.client = Client()
+
+    def test_api_client(self):
+        api_client = self.create_api_client()
+        self.assertTrue(isinstance(api_client))
 
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
