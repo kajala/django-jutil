@@ -858,6 +858,7 @@ class Tests(TestCase, TestSetupMixin):
             if is_media:
                 self.assertEqual(strip_media_root(src), dst)
                 self.assertEqual(get_media_full_path(dst), src)
+                self.assertEqual(get_media_full_path(dst), get_media_full_path(get_media_full_path(dst)))
 
     def test_end_of_month(self):
         helsinki = pytz.timezone('Europe/Helsinki')
