@@ -71,6 +71,13 @@ Test Code Coverage
 Changes
 =======
 
+3.7.1:
+* requirements.txt: deleted optional dependency sendgrid, add sendgrid on project level sendgrid>=6.3.1,<7.0.0
+* deleted deprecated auth.require_auth, use auth.get_auth_user and auth.get_auth_user_or_none
+* deleted deprecated dict.choices_label and dict.dict_to_html, use format.choices_label and format.format_dict_as_html
+* deleted deprecated logs.*, use logging directly
+* deleted deprecated objects.*, use type-safer alternatives
+
 3.6.11:
 * Deprecated object.get/set obj attr functions
 * Deprecated url equals and url host
