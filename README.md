@@ -77,6 +77,7 @@ Changes
 * deleted deprecated dict.choices_label and dict.dict_to_html, use format.choices_label and format.format_dict_as_html
 * deleted deprecated logs.*, use logging directly
 * deleted deprecated object.*, use type-safer alternatives
+* deleted deprecated url_equals and url_host, use urlparse directly
 
 3.6.11:
 * Deprecated object.get/set obj attr functions
