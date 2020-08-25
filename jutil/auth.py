@@ -30,12 +30,6 @@ def get_auth_user_or_none(request: Union[Request, HttpRequest]) -> Optional[User
     return request.user  # type: ignore
 
 
-def require_auth(request: Union[Request, HttpRequest], exceptions: bool = True) -> Optional[User]:
-    logger.warning('jutil.auth.require_auth(.., exceptions=%s) is deprecated, use jutil.auth.%s',
-                   exceptions, 'get_auth_user' if exceptions else 'get_auth_user_or_none')
-    return get_auth_user(request) if exceptions else get_auth_user_or_none(request)
-
-
 class AuthUserMixin:
     @property
     def auth_user(self) -> User:
