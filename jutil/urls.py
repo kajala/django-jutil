@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
 logger = logging.getLogger(__name__)
 
 
-def url_mod(url: str, new_params: dict) -> str:
+def modify_url(url: str, new_params: dict) -> str:
     """
     Modifies existing URL by setting/overriding specified query string parameters.
     This can be useful for example if you need to modify user-provided callback URL

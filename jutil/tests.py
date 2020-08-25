@@ -29,9 +29,9 @@ from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, Ens
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none, \
     wait_object_or_none
 from jutil.request import get_ip_info
-from jutil.responses import FileSystemFileResponse, CsvResponse
+from jutil.responses import CsvResponse
 from jutil.testing import DefaultTestSetupMixin
-from jutil.urls import url_equals, url_mod, url_host
+from jutil.urls import modify_url
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
     last_year, last_week, yesterday, end_of_month, this_year, get_time_steps, TIME_STEP_DAILY
@@ -289,11 +289,8 @@ class Tests(TestCase, DefaultTestSetupMixin):
 
     def test_urls(self):
         url = 'http://yle.fi/uutiset/3-8045550?a=123&b=456'
-        self.assertEqual(url_host(url), 'yle.fi')
-        self.assertTrue(
-            url_equals('http://yle.fi/uutiset/3-8045550?a=123&b=456', 'http://yle.fi/uutiset/3-8045550?b=456&a=123'))
-        self.assertTrue(url_equals(url_mod('http://yle.fi/uutiset/3-8045550?a=123&b=456', {'b': '123', 'a': '456'}),
-                                   'http://yle.fi/uutiset/3-8045550?b=123&a=456'))
+        self.assertEqual(modify_url('http://yle.fi/uutiset/3-8045550?a=123&b=456', {'a': '123', 'b': '456'}),
+                         'http://yle.fi/uutiset/3-8045550?a=123&b=456')
 
     def test_email_filter_and_validation(self):
         emails = [
