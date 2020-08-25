@@ -1,4 +1,7 @@
+import logging
 from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
+
+logger = logging.getLogger(__name__)
 
 
 def url_equals(a: str, b: str) -> bool:
@@ -9,6 +12,7 @@ def url_equals(a: str, b: str) -> bool:
     :param b: URL/path
     :return: True if URLs/paths are equal
     """
+    logger.warning('jutil.urls.urL_equals is deprecated')
     a2 = list(urlparse(a))
     b2 = list(urlparse(b))
     a2[4] = dict(parse_qsl(a2[4]))  # type: ignore
@@ -19,7 +23,8 @@ def url_equals(a: str, b: str) -> bool:
 def url_mod(url: str, new_params: dict) -> str:
     """
     Modifies existing URL by setting/overriding specified query string parameters.
-    Note: Does not support multiple querystring parameters with identical name.
+    This can be useful for example if you need to modify user-provided callback URL
+    for extra arguments. Note: Does not support multiple querystring parameters with identical name.
     :param url: Base URL/path to modify
     :param new_params: Querystring parameters to set/override (dict)
     :return: New URL/path
@@ -42,5 +47,6 @@ def url_host(url: str) -> str:
     :param url: URL
     :return: hostname
     """
+    logger.warning('jutil.urls.urL_host is deprecated, use urllib.parse.urlparse(url).hostname')
     res = urlparse(url)
     return res.netloc.split(':')[0] if res.netloc else ''
