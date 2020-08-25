@@ -4,7 +4,8 @@ from typing import Type, List, Tuple, Any, Optional
 from django.db.models import Model
 from django.utils.encoding import force_text
 from django.utils.timezone import now
-from jutil.dict import choices_label
+
+from jutil.format import choices_label
 
 
 def get_object_or_none(cls: Any, **kwargs) -> Any:
