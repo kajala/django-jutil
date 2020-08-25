@@ -72,12 +72,14 @@ Changes
 =======
 
 3.7.1:
-* requirements.txt: deleted optional dependency sendgrid, add sendgrid on project level sendgrid>=6.3.1,<7.0.0
-* deleted deprecated auth.require_auth, use auth.get_auth_user and auth.get_auth_user_or_none
-* deleted deprecated dict.choices_label and dict.dict_to_html, use format.choices_label and format.format_dict_as_html
-* deleted deprecated logs.*, use logging directly
-* deleted deprecated object.*, use type-safer alternatives
-* deleted deprecated url_equals and url_host, use urlparse directly
+* Requirements.txt: deleted optional dependency sendgrid, add sendgrid on project level sendgrid>=6.3.1,<7.0.0
+* Deleted deprecated auth.require_auth, use auth.get_auth_user and auth.get_auth_user_or_none
+* Deleted deprecated dict.choices_label and dict.dict_to_html, use format.choices_label and format.format_dict_as_html
+* Deleted deprecated logs.*, use logging directly
+* Deleted deprecated object.*, use type-safer alternatives
+* Deleted deprecated url_equals and url_host, use urlparse directly
+* Removed deprecated testing.*
+* Cleaned up parse_datetime, parse_bool, parse_datetime_or_none and parse_bool_or_none   
 
 3.6.11:
 * Deprecated object.get/set obj attr functions

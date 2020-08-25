@@ -30,7 +30,7 @@ from jutil.model import is_model_field_changed, clone_model, get_model_field_lab
     wait_object_or_none
 from jutil.request import get_ip_info
 from jutil.responses import CsvResponse
-from jutil.testing import DefaultTestSetupMixin
+from jutil.testing import TestSetupMixin
 from jutil.urls import modify_url
 from jutil.xml import xml_to_dict, dict_to_element, _xml_filter_tag_name
 from jutil.dates import add_month, per_delta, per_month, this_week, next_month, next_week, this_month, last_month, \
@@ -106,18 +106,14 @@ class MyCustomAdmin(ModelAdminBase):
         return self.model.objects.get(id=obj_id)
 
 
-class Tests(TestCase, DefaultTestSetupMixin):
+class Tests(TestCase, TestSetupMixin):
     def setUp(self):
-        super().setUp()
-        user = self.add_test_user('test@example.com', 'test1234')
+        self.user = user = self.add_test_user('test@example.com', 'test1234')
         assert isinstance(user, User)
         user.is_superuser = True
         user.is_staff = True
         user.save()
         self.client = Client()
-
-    def tearDown(self):
-        super().setUp()
 
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
