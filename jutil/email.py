@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
-from jutil.logs import log_event
 from base64 import b64encode
 from os.path import basename
 
@@ -153,13 +152,12 @@ def send_email_sendgrid(recipients: Sequence[Union[str, Tuple[str, str]]], subje
         send_dt = (now() - send_time).total_seconds()
 
         if res.status_code == 202:
-            log_event('EMAIL_SENT', data={'time': send_dt, 'to': recipients, 'subject': subject, 'status': res.status_code})
+            logger.info('EMAIL_SENT %s', {'time': send_dt, 'to': recipients, 'subject': subject, 'status': res.status_code})
         else:
-            log_event('EMAIL_ERROR', data={'time': send_dt, 'to': recipients, 'subject': subject, 'status': res.status_code, 'body': res.body})
+            logger.info('EMAIL_ERROR %s', {'time': send_dt, 'to': recipients, 'subject': subject, 'status': res.status_code, 'body': res.body})
 
     except Exception as e:
-        logger.error('Failed to send email (SendGrid) to %s: %s', recipients, e)
-        log_event('EMAIL_ERROR', data={'to': recipients, 'subject': subject, 'exception': str(e)})
+        logger.error('EMAIL_ERROR %s', {'to': recipients, 'subject': subject, 'exception': str(e)})
         if exceptions:
             raise
         return -1
@@ -221,11 +219,10 @@ def send_email_smtp(recipients: Sequence[Union[str, Tuple[str, str]]],  # noqa
         send_time = now()
         mail.send(fail_silently=False)
         send_dt = (now() - send_time).total_seconds()
-        log_event('EMAIL_SENT', data={'time': send_dt, 'to': recipients, 'subject': subject})
+        logger.info('EMAIL_SENT %s', {'time': send_dt, 'to': recipients, 'subject': subject})
 
     except Exception as e:
-        logger.error('Failed to send email (SMTP) to %s: %s', recipients, e)
-        log_event('EMAIL_ERROR', data={'to': recipients, 'subject': subject, 'exception': str(e)})
+        logger.error('EMAIL_ERROR %s', {'to': recipients, 'subject': subject, 'exception': str(e)})
         if exceptions:
             raise
         return -1
