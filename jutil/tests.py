@@ -3,13 +3,10 @@ import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from os.path import join
-from pprint import pprint
 from urllib.parse import urlparse
 from django.utils import timezone
 from typing import List
-
 from django.utils.timezone import now
-
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -27,7 +24,6 @@ from rest_framework.exceptions import NotAuthenticated
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin
 from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
-from jutil.dict import dict_to_html, choices_label
 from jutil.email import make_email_recipient_list
 from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
 from jutil.model import is_model_field_changed, clone_model, get_model_field_label_and_value, get_object_or_none, \
@@ -41,7 +37,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
     last_year, last_week, yesterday, end_of_month, this_year, get_time_steps, TIME_STEP_DAILY
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
-    underscore_to_camel_case, format_as_html_json
+    underscore_to_camel_case, format_as_html_json, format_dict_as_html, choices_label
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -668,10 +664,10 @@ class Tests(TestCase, DefaultTestSetupMixin):
         self.assertEqual(email_sanitizer('test@example.com'), 'test@example.com')
         self.assertEqual(email_sanitizer('testexample.com'), '')
 
-    def test_dict_to_html(self):
+    def test_format_dict_as_html(self):
         a = {'b': 1, 'c': {'@testVariable': '123'}}
         res = '<pre>B: 1\nC:\n    Test variable: 123\n\n</pre>'
-        self.assertEqual(dict_to_html(a), res)
+        self.assertEqual(format_dict_as_html(a), res)
 
     def test_format_xml(self):
         assert settings.XMLLINT_PATH, 'add e.g. XMLLINT_PATH = "/usr/bin/xmllint" to settings.py'
