@@ -427,11 +427,12 @@ def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
     return Decimal(a).quantize(Decimal('1.000000'))
 
 
-def is_media_path(file_path: str) -> bool:
+def is_media_full_path(file_path: str) -> bool:
     """
-    Checks if file path starts with (settings) MEDIA_ROOT,
+    Checks if file path is under (settings) MEDIA_ROOT.
     """
-    return hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and file_path.startswith(settings.MEDIA_ROOT)
+    return hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and os.path.isabs(file_path) and \
+           os.path.realpath(file_path).startswith(settings.MEDIA_ROOT)
 
 
 def strip_media_root(file_path: str) -> str:
@@ -445,10 +446,11 @@ def strip_media_root(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    if not is_media_path(file_path):
-        logger.error('strip_media_root() expects absolute path under MEDIA_ROOT, got %s', file_path)
+    full_path = os.path.realpath(file_path)
+    if not is_media_full_path(file_path):
+        logger.error('strip_media_root() expects absolute path under MEDIA_ROOT, got %s (%s)', file_path, full_path)
         raise ValueError('strip_media_root() expects absolute path under MEDIA_ROOT')
-    file_path = file_path[len(settings.MEDIA_ROOT):]
+    file_path = full_path[len(settings.MEDIA_ROOT):]
     if file_path.startswith('/'):
         return file_path[1:]
     return file_path
@@ -463,12 +465,11 @@ def get_media_full_path(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    if os.path.isabs(file_path) or file_path[:1] in ('.', '/'):
-        if is_media_path(file_path):
-            return file_path
-        logger.error('get_media_full_path() expects relative path to MEDIA_ROOT, got %s', file_path)
+    full_path = os.path.realpath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
+    if not is_media_full_path(full_path):
+        logger.error('get_media_full_path() expects relative path to MEDIA_ROOT, got %s (%s)', file_path, full_path)
         raise ValueError('get_media_full_path() expects relative path to MEDIA_ROOT')
-    return os.path.join(settings.MEDIA_ROOT, file_path)
+    return full_path
 
 
 def camel_case_to_underscore(s: str) -> str:

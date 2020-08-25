@@ -39,7 +39,7 @@ from jutil.dates import add_month, per_delta, per_month, this_week, next_month, 
     last_year, last_week, yesterday, end_of_month, this_year, get_time_steps, TIME_STEP_DAILY
 from jutil.format import format_full_name, format_xml, format_xml_bytes, format_timedelta, dec1, dec2, dec3, dec4, dec5, \
     dec6, format_table, ucfirst_lazy, strip_media_root, get_media_full_path, camel_case_to_underscore, \
-    underscore_to_camel_case, format_as_html_json, format_dict_as_html, choices_label, is_media_path
+    underscore_to_camel_case, format_as_html_json, format_dict_as_html, choices_label, is_media_full_path
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import fi_payment_reference_number, se_ssn_validator, se_ssn_filter, fi_iban_validator, \
     se_iban_validator, iban_filter_readable, email_filter, iban_validator, iban_bank_info, fi_company_org_id_validator, \
@@ -850,11 +850,11 @@ class Tests(TestCase, TestSetupMixin):
         media_root2 = os.path.join(settings.MEDIA_ROOT, 'path3') + '/'
         test_paths = [
             (True, os.path.join(media_root1, 'test1.file'), 'path1/path2/test1.file'),
-            (False, os.path.join('/diff/path', 'test1.file'), '/diff/path/test1.file'),
-            (True, os.path.join(media_root2, 'test1.file'), 'path3/test1.file'),
+            (False, os.path.join('/diff/path', 'test2.file'), '/diff/path/test2.file'),
+            (True, os.path.join(media_root2, 'test3.file'), 'path3/test3.file'),
         ]
         for is_media, src, dst in test_paths:
-            self.assertEqual(is_media_path(src), is_media)
+            self.assertEqual(is_media_full_path(src), is_media)
             if is_media:
                 self.assertEqual(strip_media_root(src), dst)
                 self.assertEqual(get_media_full_path(dst), src)
