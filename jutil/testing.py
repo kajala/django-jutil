@@ -1,8 +1,11 @@
 import json
+import logging
 from typing import Tuple, Optional
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
+
+logger = logging.getLogger(__name__)
 
 
 class DefaultTestSetupMixin:
@@ -10,6 +13,9 @@ class DefaultTestSetupMixin:
     token = None
     api_client = None
     verbose = True
+
+    def __init__(self):
+        logger.warning('jutil.testing.DefaultTestSetupMixin is deprecated')
 
     def debug_print(self, *args, **kw):
         """
