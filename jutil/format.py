@@ -445,26 +445,26 @@ def strip_media_root(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    if is_media_path(file_path):
-        file_path = file_path[len(settings.MEDIA_ROOT):]
-        if file_path.startswith('/'):
-            return file_path[1:]
+    if not is_media_path(file_path):
+        raise ValueError('strip_media_root() expects absolute path under MEDIA_ROOT')
+    file_path = file_path[len(settings.MEDIA_ROOT):]
+    if file_path.startswith('/'):
+        return file_path[1:]
     return file_path
 
 
 def get_media_full_path(file_path: str) -> str:
     """
-    If file path is absolute, the path is returned as is.
-    Otherwise it is returned relative to (settings) MEDIA_ROOT.
+    Returns the absolute path from a relative path to (settings) MEDIA_ROOT.
     This enabled stored file names in more portable format for different environment / storage.
-    If MEDIA_ROOT is missing or empty, the filename is returned as is.
+    If MEDIA_ROOT is missing or absolute path is passed to function, exception is raised.
     Reverse operation of this is strip_media_root().
     :param file_path: str
     :return: str
     """
-    if file_path and not os.path.isabs(file_path):
-        return os.path.join(settings.MEDIA_ROOT, file_path)
-    return file_path
+    if os.path.isabs(file_path) or file_path[:1] in ('.', '/'):
+        raise ValueError('get_media_full_path() expects relative path to MEDIA_ROOT')
+    return os.path.join(settings.MEDIA_ROOT, file_path)
 
 
 def camel_case_to_underscore(s: str) -> str:
