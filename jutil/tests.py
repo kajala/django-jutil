@@ -119,7 +119,7 @@ class Tests(TestCase, TestSetupMixin):
 
     def test_api_client(self):
         api_client = self.create_api_client()
-        self.assertTrue(isinstance(api_client))
+        self.assertTrue(isinstance(api_client, APIClient))
 
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
