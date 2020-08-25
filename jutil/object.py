@@ -1,4 +1,7 @@
+import logging
 from typing import Tuple, Any
+
+logger = logging.getLogger(__name__)
 
 
 def _split_obj_attr_path(obj, key: str, exceptions: bool = True) -> Tuple[Any, str]:
@@ -25,6 +28,7 @@ def set_obj_attr(obj, key: str, val: Any):
     :param val: New attribute value
     :return: None
     """
+    logger.warning('jutil.object.set_obj_attr is deprecated')
     obj, key_name = _split_obj_attr_path(obj, key)
     setattr(obj, key_name, val)
 
@@ -39,5 +43,6 @@ def get_obj_attr(obj, key: str, default: Any = None, exceptions: bool = True) ->
     :param exceptions: Raise AttributeError or not. Default is True.
     :return: Attribute value
     """
+    logger.warning('jutil.object.get_obj_attr is deprecated')
     obj, key_name = _split_obj_attr_path(obj, key, exceptions=exceptions)
     return getattr(obj, key_name) if obj is not None else default
