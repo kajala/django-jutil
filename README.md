@@ -71,6 +71,20 @@ Test Code Coverage
 Changes
 =======
 
+3.6.11:
+* Deprecated object.get/set obj attr functions
+* Deprecated url equals and url host
+* Deprecated testing.DefaultTestSetupMixin
+* Separated parse functions /w xxx or none versions for better typing support
+* Dropped python-dateutil dependency, added unit tests for get time steps
+* Deprecated log event
+* Updated send_email_sendgrid docs
+* Refactored choices label and dict to html in dict and format, added deprecation warnings
+* Added --this-month, --this-week, --this-year to add date range arguments, get date range by name, parse date range arguments
+* Require auth refactoring
+* Removed AdminFileDownloadMixin - Django 3.1 has new logic for uploaded file URL format making the mixin obsolete
+* (origin/master, origin/HEAD, master) README update
+
 3.6.10:
 * Unit test fix
 * Log entry ordering fix
