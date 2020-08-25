@@ -71,8 +71,12 @@ Test Code Coverage
 Changes
 =======
 
-3.7.3:
+3.7.4:
 * Stricter get_media_full_path and is_media_full_path
+
+3.7.3:
+* Unit tests
+* Get media full path cleanup
 
 3.7.2:
 * Cleanup
