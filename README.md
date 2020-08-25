@@ -79,7 +79,8 @@ Changes
 * Deleted deprecated object.*, use type-safer alternatives
 * Deleted deprecated url_equals and url_host, use urlparse directly
 * Removed deprecated testing.*
-* Cleaned up parse_datetime, parse_bool, parse_datetime_or_none and parse_bool_or_none   
+* Cleaned up parse_datetime, parse_bool, parse_datetime_or_none and parse_bool_or_none
+* Simpler cleaned up testing mixin TestSetupMixin   
 
 3.6.11:
 * Deprecated object.get/set obj attr functions
