@@ -123,6 +123,16 @@ class Tests(TestCase, TestSetupMixin):
 
     def test_payment_reference(self):
         self.assertEqual(fi_payment_reference_number('100'), '1009')
+        invalids = [
+            '89182932u',
+            '0000002',
+        ]
+        for invalid in invalids:
+            try:
+                fi_payment_reference_number(invalid)
+                self.fail('invalid number but passed: {}'.format(invalid))
+            except ValidationError:
+                pass
 
     def test_format_full_name(self):
         samples = [
