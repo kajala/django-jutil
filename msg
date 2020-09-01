@@ -1,5 +1,3 @@
-python manage.py makemessages -i venv -i data
-pushd jutil
-python ../manage.py compilemessages
-popd
-
+./venv/bin/python manage.py makemessages -l en -l fi -i '*venv*' -i '*web/static*' -i '*/data/*' -i '*.txt' -i '*uploads/*' -i '*downloads/*'
+cd jutil/locale
+../../venv/bin/python ../../manage.py compilemessages
