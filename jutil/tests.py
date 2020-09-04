@@ -991,7 +991,7 @@ class Tests(TestCase, TestSetupMixin):
         AdminLogEntryMixin.fields_changed(user, ['username'], who=None)
         e = LogEntry.objects.filter(object_id=user.id).last()
         assert isinstance(e, LogEntry)
-        self.assertEqual(e.change_message, 'User id={}: username=test@example.com'.format(user.id))
+        self.assertEqual(e.change_message, 'username: "test@example.com"'.format(user.id))
 
     def test_auth(self):
         req = self.create_dummy_request()

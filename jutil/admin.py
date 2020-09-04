@@ -18,6 +18,8 @@ from django.utils.text import capfirst
 from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
+from jutil.request import get_ip
+
 
 def admin_log(instances: Sequence[object],
               msg: str, who: Optional[User] = None, **kw):
@@ -169,13 +171,13 @@ class AdminLogEntryMixin:
     Mixin for logging Django admin changes of models.
     Call fields_changed() on change events.
     """
-
     def fields_changed(self, field_names: Sequence[str], who: Optional[User], **kw):
-        fv_str = ''
+        fv = []
         for k in field_names:
             label, value = get_model_field_label_and_value(self, k)
-            fv_str += '{}={}'.format(label, value) if not fv_str else ', {}={}'.format(label, value)
+            fv.append('{}: "{}"'.format(label, value))
 
-        msg = "{class_name} id={id}: {fv_str}".format(
-            class_name=self._meta.verbose_name.title(), id=self.id, fv_str=fv_str)  # type: ignore
-        admin_log([who, self], msg, who, **kw)  # type: ignore
+        msg = ', '.join(fv)
+        if 'ip' in kw:
+            msg += " (IP {ip})".format(ip=kw.pop('ip'))
+        admin_log([self], msg, who, **kw)  # type: ignore
