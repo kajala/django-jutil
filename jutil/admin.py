@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Optional, Sequence
+from typing import Optional, Sequence, List
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -17,8 +17,6 @@ from django.core.exceptions import PermissionDenied
 from django.utils.text import capfirst
 from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
-
-from jutil.request import get_ip
 
 
 def admin_log(instances: Sequence[object],
@@ -60,6 +58,25 @@ def admin_log(instances: Sequence[object],
                 action_flag=CHANGE,
                 change_message=msg,
             )
+
+
+def admin_log_changed_fields(obj: object, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
+    """
+    Logs changed fields of a model instance to admin log.
+    :param obj: Model instance
+    :param field_names: Field names
+    :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
+    :param kwargs: Optional key-value attributes to append to message
+    :return:
+    """
+    fv: List[str] = []
+    for k in field_names:
+        label, value = get_model_field_label_and_value(obj, k)
+        fv.append('{}: "{}"'.format(label, value))
+    msg = ', '.join(fv)
+    if 'ip' in kwargs:
+        msg += " (IP {ip})".format(ip=kwargs.pop('ip'))
+    admin_log([obj], msg, who, **kwargs)  # type: ignore
 
 
 def admin_obj_url(obj: Optional[object], route: str = '', base_url: str = '') -> str:
@@ -171,13 +188,5 @@ class AdminLogEntryMixin:
     Mixin for logging Django admin changes of models.
     Call fields_changed() on change events.
     """
-    def fields_changed(self, field_names: Sequence[str], who: Optional[User], **kw):
-        fv = []
-        for k in field_names:
-            label, value = get_model_field_label_and_value(self, k)
-            fv.append('{}: "{}"'.format(label, value))
-
-        msg = ', '.join(fv)
-        if 'ip' in kw:
-            msg += " (IP {ip})".format(ip=kw.pop('ip'))
-        admin_log([self], msg, who, **kw)  # type: ignore
+    def fields_changed(self, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
+        admin_log_changed_fields(self, field_names, who, **kwargs)
