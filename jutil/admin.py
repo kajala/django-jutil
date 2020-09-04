@@ -7,7 +7,6 @@ from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from jutil.model import get_model_field_label_and_value
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin.models import CHANGE
 from django.template.response import TemplateResponse
@@ -69,6 +68,7 @@ def admin_log_changed_fields(obj: object, field_names: Sequence[str], who: Optio
     :param kwargs: Optional key-value attributes to append to message
     :return:
     """
+    from jutil.model import get_model_field_label_and_value  # noqa
     fv: List[str] = []
     for k in field_names:
         label, value = get_model_field_label_and_value(obj, k)
