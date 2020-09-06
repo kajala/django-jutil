@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -183,9 +183,30 @@ class ModelAdminBase(admin.ModelAdmin):
         ], context)
 
 
+class InlineModelAdminParentAccessMixin:
+    """
+    Admin mixin for accessing parent objects to be used in InlineModelAdmin derived classes.
+    """
+    OBJECT_PK_KWARGS = ['object_id', 'pk', 'id']
+
+    def get_parent_object(self, request) -> Optional[object]:
+        """
+        Returns the inline admin object's parent object or None if not found.
+        """
+        mgr = self.parent_model.objects  # type: ignore
+        resolved = resolve(request.path_info)
+        if resolved.kwargs:
+            for k in self.OBJECT_PK_KWARGS:
+                if k in resolved.kwargs:
+                    return mgr.filter(pk=resolved.kwargs[k]).first()
+        if resolved.args:
+            return mgr.filter(pk=resolved.args[0]).first()
+        return None
+
+
 class AdminLogEntryMixin:
     """
-    Mixin for logging Django admin changes of models.
+    Model mixin for logging Django admin changes of Models.
     Call fields_changed() on change events.
     """
     def fields_changed(self, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
