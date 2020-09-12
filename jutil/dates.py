@@ -15,22 +15,15 @@ TIME_RANGE_CHOICES = [
     ('this_week', _('this week')),
     ('yesterday', _('yesterday')),
     ('today', _('today')),
-    ('prev_90d', format_lazy('-90 {}', _('number.of.days'))),
-    ('plus_minus_90d', format_lazy('+-90 {}', _('number.of.days'))),
-    ('next_90d', format_lazy('+90 {}', _('number.of.days'))),
-    ('prev_60d', format_lazy('-60 {}', _('number.of.days'))),
-    ('plus_minus_60d', format_lazy('+-60 {}', _('number.of.days'))),
-    ('next_60d', format_lazy('+60 {}', _('number.of.days'))),
-    ('prev_30d', format_lazy('-30 {}', _('number.of.days'))),
-    ('plus_minus_30d', format_lazy('+-30 {}', _('number.of.days'))),
-    ('next_30d', format_lazy('+30 {}', _('number.of.days'))),
-    ('prev_15d', format_lazy('-15 {}', _('number.of.days'))),
-    ('plus_minus_15d', format_lazy('+-15 {}', _('number.of.days'))),
-    ('next_15d', format_lazy('+15 {}', _('number.of.days'))),
-    ('prev_7d', format_lazy('-7 {}', _('number.of.days'))),
-    ('plus_minus_7d', format_lazy('+-7 {}', _('number.of.days'))),
-    ('next_7d', format_lazy('+7 {}', _('number.of.days'))),
 ]
+# plus +- date ranges from current datetime:
+# (e.g. --yesterday is full day yesterday but --prev-1d is 24h less from current time)
+for d in [90, 60, 45, 30, 15, 7, 2, 1]:
+    TIME_RANGE_CHOICES.extend([
+        ('prev_{}d'.format(d), format_lazy('-{} {}', d, _('number.of.days'))),
+        ('plus_minus_{}d'.format(d), format_lazy('+-{} {}', d, _('number.of.days'))),
+        ('next_{}d'.format(d), format_lazy('+{} {}', d, _('number.of.days'))),
+    ])
 
 TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
 

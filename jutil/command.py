@@ -69,6 +69,12 @@ def add_date_range_arguments(parser: CommandParser):
       --prev-7d
       --plus-minus-7d
       --next-7d
+      --prev-2d
+      --plus-minus-2d
+      --next-2d
+      --prev-1d
+      --plus-minus-1d
+      --next-1d
 
     Steps:
       --daily
