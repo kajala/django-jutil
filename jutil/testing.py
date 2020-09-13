@@ -10,18 +10,21 @@ logger = logging.getLogger(__name__)
 
 class TestSetupMixin:
     @staticmethod
-    def add_test_user(email: str = '', password: str = '', **kwargs) -> User:  # nosec
+    def add_test_user(email: str = '', password: str = '', username: str = '', **kwargs) -> User:  # nosec
         """
         Add and login test user.
         :param email: Optional email. Default is <random>@example.com
         :param password: Optional password. Default is <random>.
+        :param username: Optional username. Defaults to email.
         :return: User
         """
         if not email:
-            email = '{}@example.com'.format(uuid1().hex)
+            email = '{}@example.com'.format(username or uuid1().hex)
         if not password:
             email = email.split('@')[0]
-        user = User.objects.create(username=email, email=email, **kwargs)
+        if not username:
+            username = email
+        user = User.objects.create(username=username, email=email, **kwargs)
         assert isinstance(user, User)
         user.set_password(password)
         user.save()

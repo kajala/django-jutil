@@ -1,6 +1,9 @@
 import logging
+import re
 import traceback
 from typing import Dict, Optional
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
@@ -137,4 +140,26 @@ class ActivateUserProfileTimezoneMiddleware:
         # the view is called.
         if activated:
             timezone.deactivate()
+        return response
+
+
+class TestClientLogger:
+    ignored_paths = {
+        '/admin/jsi18n/',
+        '/favicon.ico',
+    }
+
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if settings.DEBUG:
+            assert isinstance(request, HttpRequest)
+            if request.path not in self.ignored_paths:
+                url = request.path
+                qs = request.GET.dict()
+                if qs:
+                    url += '?' + urlencode(request.GET.dict())
+                logger.debug('[TestClientLogger] self.client.%s("%s", data=%s)', request.method.lower(), url, request.POST.dict())
+        response = self.get_response(request)
         return response
