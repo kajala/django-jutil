@@ -1,15 +1,12 @@
 import logging
-import re
 import traceback
 from typing import Dict, Optional
 from urllib.parse import urlencode
-
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
 from ipware import get_client_ip  # type: ignore
 from jutil.email import send_email
-
 
 logger = logging.getLogger(__name__)
 
@@ -144,6 +141,9 @@ class ActivateUserProfileTimezoneMiddleware:
 
 
 class TestClientLogger:
+    """
+    Logs requests for Django test client.
+    """
     ignored_paths = {
         '/admin/jsi18n/',
         '/favicon.ico',
