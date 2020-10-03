@@ -432,7 +432,7 @@ def is_media_full_path(file_path: str) -> bool:
     Checks if file path is under (settings) MEDIA_ROOT.
     """
     return hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and os.path.isabs(file_path) and \
-           os.path.realpath(file_path).startswith(settings.MEDIA_ROOT)
+           os.path.realpath(file_path).startswith(str(settings.MEDIA_ROOT))
 
 
 def strip_media_root(file_path: str) -> str:
