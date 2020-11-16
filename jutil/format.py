@@ -447,7 +447,7 @@ def strip_media_root(file_path: str) -> str:
     :return: str
     """
     full_path = os.path.realpath(file_path)
-    if not is_media_full_path(file_path):
+    if not is_media_full_path(full_path):
         logger.error('strip_media_root() expects absolute path under MEDIA_ROOT, got %s (%s)', file_path, full_path)
         raise ValueError('strip_media_root() expects absolute path under MEDIA_ROOT')
     file_path = full_path[len(settings.MEDIA_ROOT):]
