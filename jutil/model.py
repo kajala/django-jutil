@@ -55,16 +55,16 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
     :return: (label, value) tuple
     """
     label = field_name
-    value = str(getattr(instance, field_name))
+    value = str(getattr(instance, field_name)) if hasattr(instance, field_name) else None
     for f in instance._meta.fields:
         if f.attname == field_name:
             label = f.verbose_name
             if hasattr(f, 'choices') and f.choices:
                 value = choices_label(f.choices, value)
             break
+    if value is None:
+        value = ''
     val = force_text(value)
-    if val is None:
-        val = ''
     return label, val
 
 
