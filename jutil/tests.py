@@ -9,6 +9,7 @@ from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
 
+from jutil.drf_exceptions import transform_exception_to_drf
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -16,6 +17,7 @@ from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError, ErrorDetail
 from django.core.management.base import CommandParser  # type: ignore
 from django.db import models
 from django.http.response import HttpResponse
@@ -650,8 +652,6 @@ class Tests(TestCase, TestSetupMixin):
             self.assertEqual(ascii_filter(a), b, 'ascii_filter("{}") != "{}"'.format(b, ascii_filter(a)))
 
     def test_l10n(self):
-        from rest_framework.exceptions import ValidationError
-
         with override('fi'):
             msg = _("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
             if 'muoto ei kelpaa' not in msg:
@@ -660,7 +660,7 @@ class Tests(TestCase, TestSetupMixin):
 
             try:
                 parse_bool('hello')
-            except ValidationError as e:
+            except DRFValidationError as e:
                 self.assertEqual(str(e),
                                  "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]")
 
@@ -1129,6 +1129,13 @@ class Tests(TestCase, TestSetupMixin):
             self.assertTrue(parse_bool(ref))
         for ref in refs_false:
             self.assertFalse(parse_bool(ref))
+
+    def test_exception_convert(self):
+        e = transform_exception_to_drf(ValidationError({'hello': 'world'}))
+        assert isinstance(e, DRFValidationError)
+        self.assertTrue(isinstance(e, DRFValidationError))
+        self.assertIn('hello', e.detail)
+        self.assertEqual(e.detail['hello'], [ErrorDetail(string='world', code='invalid')])
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
