@@ -1,4 +1,6 @@
 import logging
+from typing import Any
+
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.views import exception_handler as drf_exception_handler
@@ -6,14 +8,14 @@ from rest_framework.views import exception_handler as drf_exception_handler
 logger = logging.getLogger(__name__)
 
 
-def transform_exception_to_drf(exception: DjangoValidationError) -> DRFValidationError:
+def transform_exception_to_drf(exception: Exception) -> Exception:
     """
     Transform Django ValidationError into an equivalent DRF ValidationError.
     Note that even if this approach is not technically recommended, this is still
     the most convenient way to handle shared validation between Django admin and API.
     """
     if isinstance(exception, DjangoValidationError):
-        detail = str(exception)
+        detail: Any = str(exception)
         if hasattr(exception, "message_dict"):
             detail = exception.message_dict
         elif hasattr(exception, "messages"):
@@ -22,7 +24,7 @@ def transform_exception_to_drf(exception: DjangoValidationError) -> DRFValidatio
             detail = exception.message
         else:
             logger.error("Unsupported ValidationError detail: %s", exception)
-        exception = DRFValidationError(detail=detail)
+        return DRFValidationError(detail=detail)
     return exception
 
 
