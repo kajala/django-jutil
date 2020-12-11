@@ -405,7 +405,8 @@ def fi_iban_bank_info(v: str) -> Tuple[str, str]:
     """
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
-    return (bic, FI_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
+    name = FI_BANK_NAME_BY_BIC.get(bic, '') if bic is not None else ''
+    return bic or '', name
 
 
 def fi_ssn_filter(v: str) -> str:

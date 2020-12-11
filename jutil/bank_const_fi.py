@@ -649,6 +649,7 @@ FI_BANK_NAME_BY_BIC = {  # 13
     'AABAFI22': 'Ålandsbanken',
     'BIGKFIH1': 'Bigbank',
     'DABAFIHH': 'Danske Bank',
+    'DABAFIHX': 'Danske Bank',
     'ESSEFIHX': 'SEB',
     'HANDFIHH': 'Handelsbanken',
     'HELSFIHH': 'Aktia',
