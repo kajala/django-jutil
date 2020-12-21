@@ -4,7 +4,6 @@ from typing import Type, List, Tuple, Any, Optional
 from django.db.models import Model
 from django.utils.encoding import force_text
 from django.utils.timezone import now
-
 from jutil.format import choices_label
 
 
@@ -81,7 +80,7 @@ def is_model_field_changed(instance, field_name: str) -> bool:
         return False
     qs = instance.__class__.objects.all()
     params = {'pk': instance.pk, field_name: getattr(instance, field_name)}
-    return qs.filter(**params).first() is None
+    return not qs.filter(**params).exists()
 
 
 def get_model_keys(instance, cls: Optional[Type[Model]] = None,
