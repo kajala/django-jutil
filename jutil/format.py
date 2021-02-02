@@ -166,7 +166,7 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
         if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
             return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])
         with open(full_path, 'rb') as fp:
-            return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)
+            return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)  # type: ignore
     except Exception as e:
         logger.error('format_xml_file failed (1): %s', e)
         if exceptions:

@@ -51,8 +51,8 @@ def admin_log(instances: Sequence[object],
         if instance:
             LogEntry.objects.log_action(
                 user_id=who.pk if who is not None else None,
-                content_type_id=get_content_type_for_model(instance).pk,
-                object_id=instance.pk,  # pytype: disable=attribute-error
+                content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
+                object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
                 object_repr=force_text(instance),
                 action_flag=CHANGE,
                 change_message=msg,

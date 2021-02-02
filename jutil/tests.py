@@ -1134,8 +1134,8 @@ class Tests(TestCase, TestSetupMixin):
         e = transform_exception_to_drf(ValidationError({'hello': 'world'}))
         assert isinstance(e, DRFValidationError)
         self.assertTrue(isinstance(e, DRFValidationError))
-        self.assertIn('hello', e.detail)
-        self.assertEqual(e.detail['hello'], [ErrorDetail(string='world', code='invalid')])
+        self.assertIn('hello', e.detail)  # type: ignore
+        self.assertEqual(e.detail['hello'], [ErrorDetail(string='world', code='invalid')])  # type: ignore
 
 
 dummy_admin_func_a.short_description = 'A'  # type: ignore
