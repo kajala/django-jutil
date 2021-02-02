@@ -12,17 +12,18 @@ class CachedFieldsMixin:
     3) Call update_cached_fields() to refresh
     4) Optionally call update_cached_fields_pre_save() on pre_save signal for objects (to automatically refresh on save)
     """
+
     cached_fields: Sequence[str] = []
 
     if TYPE_CHECKING:
         pk: Any = None
 
-        def save(self, force_insert=False, force_update=False, using=None,
-                 update_fields=None):
+        def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
             pass
 
-    def update_cached_fields(self, commit: bool = True, exceptions: bool = True,
-                             updated_fields: Optional[Sequence[str]] = None):
+    def update_cached_fields(
+        self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None
+    ):
         """
         Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
         :param commit: Save update fields to DB
@@ -32,15 +33,19 @@ class CachedFieldsMixin:
         try:
             fields = updated_fields or self.cached_fields
             for k in fields:
-                f = 'get_' + k
+                f = "get_" + k
                 if not hasattr(self, f):
-                    raise Exception('Field {k} marked as cached in {obj} but function get_{k}() does not exist'.format(k=k, obj=self))
+                    raise Exception(
+                        "Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(
+                            k=k, obj=self
+                        )
+                    )
                 v = self.__getattribute__(f)()
                 setattr(self, k, v)
             if commit:
                 self.save(update_fields=fields)  # pytype: disable=attribute-error
         except Exception as e:
-            logger.error('%s.update_cached_fields: %s', self.__class__, e)
+            logger.error("%s.update_cached_fields: %s", self.__class__, e)
             if exceptions:
                 raise e
 
@@ -49,7 +54,7 @@ class CachedFieldsMixin:
         Call on pre_save signal for objects (to automatically refresh on save).
         :param update_fields: list of fields to update
         """
-        if hasattr(self, 'pk') and self.pk and update_fields is None:
+        if hasattr(self, "pk") and self.pk and update_fields is None:
             self.update_cached_fields(commit=False, exceptions=False)
 
 
@@ -62,7 +67,7 @@ def update_cached_fields(*args):
     """
     for a in args:
         if a is not None:
-            if hasattr(a, '__iter__'):
+            if hasattr(a, "__iter__"):
                 for e in a:
                     e.update_cached_fields()
             else:

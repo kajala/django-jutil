@@ -50,14 +50,16 @@ def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
     :return: dict
     """
     try:
-        res = requests.get('http://api.ipstack.com/{}?access_key={}&format=1'.format(ip, settings.IPSTACK_TOKEN), timeout=timeout)
+        res = requests.get(
+            "http://api.ipstack.com/{}?access_key={}&format=1".format(ip, settings.IPSTACK_TOKEN), timeout=timeout
+        )
         if res.status_code != 200:
             if exceptions:
-                raise Exception('api.ipstack.com HTTP {}'.format(res.status_code))
+                raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
             return {}
         return res.json()
     except Exception as e:
-        msg = 'geoip({}) failed: {}'.format(ip, e)
+        msg = "geoip({}) failed: {}".format(ip, e)
         logger.error(msg)
         if exceptions:
             raise
@@ -73,14 +75,14 @@ def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[s
     :return: (ip, country_code, host)
     """
     if not ip:  # localhost
-        return '', '', ''
-    host = ''
-    country_code = get_geo_ip(ip, exceptions=exceptions, timeout=timeout).get('country_code', '')
+        return "", "", ""
+    host = ""
+    country_code = get_geo_ip(ip, exceptions=exceptions, timeout=timeout).get("country_code", "")
     try:
         res = socket.gethostbyaddr(ip)
-        host = res[0][:255] if ip else ''
+        host = res[0][:255] if ip else ""
     except Exception as e:
-        msg = 'socket.gethostbyaddr({}) failed: {}'.format(ip, e)
+        msg = "socket.gethostbyaddr({}) failed: {}".format(ip, e)
         logger.error(msg)
         if exceptions:
             raise e

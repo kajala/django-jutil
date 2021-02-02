@@ -7,29 +7,31 @@ from django.utils.translation import gettext_lazy as _
 
 
 TIME_RANGE_CHOICES = [
-    ('last_month', _('last month')),
-    ('last_year', _('last year')),
-    ('this_month', _('this month')),
-    ('this_year', _('this year')),
-    ('last_week', _('last week')),
-    ('this_week', _('this week')),
-    ('yesterday', _('yesterday')),
-    ('today', _('today')),
+    ("last_month", _("last month")),
+    ("last_year", _("last year")),
+    ("this_month", _("this month")),
+    ("this_year", _("this year")),
+    ("last_week", _("last week")),
+    ("this_week", _("this week")),
+    ("yesterday", _("yesterday")),
+    ("today", _("today")),
 ]
 # plus +- date ranges from current datetime:
 # (e.g. --yesterday is full day yesterday but --prev-1d is 24h less from current time)
 for d in [90, 60, 45, 30, 15, 7, 2, 1]:
-    TIME_RANGE_CHOICES.extend([
-        ('prev_{}d'.format(d), format_lazy('-{} {}', d, _('number.of.days'))),
-        ('plus_minus_{}d'.format(d), format_lazy('+-{} {}', d, _('number.of.days'))),
-        ('next_{}d'.format(d), format_lazy('+{} {}', d, _('number.of.days'))),
-    ])
+    TIME_RANGE_CHOICES.extend(
+        [
+            ("prev_{}d".format(d), format_lazy("-{} {}", d, _("number.of.days"))),
+            ("plus_minus_{}d".format(d), format_lazy("+-{} {}", d, _("number.of.days"))),
+            ("next_{}d".format(d), format_lazy("+{} {}", d, _("number.of.days"))),
+        ]
+    )
 
 TIME_RANGE_NAMES = list(zip(*TIME_RANGE_CHOICES))[0]
 
-TIME_STEP_DAILY = 'daily'
-TIME_STEP_WEEKLY = 'weekly'
-TIME_STEP_MONTHLY = 'monthly'
+TIME_STEP_DAILY = "daily"
+TIME_STEP_WEEKLY = "weekly"
+TIME_STEP_MONTHLY = "monthly"
 
 TIME_STEP_TYPES = [
     TIME_STEP_DAILY,
@@ -38,9 +40,9 @@ TIME_STEP_TYPES = [
 ]
 
 TIME_STEP_CHOICES = [
-    (TIME_STEP_DAILY, _('daily')),
-    (TIME_STEP_WEEKLY, _('weekly')),
-    (TIME_STEP_MONTHLY, _('monthly')),
+    (TIME_STEP_DAILY, _("daily")),
+    (TIME_STEP_WEEKLY, _("weekly")),
+    (TIME_STEP_MONTHLY, _("monthly")),
 ]
 
 TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
@@ -151,7 +153,7 @@ def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
     """
     if today is None:
         today = datetime.utcnow()
-    begin = today + timedelta(days=7-today.weekday())
+    begin = today + timedelta(days=7 - today.weekday())
     begin = datetime(year=begin.year, month=begin.month, day=begin.day)
     return localize_time_range(begin, begin + timedelta(days=7), tz)
 
@@ -316,8 +318,8 @@ def get_time_steps(step_type: str, begin: datetime, end: datetime) -> List[Tuple
         if step_type == TIME_STEP_DAILY:
             t = t0 + timedelta(days=n)
         elif step_type == TIME_STEP_WEEKLY:
-            t = t0 + timedelta(days=7*n)
+            t = t0 + timedelta(days=7 * n)
         elif step_type == TIME_STEP_MONTHLY:
             t = add_month(t0, n)
         n += 1
-    return [(begins[i], begins[i+1]) for i in range(len(begins)-1)]
+    return [(begins[i], begins[i + 1]) for i in range(len(begins) - 1)]

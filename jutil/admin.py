@@ -18,8 +18,7 @@ from django.utils.encoding import force_text
 from django.contrib.admin.models import LogEntry
 
 
-def admin_log(instances: Sequence[object],
-              msg: str, who: Optional[User] = None, **kw):
+def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, **kw):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances (None values are ignored)
@@ -30,7 +29,7 @@ def admin_log(instances: Sequence[object],
     """
     # use system user if 'who' is missing
     if who is None:
-        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, 'DJANGO_SYSTEM_USER') else 'system'
+        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"
         who = User.objects.get_or_create(username=username)[0]
 
     # allow passing individual instance
@@ -38,13 +37,13 @@ def admin_log(instances: Sequence[object],
         instances = [instances]  # type: ignore
 
     # append extra keyword attributes if any
-    att_str = ''
+    att_str = ""
     for k, v in kw.items():
-        if hasattr(v, 'pk'):  # log only primary key for model instances, not whole str representation
+        if hasattr(v, "pk"):  # log only primary key for model instances, not whole str representation
             v = v.pk
-        att_str += '{}={}'.format(k, v) if not att_str else ', {}={}'.format(k, v)
+        att_str += "{}={}".format(k, v) if not att_str else ", {}={}".format(k, v)
     if att_str:
-        att_str = ' [{}]'.format(att_str)
+        att_str = " [{}]".format(att_str)
     msg = str(msg) + att_str
 
     for instance in instances:
@@ -69,17 +68,18 @@ def admin_log_changed_fields(obj: object, field_names: Sequence[str], who: Optio
     :return:
     """
     from jutil.model import get_model_field_label_and_value  # noqa
+
     fv: List[str] = []
     for k in field_names:
         label, value = get_model_field_label_and_value(obj, k)
         fv.append('{}: "{}"'.format(label, value))
-    msg = ', '.join(fv)
-    if 'ip' in kwargs:
-        msg += " (IP {ip})".format(ip=kwargs.pop('ip'))
+    msg = ", ".join(fv)
+    if "ip" in kwargs:
+        msg += " (IP {ip})".format(ip=kwargs.pop("ip"))
     admin_log([obj], msg, who, **kwargs)  # type: ignore
 
 
-def admin_obj_url(obj: Optional[object], route: str = '', base_url: str = '') -> str:
+def admin_obj_url(obj: Optional[object], route: str = "", base_url: str = "") -> str:
     """
     Returns admin URL to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
@@ -89,14 +89,14 @@ def admin_obj_url(obj: Optional[object], route: str = '', base_url: str = '') ->
     :return: URL to admin object change view
     """
     if obj is None:
-        return ''
+        return ""
     if not route:
-        route = 'admin:{}_{}_change'.format(obj._meta.app_label, obj._meta.model_name)  # type: ignore
+        route = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)  # type: ignore
     path = reverse(route, args=[obj.id])  # type: ignore
     return base_url + path
 
 
-def admin_obj_link(obj: Optional[object], label: str = '', route: str = '', base_url: str = '') -> str:
+def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base_url: str = "") -> str:
     """
     Returns safe-marked admin link to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
@@ -107,7 +107,7 @@ def admin_obj_link(obj: Optional[object], label: str = '', route: str = '', base
     :return: HTML link marked safe
     """
     if obj is None:
-        return ''
+        return ""
     url = mark_safe(admin_obj_url(obj, route, base_url))  # nosec
     return format_html("<a href='{}'>{}</a>", url, str(obj) if not label else label)
 
@@ -116,6 +116,7 @@ class ModelAdminBase(admin.ModelAdmin):
     """
     ModelAdmin with save-on-top default enabled and customized (length-limited) history view.
     """
+
     save_on_top = True
     max_history_length = 1000
 
@@ -146,6 +147,7 @@ class ModelAdminBase(admin.ModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry  # noqa
+
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
@@ -158,36 +160,43 @@ class ModelAdminBase(admin.ModelAdmin):
         # Then get the history for this object.
         opts = model._meta
         app_label = opts.app_label
-        action_list = LogEntry.objects.filter(
-            object_id=unquote(object_id),
-            content_type=get_content_type_for_model(model)
-        ).select_related().order_by('-action_time')[:self.max_history_length]
+        action_list = (
+            LogEntry.objects.filter(object_id=unquote(object_id), content_type=get_content_type_for_model(model))
+            .select_related()
+            .order_by("-action_time")[: self.max_history_length]
+        )
 
         context = {
             **self.admin_site.each_context(request),
-            'title': _('Change history: %s') % obj,
-            'action_list': action_list,
-            'module_name': str(capfirst(opts.verbose_name_plural)),
-            'object': obj,
-            'opts': opts,
-            'preserved_filters': self.get_preserved_filters(request),
+            "title": _("Change history: %s") % obj,
+            "action_list": action_list,
+            "module_name": str(capfirst(opts.verbose_name_plural)),
+            "object": obj,
+            "opts": opts,
+            "preserved_filters": self.get_preserved_filters(request),
             **(extra_context or {}),
         }
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request, self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
-            "admin/%s/object_history.html" % app_label,
-            "admin/object_history.html"
-        ], context)
+        return TemplateResponse(
+            request,
+            self.object_history_template
+            or [
+                "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
+                "admin/%s/object_history.html" % app_label,
+                "admin/object_history.html",
+            ],
+            context,
+        )
 
 
 class InlineModelAdminParentAccessMixin:
     """
     Admin mixin for accessing parent objects to be used in InlineModelAdmin derived classes.
     """
-    OBJECT_PK_KWARGS = ['object_id', 'pk', 'id']
+
+    OBJECT_PK_KWARGS = ["object_id", "pk", "id"]
 
     def get_parent_object(self, request) -> Optional[object]:
         """
@@ -209,5 +218,6 @@ class AdminLogEntryMixin:
     Model mixin for logging Django admin changes of Models.
     Call fields_changed() on change events.
     """
+
     def fields_changed(self, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
         admin_log_changed_fields(self, field_names, who, **kwargs)

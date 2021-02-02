@@ -6,8 +6,19 @@ from typing import Tuple, List, Any, Optional
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
-from jutil.dates import last_month, yesterday, TIME_RANGE_NAMES, TIME_STEP_NAMES, this_month, last_year, last_week, \
-    localize_time_range, this_year, this_week, get_time_steps
+from jutil.dates import (
+    last_month,
+    yesterday,
+    TIME_RANGE_NAMES,
+    TIME_STEP_NAMES,
+    this_month,
+    last_year,
+    last_week,
+    localize_time_range,
+    this_year,
+    this_week,
+    get_time_steps,
+)
 from jutil.email import send_email
 import getpass
 from django.utils import translation
@@ -23,16 +34,17 @@ class SafeCommand(BaseCommand):
     Uses list of emails from settings.ADMINS.
     Implement do() in derived classes.
     """
+
     def handle(self, *args, **options):
         try:
-            if hasattr(settings, 'LANGUAGE_CODE'):
+            if hasattr(settings, "LANGUAGE_CODE"):
                 translation.activate(settings.LANGUAGE_CODE)
             return self.do(*args, **options)
         except Exception as e:
             msg = "ERROR: {} {}".format(str(e), traceback.format_exc())
             logger.error(msg)
             if not settings.DEBUG:
-                send_email(settings.ADMINS, 'Error @ {}'.format(getpass.getuser()), msg)
+                send_email(settings.ADMINS, "Error @ {}".format(getpass.getuser()), msg)
             raise
 
     def do(self, *args, **kwargs):
@@ -84,12 +96,12 @@ def add_date_range_arguments(parser: CommandParser):
     :param parser:
     :return:
     """
-    parser.add_argument('--begin', type=str)
-    parser.add_argument('--end', type=str)
+    parser.add_argument("--begin", type=str)
+    parser.add_argument("--end", type=str)
     for v in TIME_STEP_NAMES:
-        parser.add_argument('--' + v.replace('_', '-'), action='store_true')
+        parser.add_argument("--" + v.replace("_", "-"), action="store_true")
     for v in TIME_RANGE_NAMES:
-        parser.add_argument('--' + v.replace('_', '-'), action='store_true')
+        parser.add_argument("--" + v.replace("_", "-"), action="store_true")
 
 
 def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -102,40 +114,42 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     """
     if today is None:
         today = datetime.utcnow()
-    if name == 'last_week':
+    if name == "last_week":
         return last_week(today, tz)
-    if name == 'last_month':
+    if name == "last_month":
         return last_month(today, tz)
-    if name == 'last_year':
+    if name == "last_year":
         return last_year(today, tz)
-    if name == 'this_week':
+    if name == "this_week":
         return this_week(today, tz)
-    if name == 'this_month':
+    if name == "this_month":
         return this_month(today, tz)
-    if name == 'this_year':
+    if name == "this_year":
         return this_year(today, tz)
-    if name == 'yesterday':
+    if name == "yesterday":
         return yesterday(today, tz)
-    if name == 'today':
+    if name == "today":
         begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
         end = begin + timedelta(hours=24)
         return localize_time_range(begin, end, tz)
-    m = re.match(r'^plus_minus_(\d+)d$', name)
+    m = re.match(r"^plus_minus_(\d+)d$", name)
     if m:
         days = int(m.group(1))
         return localize_time_range(today - timedelta(days=days), today + timedelta(days=days), tz)
-    m = re.match(r'^prev_(\d+)d$', name)
+    m = re.match(r"^prev_(\d+)d$", name)
     if m:
         days = int(m.group(1))
         return localize_time_range(today - timedelta(days=days), today, tz)
-    m = re.match(r'^next_(\d+)d$', name)
+    m = re.match(r"^next_(\d+)d$", name)
     if m:
         days = int(m.group(1))
         return localize_time_range(today, today + timedelta(days=days), tz)
-    raise ValueError('Invalid date range name: {}'.format(name))
+    raise ValueError("Invalid date range name: {}".format(name))
 
 
-def parse_date_range_arguments(options: dict, default_range: str = 'last_month') -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
+def parse_date_range_arguments(
+    options: dict, default_range: str = "last_month"
+) -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
     """
     Parses date range from input and returns timezone-aware date range and
     interval list according to 'step' name argument (optional).
@@ -148,17 +162,17 @@ def parse_date_range_arguments(options: dict, default_range: str = 'last_month')
     for range_name in TIME_RANGE_NAMES:
         if options.get(range_name):
             begin, end = get_date_range_by_name(range_name)
-    if options.get('begin'):
-        begin = parse_datetime(options['begin'])  # type: ignore
+    if options.get("begin"):
+        begin = parse_datetime(options["begin"])  # type: ignore
         end = now()
-    if options.get('end'):
-        end = parse_datetime(options['end'])  # type: ignore
+    if options.get("end"):
+        end = parse_datetime(options["end"])  # type: ignore
 
-    step_type = ''
+    step_type = ""
     for step_name in TIME_STEP_NAMES:
         if options.get(step_name):
             if step_type:
-                raise ValueError('Cannot use --{} and --{} simultaneously'.format(step_type, step_name))
+                raise ValueError("Cannot use --{} and --{} simultaneously".format(step_type, step_name))
             step_type = step_name
     if step_type:
         steps = get_time_steps(step_type, begin, end)

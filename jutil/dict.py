@@ -2,8 +2,8 @@ import logging
 from collections import OrderedDict
 from typing import Dict, TypeVar
 
-R = TypeVar('R')
-S = TypeVar('S')
+R = TypeVar("R")
+S = TypeVar("S")
 
 logger = logging.getLogger(__name__)
 

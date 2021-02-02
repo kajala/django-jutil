@@ -20,7 +20,7 @@ from django.utils.text import capfirst
 
 logger = logging.getLogger(__name__)
 
-S = TypeVar('S')
+S = TypeVar("S")
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> str:
@@ -32,43 +32,44 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> s
     :return: Full name of shortened version depending on length
     """
     # dont allow commas in limited names
-    first_name = first_name.replace(',', ' ')
-    last_name = last_name.replace(',', ' ')
+    first_name = first_name.replace(",", " ")
+    last_name = last_name.replace(",", " ")
 
     # accept short full names as is
-    original_full_name = first_name + ' ' + last_name
+    original_full_name = first_name + " " + last_name
     if len(original_full_name) <= max_length:
         return original_full_name
 
     # drop middle names
-    first_name = first_name.split(' ')[0]
-    full_name = first_name + ' ' + last_name
+    first_name = first_name.split(" ")[0]
+    full_name = first_name + " " + last_name
     if len(full_name) <= max_length:
         return full_name
 
     # drop latter parts of combined first names
-    first_name = re.split(r'[\s\-]', first_name)[0]
-    full_name = first_name + ' ' + last_name
+    first_name = re.split(r"[\s\-]", first_name)[0]
+    full_name = first_name + " " + last_name
     if len(full_name) <= max_length:
         return full_name
 
     # drop latter parts of multi part last names
-    last_name = re.split(r'[\s\-]', last_name)[0]
-    full_name = first_name + ' ' + last_name
+    last_name = re.split(r"[\s\-]", last_name)[0]
+    full_name = first_name + " " + last_name
     if len(full_name) <= max_length:
         return full_name
 
     # shorten last name to one letter
     last_name = last_name[:1]
 
-    full_name = first_name + ' ' + last_name
+    full_name = first_name + " " + last_name
     if len(full_name) > max_length:
-        raise Exception('Failed to shorten name {}'.format(original_full_name))
+        raise Exception("Failed to shorten name {}".format(original_full_name))
     return full_name
 
 
-def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h',
-                     minutes_label: str = 'min', seconds_label: str = 's') -> str:
+def format_timedelta(
+    dt: timedelta, days_label: str = "d", hours_label: str = "h", minutes_label: str = "min", seconds_label: str = "s"
+) -> str:
     """
     Formats timedelta to readable format, e.g. 1h30min15s.
     :param dt: timedelta
@@ -95,13 +96,13 @@ def format_timedelta(dt: timedelta, days_label: str = 'd', hours_label: str = 'h
     out_str = out.strip()
     if not out_str:
         if seconds_f >= 0.001:
-            out_str = '{:0.3f}'.format(int(seconds_f * 1000.0) * 0.001) + seconds_label
+            out_str = "{:0.3f}".format(int(seconds_f * 1000.0) * 0.001) + seconds_label
         else:
-            out_str = '0' + seconds_label
+            out_str = "0" + seconds_label
     return out_str.strip()
 
 
-def format_xml(content: str, encoding: str = 'UTF-8', exceptions: bool = False) -> str:
+def format_xml(content: str, encoding: str = "UTF-8", exceptions: bool = False) -> str:
     """
     Formats XML document as human-readable plain text.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
@@ -112,21 +113,21 @@ def format_xml(content: str, encoding: str = 'UTF-8', exceptions: bool = False) 
     """
     assert isinstance(content, str)
     try:
-        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
+        if hasattr(settings, "XMLLINT_PATH") and settings.XMLLINT_PATH:
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(content.encode(encoding=encoding))
                 fp.flush()
-                out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
+                out = subprocess.check_output([settings.XMLLINT_PATH, "--format", fp.name])
                 return out.decode(encoding=encoding)
         return xml.dom.minidom.parseString(content).toprettyxml()
     except Exception as e:
-        logger.error('format_xml failed: %s', e)
+        logger.error("format_xml failed: %s", e)
         if exceptions:
             raise
         return content
 
 
-def format_xml_bytes(content: bytes, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
+def format_xml_bytes(content: bytes, encoding: str = "UTF-8", exceptions: bool = False) -> bytes:
     """
     Formats XML document as human-readable plain text and returns result in bytes.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
@@ -137,21 +138,21 @@ def format_xml_bytes(content: bytes, encoding: str = 'UTF-8', exceptions: bool =
     """
     assert isinstance(content, bytes)
     try:
-        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
+        if hasattr(settings, "XMLLINT_PATH") and settings.XMLLINT_PATH:
             with tempfile.NamedTemporaryFile() as fp:
                 fp.write(content)
                 fp.flush()
-                out = subprocess.check_output([settings.XMLLINT_PATH, '--format', fp.name])
+                out = subprocess.check_output([settings.XMLLINT_PATH, "--format", fp.name])
                 return out
         return xml.dom.minidom.parseString(content.decode(encoding=encoding)).toprettyxml(encoding=encoding)
     except Exception as e:
-        logger.error('format_xml_bytes failed: %s', e)
+        logger.error("format_xml_bytes failed: %s", e)
         if exceptions:
             raise
         return content
 
 
-def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = False) -> bytes:
+def format_xml_file(full_path: str, encoding: str = "UTF-8", exceptions: bool = False) -> bytes:
     """
     Formats XML file as human-readable plain text and returns result in bytes.
     Tries to format XML file first, if formatting fails the file content is returned as is.
@@ -163,20 +164,20 @@ def format_xml_file(full_path: str, encoding: str = 'UTF-8', exceptions: bool = 
     :return: bytes
     """
     try:
-        if hasattr(settings, 'XMLLINT_PATH') and settings.XMLLINT_PATH:
-            return subprocess.check_output([settings.XMLLINT_PATH, '--format', full_path])
-        with open(full_path, 'rb') as fp:
+        if hasattr(settings, "XMLLINT_PATH") and settings.XMLLINT_PATH:
+            return subprocess.check_output([settings.XMLLINT_PATH, "--format", full_path])
+        with open(full_path, "rb") as fp:
             return xml.dom.minidom.parse(fp).toprettyxml(encoding=encoding)  # type: ignore
     except Exception as e:
-        logger.error('format_xml_file failed (1): %s', e)
+        logger.error("format_xml_file failed (1): %s", e)
         if exceptions:
             raise
     try:
-        with open(full_path, 'rb') as fp:
+        with open(full_path, "rb") as fp:
             return fp.read()
     except Exception as e:
-        logger.error('format_xml_file failed (2): %s', e)
-    return b''
+        logger.error("format_xml_file failed (2): %s", e)
+    return b""
 
 
 def format_as_html_json(value: Any) -> str:
@@ -185,39 +186,39 @@ def format_as_html_json(value: Any) -> str:
     :param value: Any value which can be converted to JSON by json.dumps
     :return: str
     """
-    return mark_safe(html.escape(json.dumps(value, indent=4)).replace('\n', '<br/>').replace(' ', '&nbsp;'))
+    return mark_safe(html.escape(json.dumps(value, indent=4)).replace("\n", "<br/>").replace(" ", "&nbsp;"))
 
 
 def _format_dict_as_html_key(k: str) -> str:
-    if k.startswith('@'):
+    if k.startswith("@"):
         k = k[1:]
-    k = k.replace('_', ' ')
-    k = re.sub(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r' \1', k)
-    parts = k.split(' ')
+    k = k.replace("_", " ")
+    k = re.sub(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r" \1", k)
+    parts = k.split(" ")
     out: List[str] = [str(capfirst(parts[0].strip()))]
     for p in parts[1:]:
         p2 = p.strip().lower()
         if p2:
             out.append(p2)
-    return ' '.join(out)
+    return " ".join(out)
 
 
-def _format_dict_as_html_r(data: Dict[str, Any], margin: str = '', format_keys: bool = True) -> str:
+def _format_dict_as_html_r(data: Dict[str, Any], margin: str = "", format_keys: bool = True) -> str:
     if not isinstance(data, dict):
-        return '{}{}\n'.format(margin, data)
-    out = ''
+        return "{}{}\n".format(margin, data)
+    out = ""
     for k, v in OrderedDict(sorted(data.items())).items():
         if isinstance(v, dict):
-            out += '{}{}:\n'.format(margin, _format_dict_as_html_key(k) if format_keys else k)
-            out += _format_dict_as_html_r(v, margin + '    ', format_keys=format_keys)
-            out += '\n'
+            out += "{}{}:\n".format(margin, _format_dict_as_html_key(k) if format_keys else k)
+            out += _format_dict_as_html_r(v, margin + "    ", format_keys=format_keys)
+            out += "\n"
         elif isinstance(v, list):
             for v2 in v:
-                out += '{}{}:\n'.format(margin, _format_dict_as_html_key(k) if format_keys else k)
-                out += _format_dict_as_html_r(v2, margin + '    ', format_keys=format_keys)
-            out += '\n'
+                out += "{}{}:\n".format(margin, _format_dict_as_html_key(k) if format_keys else k)
+                out += _format_dict_as_html_r(v2, margin + "    ", format_keys=format_keys)
+            out += "\n"
         else:
-            out += '{}{}: {}\n'.format(margin, _format_dict_as_html_key(k) if format_keys else k, v)
+            out += "{}{}: {}\n".format(margin, _format_dict_as_html_key(k) if format_keys else k, v)
     return out
 
 
@@ -228,10 +229,10 @@ def format_dict_as_html(data: Dict[str, Any], format_keys: bool = True) -> str:
     :param format_keys: Re-format 'additionalInfo' and 'additional_info' type of keys as 'Additional info'
     :return: str (html)
     """
-    return '<pre>' + _format_dict_as_html_r(data, format_keys=format_keys) + '</pre>'
+    return "<pre>" + _format_dict_as_html_r(data, format_keys=format_keys) + "</pre>"
 
 
-def format_csv(rows: List[List[Any]], dialect: str = 'excel') -> str:
+def format_csv(rows: List[List[Any]], dialect: str = "excel") -> str:
     """
     Formats rows to CSV string content.
     :param rows: List[List[Any]]
@@ -245,10 +246,18 @@ def format_csv(rows: List[List[Any]], dialect: str = 'excel') -> str:
     return f.getvalue()
 
 
-def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line: Optional[int] = 200,  # noqa
-                 col_sep: str = '|', row_sep: str = '-', row_begin: str = '|', row_end: str = '|',
-                 has_label_row: bool = False,
-                 left_align: Optional[List[int]] = None, center_align: Optional[List[int]] = None) -> str:
+def format_table(  # noqa
+    rows: List[List[Any]],
+    max_col: Optional[int] = None,
+    max_line: Optional[int] = 200,
+    col_sep: str = "|",
+    row_sep: str = "-",
+    row_begin: str = "|",
+    row_end: str = "|",
+    has_label_row: bool = False,
+    left_align: Optional[List[int]] = None,
+    center_align: Optional[List[int]] = None,
+) -> str:
     """
     Formats "ASCII-table" rows by padding column widths to longest column value, optionally limiting column widths.
     Optionally separates colums with ' | ' character and header row with '-' characters.
@@ -274,7 +283,7 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
         center_align = []
     if left_align:
         if set(left_align) & set(center_align):
-            raise ValidationError('Left align columns {} overlap with center align {}'.format(left_align, center_align))
+            raise ValidationError("Left align columns {} overlap with center align {}".format(left_align, center_align))
 
     # find out number of columns
     ncols = 0
@@ -300,11 +309,11 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
         for ix, v in enumerate(row):
             v = str(v)
             if max_col and len(v) > max_col:
-                v = v[:max_col-2] + '..'
+                v = v[: max_col - 2] + ".."
             line.append(v)
             col_lens[ix] = max(col_lens[ix], len(v))
         while len(line) < ncols:
-            line.append('')
+            line.append("")
         lines.append(line)
 
     # padded lines
@@ -315,14 +324,14 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
             col_len = col_lens[ix]
             if len(v) < col_len:
                 if ix in left_align:
-                    v = v + ' ' * (col_len - len(v))
+                    v = v + " " * (col_len - len(v))
                 elif ix in center_align:
                     pad = col_len - len(v)
-                    lpad = int(pad/2)
+                    lpad = int(pad / 2)
                     rpad = pad - lpad
-                    v = ' ' * lpad + v + ' '*rpad
+                    v = " " * lpad + v + " " * rpad
                 else:
-                    v = ' '*(col_len-len(v)) + v
+                    v = " " * (col_len - len(v)) + v
             line2.append(v)
         lines2.append(line2)
 
@@ -332,17 +341,17 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
     ncols0 = ncols
     for line in lines2:
         if max_line is not None:
-            line_len = len(row_begin) + sum(len(v)+col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
+            line_len = len(row_begin) + sum(len(v) + col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
             while line_len > max_line:
                 ncols -= 1
-                line_len = len(row_begin) + sum(len(v)+col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
+                line_len = len(row_begin) + sum(len(v) + col_sep_len for v in line[:ncols]) - col_sep_len + len(row_end)
             max_line_len = max(max_line_len, line_len)
 
     # find out how we should terminate lines/rows
-    line_term = ''
-    row_sep_term = ''
+    line_term = ""
+    row_sep_term = ""
     if ncols0 > ncols:
-        line_term = '..'
+        line_term = ".."
         row_sep_term = row_sep * int(2 / len(row_sep))
 
     # final output with row and column separators
@@ -358,7 +367,7 @@ def format_table(rows: List[List[Any]], max_col: Optional[int] = None, max_line:
             lines3.append(row_sep * max_line_len + row_sep_term)
     if row_sep:
         lines3.append(row_sep * max_line_len + row_sep_term)
-    return '\n'.join(lines3)
+    return "\n".join(lines3)
 
 
 def ucfirst(v: str) -> str:
@@ -379,7 +388,7 @@ def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 1 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.0'))
+    return Decimal(a).quantize(Decimal("1.0"))
 
 
 def dec2(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -388,7 +397,7 @@ def dec2(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 2 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.00'))
+    return Decimal(a).quantize(Decimal("1.00"))
 
 
 def dec3(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -397,7 +406,7 @@ def dec3(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 3 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.000'))
+    return Decimal(a).quantize(Decimal("1.000"))
 
 
 def dec4(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -406,7 +415,7 @@ def dec4(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.0000'))
+    return Decimal(a).quantize(Decimal("1.0000"))
 
 
 def dec5(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -415,7 +424,7 @@ def dec5(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.00000'))
+    return Decimal(a).quantize(Decimal("1.00000"))
 
 
 def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -424,15 +433,19 @@ def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
     :param a: Number
     :return: Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal('1.000000'))
+    return Decimal(a).quantize(Decimal("1.000000"))
 
 
 def is_media_full_path(file_path: str) -> bool:
     """
     Checks if file path is under (settings) MEDIA_ROOT.
     """
-    return hasattr(settings, 'MEDIA_ROOT') and settings.MEDIA_ROOT and os.path.isabs(file_path) and \
-           os.path.realpath(file_path).startswith(str(settings.MEDIA_ROOT))
+    return (
+        hasattr(settings, "MEDIA_ROOT")
+        and settings.MEDIA_ROOT
+        and os.path.isabs(file_path)
+        and os.path.realpath(file_path).startswith(str(settings.MEDIA_ROOT))
+    )
 
 
 def strip_media_root(file_path: str) -> str:
@@ -448,10 +461,10 @@ def strip_media_root(file_path: str) -> str:
     """
     full_path = os.path.realpath(file_path)
     if not is_media_full_path(full_path):
-        logger.error('strip_media_root() expects absolute path under MEDIA_ROOT, got %s (%s)', file_path, full_path)
-        raise ValueError('strip_media_root() expects absolute path under MEDIA_ROOT')
-    file_path = full_path[len(settings.MEDIA_ROOT):]
-    if file_path.startswith('/'):
+        logger.error("strip_media_root() expects absolute path under MEDIA_ROOT, got %s (%s)", file_path, full_path)
+        raise ValueError("strip_media_root() expects absolute path under MEDIA_ROOT")
+    file_path = full_path[len(settings.MEDIA_ROOT) :]
+    if file_path.startswith("/"):
         return file_path[1:]
     return file_path
 
@@ -465,10 +478,12 @@ def get_media_full_path(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    full_path = os.path.realpath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
+    full_path = (
+        os.path.realpath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
+    )
     if not is_media_full_path(full_path):
-        logger.error('get_media_full_path() expects relative path to MEDIA_ROOT, got %s (%s)', file_path, full_path)
-        raise ValueError('get_media_full_path() expects relative path to MEDIA_ROOT')
+        logger.error("get_media_full_path() expects relative path to MEDIA_ROOT, got %s (%s)", file_path, full_path)
+        raise ValueError("get_media_full_path() expects relative path to MEDIA_ROOT")
     return full_path
 
 
@@ -479,8 +494,8 @@ def camel_case_to_underscore(s: str) -> str:
     :return: str
     """
     if s:
-        s = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', s)
-        s = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', s)
+        s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
+        s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
         s = s.replace("-", "_")
     return s.lower()
 
@@ -492,8 +507,8 @@ def underscore_to_camel_case(s: str) -> str:
     :return: str
     """
     if s:
-        p = s.split('_')
-        s = p[0] + ''.join([ucfirst(w) for w in p[1:]])
+        p = s.split("_")
+        s = p[0] + "".join([ucfirst(w) for w in p[1:]])
     return s
 
 
@@ -507,4 +522,4 @@ def choices_label(choices: Sequence[Tuple[S, str]], value: S) -> str:
     for key, label in choices:
         if key == value:
             return label
-    return ''
+    return ""

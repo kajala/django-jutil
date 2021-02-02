@@ -15,7 +15,7 @@ def get_object_or_none(cls: Any, **kwargs) -> Any:
     :return: Object or None
     """
     try:
-        qs = cls._default_manager.all() if hasattr(cls, '_default_manager') else cls  # pylint: disable=protected-access
+        qs = cls._default_manager.all() if hasattr(cls, "_default_manager") else cls  # pylint: disable=protected-access
         return qs.get(**kwargs)
     except Exception:
         return None
@@ -34,7 +34,7 @@ def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 
     """
     t0: Optional[datetime] = None
     t1: Optional[datetime] = None
-    qs0 = cls._default_manager if hasattr(cls, '_default_manager') else cls  # pylint: disable=protected-access
+    qs0 = cls._default_manager if hasattr(cls, "_default_manager") else cls  # pylint: disable=protected-access
     while t0 is None or t0 < t1:  # type: ignore
         obj = qs0.all().filter(**kwargs).first()
         if obj is not None:
@@ -58,11 +58,11 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
     for f in instance._meta.fields:
         if f.attname == field_name:
             label = f.verbose_name
-            if hasattr(f, 'choices') and f.choices:
+            if hasattr(f, "choices") and f.choices:
                 value = choices_label(f.choices, value)
             break
     if value is None:
-        value = ''
+        value = ""
     val = force_text(value)
     return label, val
 
@@ -76,22 +76,29 @@ def is_model_field_changed(instance, field_name: str) -> bool:
     :return: True if field value has been changed compared to value stored in DB.
     """
     assert hasattr(instance, field_name)
-    if not hasattr(instance, 'pk') or instance.pk is None:
+    if not hasattr(instance, "pk") or instance.pk is None:
         return False
     qs = instance.__class__.objects.all()
-    params = {'pk': instance.pk, field_name: getattr(instance, field_name)}
+    params = {"pk": instance.pk, field_name: getattr(instance, field_name)}
     return not qs.filter(**params).exists()
 
 
-def get_model_keys(instance, cls: Optional[Type[Model]] = None,
-                   exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr') -> List[str]:
+def get_model_keys(
+    instance, cls: Optional[Type[Model]] = None, exclude_fields: tuple = ("id",), base_class_suffix: str = "_ptr"
+) -> List[str]:
     if cls is None:
         cls = instance.__class__
     return [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
 
 
-def clone_model(instance, cls: Optional[Type[Model]] = None, commit: bool = True,
-                exclude_fields: tuple = ('id',), base_class_suffix: str = '_ptr', **kw):
+def clone_model(
+    instance,
+    cls: Optional[Type[Model]] = None,
+    commit: bool = True,
+    exclude_fields: tuple = ("id",),
+    base_class_suffix: str = "_ptr",
+    **kw
+):
     """
     Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')

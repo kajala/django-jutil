@@ -1,1 +1,1 @@
-default_app_config = 'jutil.apps.JutilConfig'
+default_app_config = "jutil.apps.JutilConfig"

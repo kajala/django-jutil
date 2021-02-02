@@ -23,8 +23,8 @@ class EnsureOriginMiddleware:
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
-        if not request.META.get('HTTP_ORIGIN', None):
-            request.META['HTTP_ORIGIN'] = request.get_host()
+        if not request.META.get("HTTP_ORIGIN", None):
+            request.META["HTTP_ORIGIN"] = request.get_host()
 
         # get response
         response = self.get_response(request)
@@ -55,13 +55,13 @@ class LogExceptionMiddleware:
         assert isinstance(request, HttpRequest)
         full_path = request.get_full_path()
         user = request.user
-        msg = '{full_path}\n{err} (IP={ip}, user={user}) {trace}'.format(full_path=full_path, user=user,
-                                                                         ip=get_client_ip(request)[0], err=e,
-                                                                         trace=str(traceback.format_exc()))
+        msg = "{full_path}\n{err} (IP={ip}, user={user}) {trace}".format(
+            full_path=full_path, user=user, ip=get_client_ip(request)[0], err=e, trace=str(traceback.format_exc())
+        )
         logger.error(msg)
         hostname = request.get_host()
-        if not settings.DEBUG and hostname != 'testserver':
-            send_email(settings.ADMINS, 'Error @ {}'.format(hostname), msg)
+        if not settings.DEBUG and hostname != "testserver":
+            send_email(settings.ADMINS, "Error @ {}".format(hostname), msg)
 
 
 class EnsureLanguageCookieMiddleware:
@@ -76,6 +76,7 @@ class EnsureLanguageCookieMiddleware:
     2) Previously stored cookie
     3) settings.LANGUAGE_CODE
     """
+
     _languages: Optional[Dict[str, str]]
 
     def __init__(self, get_response=None):
@@ -89,20 +90,22 @@ class EnsureLanguageCookieMiddleware:
         return self._languages
 
     def __call__(self, request):
-        lang_cookie_name = settings.LANGUAGE_COOKIE_NAME if hasattr(settings, 'LANGUAGE_COOKIE_NAME') else 'django_language'
+        lang_cookie_name = (
+            settings.LANGUAGE_COOKIE_NAME if hasattr(settings, "LANGUAGE_COOKIE_NAME") else "django_language"
+        )
         lang_cookie = request.COOKIES.get(lang_cookie_name)
         lang = request.GET.get(lang_cookie_name)
         if not lang:
             lang = lang_cookie
         if not lang or lang not in self.languages:
-            lang = settings.LANGUAGE_CODE if hasattr(settings, 'LANGUAGE_CODE') else 'en'
+            lang = settings.LANGUAGE_CODE if hasattr(settings, "LANGUAGE_CODE") else "en"
         request.COOKIES[lang_cookie_name] = lang
 
         res = self.get_response(request)
 
         if lang_cookie is None or lang != lang_cookie:
-            secure = hasattr(settings, 'LANGUAGE_COOKIE_SECURE') and settings.LANGUAGE_COOKIE_SECURE
-            httponly = hasattr(settings, 'LANGUAGE_COOKIE_HTTPONLY') and settings.LANGUAGE_COOKIE_HTTPONLY
+            secure = hasattr(settings, "LANGUAGE_COOKIE_SECURE") and settings.LANGUAGE_COOKIE_SECURE
+            httponly = hasattr(settings, "LANGUAGE_COOKIE_HTTPONLY") and settings.LANGUAGE_COOKIE_HTTPONLY
             res.set_cookie(lang_cookie_name, lang, secure=secure, httponly=httponly)
         return res
 
@@ -111,6 +114,7 @@ class ActivateUserProfileTimezoneMiddleware:
     """
     Uses 'timezone' string in request.user.profile to activate user-specific timezone.
     """
+
     def __init__(self, get_response=None):
         self.get_response = get_response
 
@@ -120,15 +124,15 @@ class ActivateUserProfileTimezoneMiddleware:
         activated = False
         if request.user.is_authenticated:
             user = request.user
-            if hasattr(user, 'profile') and user.profile:
+            if hasattr(user, "profile") and user.profile:
                 up = user.profile
-                if hasattr(up, 'timezone') and up.timezone:
+                if hasattr(up, "timezone") and up.timezone:
                     timezone.activate(up.timezone)
                     activated = True
                 else:
-                    logger.warning('User profile timezone missing so user.profile.timezone could not be activated')
+                    logger.warning("User profile timezone missing so user.profile.timezone could not be activated")
             else:
-                logger.warning('User profile missing so user.profile.timezone could not be activated')
+                logger.warning("User profile missing so user.profile.timezone could not be activated")
 
         # get response
         response = self.get_response(request)
@@ -144,9 +148,10 @@ class TestClientLogger:
     """
     Logs requests for Django test client.
     """
+
     ignored_paths = {
-        '/admin/jsi18n/',
-        '/favicon.ico',
+        "/admin/jsi18n/",
+        "/favicon.ico",
     }
 
     def __init__(self, get_response=None):
@@ -159,7 +164,9 @@ class TestClientLogger:
                 url = request.path
                 qs = request.GET.dict()
                 if qs:
-                    url += '?' + urlencode(request.GET.dict())
-                logger.debug('[TestClientLogger] self.client.%s("%s", data=%s)', request.method.lower(), url, request.POST.dict())
+                    url += "?" + urlencode(request.GET.dict())
+                logger.debug(
+                    '[TestClientLogger] self.client.%s("%s", data=%s)', request.method.lower(), url, request.POST.dict()
+                )
         response = self.get_response(request)
         return response

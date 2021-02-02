@@ -17,7 +17,7 @@ def modify_url(url: str, new_params: dict) -> str:
     query_params = dict(parse_qsl(res.query))
     for k, v in new_params.items():
         if v is None:
-            query_params[str(k)] = ''
+            query_params[str(k)] = ""
         else:
             query_params[str(k)] = str(v)
     parts = list(res)

@@ -33,20 +33,26 @@ def _xml_tag_filter(s: str, strip_namespaces: bool) -> str:
     :return: str
     """
     if strip_namespaces:
-        ns_end = s.find('}')
+        ns_end = s.find("}")
         if ns_end != -1:
-            s = s[ns_end+1:]
+            s = s[ns_end + 1 :]
         else:
-            ns_end = s.find(':')
+            ns_end = s.find(":")
             if ns_end != -1:
-                s = s[ns_end+1:]
+                s = s[ns_end + 1 :]
     return s
 
 
-def _xml_set_element_data_r(data: dict, el: Element,  # pylint: disable=too-many-arguments,too-many-locals
-                            array_tags: Iterable[str], int_tags: Iterable[str],
-                            strip_namespaces: bool, parse_attributes: bool,
-                            value_key: str, attribute_prefix: str):
+def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-locals
+    data: dict,
+    el: Element,
+    array_tags: Iterable[str],
+    int_tags: Iterable[str],
+    strip_namespaces: bool,
+    parse_attributes: bool,
+    value_key: str,
+    attribute_prefix: str,
+):
 
     tag = _xml_tag_filter(el.tag, strip_namespaces)
 
@@ -71,9 +77,16 @@ def _xml_set_element_data_r(data: dict, el: Element,  # pylint: disable=too-many
 
     # recurse children
     for el2 in list(el):
-        _xml_set_element_data_r(obj, el2, array_tags=array_tags, int_tags=int_tags,
-                                strip_namespaces=strip_namespaces, parse_attributes=parse_attributes,
-                                value_key=value_key, attribute_prefix=attribute_prefix)
+        _xml_set_element_data_r(
+            obj,
+            el2,
+            array_tags=array_tags,
+            int_tags=int_tags,
+            strip_namespaces=strip_namespaces,
+            parse_attributes=parse_attributes,
+            value_key=value_key,
+            attribute_prefix=attribute_prefix,
+        )
 
     # store result
     if is_array:
@@ -83,16 +96,21 @@ def _xml_set_element_data_r(data: dict, el: Element,  # pylint: disable=too-many
         data[tag].append(obj)
     else:
         if tag in data:
-            raise Exception('XML parsing failed, tag {} collision'.format(tag))
+            raise Exception("XML parsing failed, tag {} collision".format(tag))
         data[tag] = obj
 
 
-def xml_to_dict(xml_bytes: bytes,  # pylint: disable=too-many-arguments,too-many-locals
-                tags: Optional[Iterable[str]] = None, array_tags: Optional[Iterable[str]] = None,
-                int_tags: Optional[Iterable[str]] = None,
-                strip_namespaces: bool = True, parse_attributes: bool = True,
-                value_key: str = '@', attribute_prefix: str = '@',
-                document_tag: bool = False) -> Dict[str, Any]:
+def xml_to_dict(  # pylint: disable=too-many-arguments,too-many-locals
+    xml_bytes: bytes,
+    tags: Optional[Iterable[str]] = None,
+    array_tags: Optional[Iterable[str]] = None,
+    int_tags: Optional[Iterable[str]] = None,
+    strip_namespaces: bool = True,
+    parse_attributes: bool = True,
+    value_key: str = "@",
+    attribute_prefix: str = "@",
+    document_tag: bool = False,
+) -> Dict[str, Any]:
     """
     Parses XML string to dict. In case of simple elements (no children, no attributes) value is stored as is.
     For complex elements value is stored in key '@', attributes '@xxx' and children as sub-dicts.
@@ -137,8 +155,10 @@ def xml_to_dict(xml_bytes: bytes,  # pylint: disable=too-many-arguments,too-many
     root = etree.ElementTree.fromstring(xml_bytes)
     if tags:
         if document_tag:
-            raise Exception('xml_to_dict: document_tag=True does not make sense when using selective tag list '
-                            'since selective tag list finds tags from the whole document, not only directly under root document tag')
+            raise Exception(
+                "xml_to_dict: document_tag=True does not make sense when using selective tag list "
+                "since selective tag list finds tags from the whole document, not only directly under root document tag"
+            )
         root_elements: List[Element] = []
         for tag in tags:
             root_elements.extend(root.iter(tag))
@@ -147,9 +167,16 @@ def xml_to_dict(xml_bytes: bytes,  # pylint: disable=too-many-arguments,too-many
 
     data: Dict[str, Any] = {}
     for el in root_elements:
-        _xml_set_element_data_r(data, el, array_tags=array_tags, int_tags=int_tags,
-                                strip_namespaces=strip_namespaces, parse_attributes=parse_attributes,
-                                value_key=value_key, attribute_prefix=attribute_prefix)
+        _xml_set_element_data_r(
+            data,
+            el,
+            array_tags=array_tags,
+            int_tags=int_tags,
+            strip_namespaces=strip_namespaces,
+            parse_attributes=parse_attributes,
+            value_key=value_key,
+            attribute_prefix=attribute_prefix,
+        )
 
     # set root attributes
     if parse_attributes:
@@ -160,13 +187,13 @@ def xml_to_dict(xml_bytes: bytes,  # pylint: disable=too-many-arguments,too-many
 
 
 def _xml_filter_tag_name(tag: str) -> str:
-    return re.sub(r'\[\d+\]', '', tag)
+    return re.sub(r"\[\d+\]", "", tag)
 
 
 def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_prefix: str):
     # print('_xml_element_set_data_r({}): {}'.format(el.tag, data))
-    if not hasattr(data, 'items'):
-        data = {'@': data}
+    if not hasattr(data, "items"):
+        data = {"@": data}
     for k, v in data.items():
         if k == value_key:
             el.text = str(v)
@@ -187,7 +214,7 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
             el2.text = str(v)
 
 
-def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@') -> Element:
+def dict_to_element(doc: dict, value_key: str = "@", attribute_prefix: str = "@") -> Element:
     """
     Generates XML Element from dict.
     Generates complex elements by assuming element attributes are prefixed with '@', and value is stored to plain '@'
@@ -226,7 +253,7 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
     Returns: xml.etree.ElementTree.Element
     """
     if len(doc) != 1:
-        raise Exception('Invalid data dict for XML generation, document root must have single element')
+        raise Exception("Invalid data dict for XML generation, document root must have single element")
 
     for tag, data in doc.items():
         el = Element(_xml_filter_tag_name(tag))
@@ -234,4 +261,4 @@ def dict_to_element(doc: dict, value_key: str = '@', attribute_prefix: str = '@'
         _xml_element_set_data_r(el, data, value_key, attribute_prefix)
         return el  # pytype: disable=bad-return-type
 
-    return Element('empty')
+    return Element("empty")
