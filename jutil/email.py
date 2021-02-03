@@ -58,7 +58,7 @@ def send_email(  # noqa
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
-):
+) -> int:
     """
     Sends email. Supports both SendGrid API client and SMTP connection.
     See send_email_sendgrid() for SendGrid specific requirements.
@@ -91,7 +91,7 @@ def send_email_sendgrid(  # noqa
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
-):
+) -> int:
     """
     Sends email using SendGrid API. Following requirements:
     * pip install sendgrid>=6.3.1,<7.0.0
@@ -196,7 +196,7 @@ def send_email_smtp(  # noqa
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
-):
+) -> int:
     """
     Sends email using SMTP connection using standard Django email settings.
 
