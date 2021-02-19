@@ -8,7 +8,6 @@ from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
-
 from jutil.drf_exceptions import transform_exception_to_drf
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
@@ -755,10 +754,8 @@ class Tests(TestCase, TestSetupMixin):
 
             try:
                 parse_bool("hello")
-            except DRFValidationError as e:
-                self.assertEqual(
-                    str(e), "[ErrorDetail(string='hello ei ole yksi valittavissa olevista arvoista', code='invalid')]"
-                )
+            except ValidationError as e:
+                self.assertEqual(str(e), "['hello ei ole yksi valittavissa olevista arvoista']")
 
     def test_sanitizers(self):
         self.assertEqual(country_code_sanitizer("kods"), "")
