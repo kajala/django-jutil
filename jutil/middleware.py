@@ -144,9 +144,9 @@ class ActivateUserProfileTimezoneMiddleware:
         return response
 
 
-class TestClientLogger:
+class TestClientLoggerMiddleware:
     """
-    Logs requests for Django test client.
+    Logs requests to be used with Django test framework client.
     """
 
     ignored_paths = {
@@ -165,8 +165,6 @@ class TestClientLogger:
                 qs = request.GET.dict()
                 if qs:
                     url += "?" + urlencode(request.GET.dict())
-                logger.debug(
-                    '[TestClientLogger] self.client.%s("%s", data=%s)', request.method.lower(), url, request.POST.dict()
-                )
+                logger.debug('self.client.%s("%s", data=%s)', request.method.lower(), url, request.POST.dict())
         response = self.get_response(request)
         return response
