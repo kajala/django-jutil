@@ -24,6 +24,7 @@ PASSPORT_FILTER = re.compile(r"[^-A-Z0-9]")
 STRIP_NON_NUMBERS = re.compile(r"[^0-9]")
 STRIP_NON_ALPHANUMERIC = re.compile(r"[^0-9A-Za-z]")
 STRIP_WHITESPACE = re.compile(r"\s+")
+STRIP_PREFIX_ZEROS = re.compile(r"^0+")
 IBAN_FILTER = re.compile(r"[^A-Z0-9]")
 DIGIT_FILTER = re.compile(r"[^0-9]")
 
@@ -384,6 +385,7 @@ def iso_payment_reference_validator(v: str):
     """
     num = ""
     v = STRIP_WHITESPACE.sub("", v)
+    v = STRIP_PREFIX_ZEROS.sub("", v)
     for ch in v[4:] + v[0:4]:
         x = ord(ch)
         if ord("0") <= x <= ord("9"):
