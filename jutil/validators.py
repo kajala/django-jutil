@@ -4,7 +4,7 @@ import unicodedata
 from datetime import date
 from decimal import Decimal
 from random import randint
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Any
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -52,8 +52,7 @@ def email_filter(v: str) -> str:
 
 
 def email_validator(v: str):
-    v = email_filter(v)
-    if not v or not EMAIL_VALIDATOR.fullmatch(v):
+    if not is_email(v):
         v_str = _("Missing value") if not v else str(v)
         raise ValidationError(_("Invalid email") + ": {}".format(v_str), code="invalid_email")
 
@@ -280,6 +279,41 @@ def filter_country_company_org_id(country_code: str, v: str):
 def validate_country_company_org_id(country_code: str, v: str):
     if country_code == "FI":
         fi_company_org_id_validator(v)
+
+
+def is_int(v: Any) -> bool:
+    """
+    Returns True if value is int or can be converted to int.
+    :param v: Any
+    :return: bool
+    """
+    try:
+        return str(int(v)) == str(v)
+    except Exception:
+        return False
+
+
+def is_iban(v: str) -> bool:
+    """
+    Returns True if account number is valid IBAN format.
+    :param v: str
+    :return: bool
+    """
+    try:
+        iban_validator(v)
+        return True
+    except ValidationError:
+        return False
+
+
+def is_email(v: str) -> bool:
+    """
+    Returns True if v is email address.
+    :param v: str
+    :return: bool
+    """
+    v = email_filter(v)
+    return bool(v and EMAIL_VALIDATOR.fullmatch(v))
 
 
 # ============================================================================

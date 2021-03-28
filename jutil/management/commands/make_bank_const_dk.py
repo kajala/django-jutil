@@ -1,17 +1,9 @@
-# pylint: disable=too-many-branches
 import csv
 from copy import copy
 from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
 from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
-
-
-def is_int(x) -> bool:
-    try:
-        int(x)
-        return True
-    except Exception:
-        return False
+from jutil.validators import is_int
 
 
 def dk_iban_load_map(filename: str) -> list:
@@ -36,7 +28,7 @@ class Command(SafeCommand):
         parser.add_argument("--filename", type=str)
         parser.add_argument("--php", action="store_true")
 
-    def do(self, *args, **kw):
+    def do(self, *args, **kw):  # pylint: disable=too-many-branches
         new_bank_list = dk_iban_load_map(kw["filename"]) if kw["filename"] else []
 
         bank_data = dict(copy(DK_BANK_CLEARING_MAP))

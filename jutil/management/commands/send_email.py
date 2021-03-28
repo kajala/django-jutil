@@ -22,7 +22,7 @@ class Command(SafeCommand):
         parser.add_argument("--smtp", action="store_true")
         parser.add_argument("--sendgrid", action="store_true")
 
-    def do(self, *args, **kw):
+    def do(self, *args, **kw):  # pylint: disable=too-many-branches
         files = kw["attach"] if kw["attach"] else []
         if not files:
             full_path = os.path.join(settings.BASE_DIR, "data/attachment.jpg")
