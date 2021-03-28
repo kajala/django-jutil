@@ -15,9 +15,9 @@ class Command(BaseCommand):
         passwd = options["password"]
         users = User.objects.filter(Q(username=name) | Q(email=name))
         if not users:
-            print("User not found")
+            self.stdout.write("User not found")
         for user in users:
             assert isinstance(user, User)
             user.set_password(passwd)
             user.save()
-            print("User {} password set to {}".format(name, passwd))
+            self.stdout.write("User {} password set to {}".format(name, passwd))

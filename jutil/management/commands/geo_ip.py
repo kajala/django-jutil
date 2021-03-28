@@ -12,4 +12,4 @@ class Command(SafeCommand):
 
     def do(self, *args, **kw):
         data = get_geo_ip(kw["ip"])
-        print(json.dumps(data, indent=4))
+        self.stdout.write(json.dumps(data, indent=4))

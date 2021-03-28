@@ -76,4 +76,4 @@ class Command(SafeCommand):
                 exceptions=True,
             )
 
-        print("send_email returned", res)
+        self.stdout.write("send_email returned {}".format(res))
