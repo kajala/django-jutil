@@ -7,15 +7,16 @@ from jutil.email import send_email, send_email_smtp, send_email_sendgrid
 
 
 class Command(SafeCommand):
-    help = "Send test email with (optional) attachment"
+    help = "Sends email with (optional) attachment"
 
     def add_arguments(self, parser: CommandParser):
-        parser.add_argument("email", type=str)
+        parser.add_argument("to", type=str)
         parser.add_argument("--cc", type=str)
         parser.add_argument("--bcc", type=str)
         parser.add_argument("--sender", type=str)
         parser.add_argument("--subject", type=str)
         parser.add_argument("--body", type=str)
+        parser.add_argument("--body-file", type=str)
         parser.add_argument("--attach", type=str, nargs="*")
         parser.add_argument("--smtp", action="store_true")
         parser.add_argument("--sendgrid", action="store_true")
@@ -23,19 +24,23 @@ class Command(SafeCommand):
     def do(self, *args, **kw):
         files = kw["attach"] if kw["attach"] else []
         if not files:
-            files.append(os.path.join(settings.BASE_DIR, "data/attachment.jpg"))
+            full_path = os.path.join(settings.BASE_DIR, "data/attachment.jpg")
+            if os.path.isfile(full_path):
+                files.append(full_path)
         subject = "hello " + now().isoformat()
         text = "body text"
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
         if kw["body"]:
             html = kw["body"]
+        if kw["body_file"]:
+            html = open(kw["body_file"], "rt").read()
         if kw["subject"]:
             subject = kw["subject"]
         sender = kw["sender"] if kw["sender"] else ""
 
         if kw["smtp"]:
             res = send_email_smtp(
-                kw["email"],
+                kw["to"],
                 subject,
                 text,
                 html,
@@ -47,7 +52,7 @@ class Command(SafeCommand):
             )
         elif kw["sendgrid"]:
             res = send_email_sendgrid(
-                kw["email"],
+                kw["to"],
                 subject,
                 text,
                 html,
@@ -59,7 +64,7 @@ class Command(SafeCommand):
             )
         else:
             res = send_email(
-                kw["email"],
+                kw["to"],
                 subject,
                 text,
                 html,
