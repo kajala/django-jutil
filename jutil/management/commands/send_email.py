@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.core.management.base import CommandParser
+from django.utils.html import strip_tags
 from django.utils.timezone import now
 from jutil.command import SafeCommand
 from jutil.email import send_email, send_email_smtp, send_email_sendgrid
@@ -28,7 +29,6 @@ class Command(SafeCommand):
             if os.path.isfile(full_path):
                 files.append(full_path)
         subject = "hello " + now().isoformat()
-        text = "body text"
         html = '<h1>html text</h1><p><a href="https://kajala.com/">Kajala Group Ltd.</a></p>'
         if kw["body"]:
             html = kw["body"]
@@ -36,6 +36,7 @@ class Command(SafeCommand):
             html = open(kw["body_file"], "rt").read()
         if kw["subject"]:
             subject = kw["subject"]
+        text = strip_tags(html)
         sender = kw["sender"] if kw["sender"] else ""
 
         if kw["smtp"]:
