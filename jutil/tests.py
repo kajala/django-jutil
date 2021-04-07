@@ -13,7 +13,7 @@ from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
 from jutil.drf_exceptions import transform_exception_to_drf
-from jutil.files import list_files
+from jutil.files import list_files, find_file
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -1247,19 +1247,19 @@ class Tests(TestCase, TestSetupMixin):
         dir_name = os.path.join(settings.BASE_DIR, "jutil/locale")
         cases = [
             [
-                {"recurse": True, "media_root": True, "suffix": ".PO", "ignore_case": True},
+                {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": True},
                 ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
             ],
             [
-                {"recurse": True, "media_root": True, "suffix": ".po", "ignore_case": False},
+                {"recurse": True, "use_media_root": True, "suffix": ".po", "ignore_case": False},
                 ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
             ],
             [
-                {"recurse": True, "media_root": True, "suffix": ".PO", "ignore_case": False},
+                {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": False},
                 [],
             ],
             [
-                {"recurse": False, "media_root": True, "suffix": ".PO", "ignore_case": True},
+                {"recurse": False, "use_media_root": True, "suffix": ".PO", "ignore_case": True},
                 [],
             ],
         ]
@@ -1267,6 +1267,26 @@ class Tests(TestCase, TestSetupMixin):
             out = StringIO()
             call_command("list_files", dir_name, json=True, stdout=out, **call_kw)
             data = json.loads(out.getvalue())
+            self.assertListEqual(data_ref, data)
+
+    def test_find_file(self):
+        dir_name = os.path.join(settings.BASE_DIR, "jutil/locale")
+        cases = [
+            [
+                {"recurse": True, "use_media_root": True, "filename": "django.po"},
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+            ],
+            [
+                {"recurse": False, "use_media_root": True, "filename": "django.po"},
+                [],
+            ],
+            [
+                {"recurse": True, "use_media_root": True, "filename": "en/LC_MESSAGES/django.po"},
+                ["jutil/locale/en/LC_MESSAGES/django.po"],
+            ],
+        ]
+        for call_kw, data_ref in cases:
+            data = find_file(**call_kw, dir_name=dir_name)
             self.assertListEqual(data_ref, data)
 
 

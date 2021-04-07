@@ -14,15 +14,17 @@ class Command(SafeCommand):
         parser.add_argument("--ignore-case", action="store_true")
         parser.add_argument("--recurse", action="store_true")
         parser.add_argument("--json", action="store_true")
-        parser.add_argument("--media-root", action="store_true")
+        parser.add_argument("--use-media-root", action="store_true")
 
     def do(self, *args, **kw):
         dir_name = kw["dir_name"]
         suffix = kw["suffix"] or ""
         recurse = kw["recurse"]
         ignore_case = kw["ignore_case"]
-        media_root = kw["media_root"]
-        out = list_files(dir_name, suffix=suffix, ignore_case=ignore_case, media_root=media_root, recurse=recurse)
+        use_media_root = kw["use_media_root"]
+        out = list_files(
+            dir_name, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse
+        )
         if kw["json"]:
             json_str = json.dumps(out, indent=4)
             self.stdout.writelines([json_str])
