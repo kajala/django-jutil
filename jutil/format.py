@@ -457,9 +457,9 @@ def strip_media_root(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    full_path = os.path.realpath(file_path)
+    full_path = os.path.abspath(file_path)
     if not is_media_full_path(full_path):
-        raise ValueError("strip_media_root() expects absolute path under MEDIA_ROOT")
+        raise ValueError("Path {} not under MEDIA_ROOT".format(file_path))
     file_path = full_path[len(settings.MEDIA_ROOT) :]
     if file_path.startswith("/"):
         return file_path[1:]
@@ -475,11 +475,9 @@ def get_media_full_path(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
-    full_path = (
-        os.path.realpath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
-    )
+    full_path = os.path.abspath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
     if not is_media_full_path(full_path):
-        raise ValueError("get_media_full_path() expects relative path to MEDIA_ROOT")
+        raise ValueError("Path {} not under MEDIA_ROOT".format(file_path))
     return full_path
 
 
