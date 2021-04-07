@@ -1,14 +1,19 @@
+import json
 import logging
 import os
 from datetime import datetime, timedelta, date
 from decimal import Decimal
+from io import BytesIO, StringIO
 from os.path import join
 from urllib.parse import urlparse
+
+from django.core.management import call_command
 from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
 from jutil.drf_exceptions import transform_exception_to_drf
+from jutil.files import list_files
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -1237,6 +1242,32 @@ class Tests(TestCase, TestSetupMixin):
         self.assertTrue(isinstance(e, DRFValidationError))
         self.assertIn("hello", e.detail)  # type: ignore
         self.assertEqual(e.detail["hello"], [ErrorDetail(string="world", code="invalid")])  # type: ignore
+
+    def test_list_files(self):
+        dir_name = os.path.join(settings.BASE_DIR, "jutil/locale")
+        cases = [
+            [
+                {"recurse": True, "media_root": True, "suffix": ".PO", "ignore_case": True},
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+            ],
+            [
+                {"recurse": True, "media_root": True, "suffix": ".po", "ignore_case": False},
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+            ],
+            [
+                {"recurse": True, "media_root": True, "suffix": ".PO", "ignore_case": False},
+                [],
+            ],
+            [
+                {"recurse": False, "media_root": True, "suffix": ".PO", "ignore_case": True},
+                [],
+            ],
+        ]
+        for call_kw, data_ref in cases:
+            out = StringIO()
+            call_command("list_files", dir_name, json=True, stdout=out, **call_kw)
+            data = json.loads(out.getvalue())
+            self.assertListEqual(data_ref, data)
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

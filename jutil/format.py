@@ -440,12 +440,10 @@ def is_media_full_path(file_path: str) -> bool:
     """
     Checks if file path is under (settings) MEDIA_ROOT.
     """
-    return (
-        hasattr(settings, "MEDIA_ROOT")
-        and settings.MEDIA_ROOT
-        and os.path.isabs(file_path)
-        and os.path.realpath(file_path).startswith(str(settings.MEDIA_ROOT))
-    )
+    if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
+        raise ValueError("MEDIA_ROOT not defined")
+    full_path = os.path.abspath(file_path)
+    return full_path.startswith(str(settings.MEDIA_ROOT))
 
 
 def strip_media_root(file_path: str) -> str:
@@ -461,7 +459,6 @@ def strip_media_root(file_path: str) -> str:
     """
     full_path = os.path.realpath(file_path)
     if not is_media_full_path(full_path):
-        logger.error("strip_media_root() expects absolute path under MEDIA_ROOT, got %s (%s)", file_path, full_path)
         raise ValueError("strip_media_root() expects absolute path under MEDIA_ROOT")
     file_path = full_path[len(settings.MEDIA_ROOT) :]
     if file_path.startswith("/"):
@@ -482,7 +479,6 @@ def get_media_full_path(file_path: str) -> str:
         os.path.realpath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
     )
     if not is_media_full_path(full_path):
-        logger.error("get_media_full_path() expects relative path to MEDIA_ROOT, got %s (%s)", file_path, full_path)
         raise ValueError("get_media_full_path() expects relative path to MEDIA_ROOT")
     return full_path
 
