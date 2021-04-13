@@ -1,5 +1,6 @@
 import logging
 import re
+import sys
 import traceback
 from datetime import datetime, timedelta
 from typing import Tuple, List, Any, Optional
@@ -35,13 +36,13 @@ class SafeCommand(BaseCommand):
     Implement do() in derived classes.
     """
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **kwargs):
         try:
             if hasattr(settings, "LANGUAGE_CODE"):
                 translation.activate(settings.LANGUAGE_CODE)
-            return self.do(*args, **options)
+            return self.do(*args, **kwargs)
         except Exception as e:
-            msg = "ERROR: {} {}".format(str(e), traceback.format_exc())
+            msg = "ERROR: {}\nargs: {}\nkwargs: {}\n{}".format(str(e), args, kwargs, traceback.format_exc())
             logger.error(msg)
             if not settings.DEBUG:
                 send_email(settings.ADMINS, "Error @ {}".format(getpass.getuser()), msg)
