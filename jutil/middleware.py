@@ -53,10 +53,11 @@ class LogExceptionMiddleware:
         :param e: Exception
         """
         assert isinstance(request, HttpRequest)
-        full_path = request.get_full_path()
+        method = str(request.method).upper()
+        uri = request.build_absolute_uri()
         user = request.user
-        msg = "{full_path}\n{err} (IP={ip}, user={user}) {trace}".format(
-            full_path=full_path, user=user, ip=get_client_ip(request)[0], err=e, trace=str(traceback.format_exc())
+        msg = "{method} {uri}\n{err} (IP={ip}, user={user}) {trace}".format(
+            method=method, uri=uri, user=user, ip=get_client_ip(request)[0], err=e, trace=traceback.format_exc()
         )
         logger.error(msg)
         hostname = request.get_host()
