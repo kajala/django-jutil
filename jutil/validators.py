@@ -16,7 +16,6 @@ from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
 from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 from jutil.bank_const_se import SE_BANK_CLEARING_LIST
 
-
 EMAIL_VALIDATOR = re.compile(r"[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+")
 PHONE_FILTER = re.compile(r"[^+0-9]")
 PHONE_VALIDATOR = re.compile(r"\+?\d{6,}")
@@ -33,11 +32,11 @@ def phone_filter(v: str) -> str:
     return PHONE_FILTER.sub("", str(v)) if v else ""
 
 
-def phone_validator(v: str):
-    v = phone_filter(v)
+def phone_validator(v0: str):
+    v = phone_filter(v0)
     if not v or not PHONE_VALIDATOR.fullmatch(v):
-        v_str = _("Missing value") if v is None else str(v)
-        raise ValidationError(_("Invalid phone number") + ": {}".format(v_str), code="invalid_phone")
+        v_str = _("Missing value") if v is None else str(v0)
+        raise ValidationError(_("Invalid phone number") + " ({})".format(v_str), code="invalid_phone")
 
 
 def phone_sanitizer(v: str) -> str:
@@ -54,7 +53,7 @@ def email_filter(v: str) -> str:
 def email_validator(v: str):
     if not is_email(v):
         v_str = _("Missing value") if not v else str(v)
-        raise ValidationError(_("Invalid email") + ": {}".format(v_str), code="invalid_email")
+        raise ValidationError(_("Invalid email") + " ({})".format(v_str), code="invalid_email")
 
 
 def email_sanitizer(v: str) -> str:
@@ -68,11 +67,11 @@ def passport_filter(v: str) -> str:
     return PASSPORT_FILTER.sub("", str(v).upper()) if v else ""
 
 
-def passport_validator(v: str):
-    v = passport_filter(v)
+def passport_validator(v0: str):
+    v = passport_filter(v0)
     if not v or len(v) < 5:
-        v_str = _("Missing value") if v is None else str(v)
-        raise ValidationError(_("Invalid passport number") + ": {}".format(v_str), code="invalid_passport")
+        v_str = _("Missing value") if v is None else str(v0)
+        raise ValidationError(_("Invalid passport number") + " ({})".format(v_str), code="invalid_passport")
 
 
 def passport_sanitizer(v: str):
@@ -90,16 +89,16 @@ def bic_filter(v: str) -> str:
     return v.strip().upper()
 
 
-def country_code_validator(v: str):
+def country_code_validator(v0: str):
     """
     Accepts both ISO-2 and ISO-3 formats.
     :param v: str
     :return: None
     """
-    v = country_code_filter(v)
+    v = country_code_filter(v0)
     if not (2 <= len(v) <= 3):
-        v_str = _("Missing value") if v is None else str(v)
-        raise ValidationError(_("Invalid country code") + ": {}".format(v_str), code="invalid_country_code")
+        v_str = _("Missing value") if v is None else str(v0)
+        raise ValidationError(_("Invalid country code") + " ({})".format(v_str), code="invalid_country_code")
 
 
 def country_code_sanitizer(v: str) -> str:
@@ -147,34 +146,36 @@ def iban_filter_readable(acct) -> str:
     return acct
 
 
-def bic_validator(v: str):
+def bic_validator(v0: str):
     """
     Validates bank BIC/SWIFT code (8-11 characters).
     :param v: str
     :return: None
     """
-    v = bic_filter(v)
+    v = bic_filter(v0)
     if not (8 <= len(v) <= 11):
-        v_str = _("Missing value") if v is None else str(v)
-        raise ValidationError(_("Invalid bank BIC/SWIFT code") + ": {}".format(v_str), code="invalid_bic")
+        v_str = _("Missing value") if v is None else str(v0)
+        raise ValidationError(_("Invalid bank BIC/SWIFT code") + " ({})".format(v_str), code="invalid_bic")
 
 
-def iban_validator(v: str):
+def iban_validator(v0: str):
     """
     Validates IBAN format bank account number.
     :param v: str
     :return: None
     """
     # validate prefix and length
-    v = iban_filter(v)
+    v = iban_filter(v0)
     if not v:
-        raise ValidationError(_("Invalid IBAN account number") + ": {}".format(_("Missing value")), code="invalid_iban")
+        raise ValidationError(
+            _("Invalid IBAN account number") + " ({})".format(_("Missing value")), code="invalid_iban"
+        )
     country = v[:2].upper()
     if country not in IBAN_LENGTH_BY_COUNTRY:
-        raise ValidationError(_("Invalid country code") + ": {}".format(country), code="invalid_country_code")
+        raise ValidationError(_("Invalid country code") + " ({})".format(country), code="invalid_country_code")
     iban_len = IBAN_LENGTH_BY_COUNTRY[country]
     if iban_len != len(v):
-        raise ValidationError(_("Invalid IBAN account number") + ": {}".format(v), code="invalid_iban")
+        raise ValidationError(_("Invalid IBAN account number") + " ({})".format(v0), code="invalid_iban")
 
     # validate IBAN numeric part
     if iban_len <= 26:  # very long IBANs are unsupported by the numeric part validation
@@ -186,7 +187,7 @@ def iban_validator(v: str):
             num += ch
         x = Decimal(num) % Decimal(97)
         if x != Decimal(1):
-            raise ValidationError(_("Invalid IBAN account number") + ": {}".format(v), code="invalid_iban")
+            raise ValidationError(_("Invalid IBAN account number") + " ({})".format(v0), code="invalid_iban")
 
 
 def iban_generator(country_code: str = "") -> str:
@@ -232,10 +233,10 @@ def iban_generator(country_code: str = "") -> str:
     raise ValidationError(_("Invalid IBAN account number"), code="invalid_iban")  # should not get here
 
 
-def validate_country_iban(v: str, country: str):
-    v = iban_filter(v)
+def validate_country_iban(v0: str, country: str):
+    v = iban_filter(v0)
     if v[0:2] != country:
-        raise ValidationError(_("Invalid IBAN account number") + " ({}.2): {}".format(country, v), code="invalid_iban")
+        raise ValidationError(_("Invalid IBAN account number") + " ({})".format(v0), code="invalid_iban")
     iban_validator(v)
 
 
@@ -460,33 +461,28 @@ def fi_company_org_id_filter(v: str) -> str:
 
 
 def fi_company_org_id_validator(v0: str):
-    prefix = re.sub(r"\s+", "", v0)[:2]  # retain prefix: either numeric or FI is ok
-    v = fi_company_org_id_filter(v0)
+    v = re.sub(r"\s+", "", v0)
+    prefix = v[:2]  # retain prefix: either numeric or FI is ok
+    v = fi_company_org_id_filter(v)
     if v[:2] == prefix:
         prefix = "FI"
     if v[-2:-1] != "-" or prefix != "FI":
-        raise ValidationError(
-            _("Invalid company organization ID") + " (FI.1): {}".format(v0), code="invalid_company_org_id"
-        )
+        raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
     v = v.replace("-", "", 1)
     if len(v) != 8:
-        raise ValidationError(
-            _("Invalid company organization ID") + " (FI.2): {}".format(v0), code="invalid_company_org_id"
-        )
+        raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
     multipliers = (7, 9, 10, 5, 8, 4, 2)
     x = 0
     for i, m in enumerate(multipliers):
         x += int(v[i]) * m
     remainder = divmod(x, 11)[1]
     if remainder == 1:
-        raise ValidationError(
-            _("Invalid company organization ID") + " (FI.3): {}".format(v0), code="invalid_company_org_id"
-        )
+        raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
     if remainder >= 2:
         check_digit = str(11 - remainder)
         if check_digit != v[-1:]:
             raise ValidationError(
-                _("Invalid company organization ID") + " (FI.4): {}".format(v0), code="invalid_company_org_id"
+                _("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id"
             )
 
 
@@ -504,10 +500,10 @@ def fi_company_org_id_generator() -> str:
     return v[:-1] + "-" + check_digit
 
 
-def fi_ssn_validator(v: str):
-    v = fi_ssn_filter(v)
+def fi_ssn_validator(v0: str):
+    v = fi_ssn_filter(v0)
     if not FI_SSN_VALIDATOR.fullmatch(v):
-        raise ValidationError(_("Invalid personal identification number") + " (FI.1): {}".format(v), code="invalid_ssn")
+        raise ValidationError(_("Invalid personal identification number") + " ({})".format(v0), code="invalid_ssn")
     d = int(Decimal(v[0:6] + v[7:10]) % Decimal(31))
     digits = {
         10: "A",
@@ -534,14 +530,14 @@ def fi_ssn_validator(v: str):
     }
     ch = digits.get(d, str(d))
     if ch != v[-1:]:
-        raise ValidationError(_("Invalid personal identification number") + " (FI.2): {}".format(v), code="invalid_ssn")
+        raise ValidationError(_("Invalid personal identification number") + " ({})".format(v0), code="invalid_ssn")
 
 
 def fi_ssn_generator(min_year: int = 1920, max_year: int = 1999):
     if not (1800 <= min_year < 2100):
-        raise ValidationError(_("Unsupported year") + ": {}".format(min_year))
+        raise ValidationError(_("Unsupported year") + " ({})".format(min_year))
     if not (1800 <= max_year < 2100):
-        raise ValidationError(_("Unsupported year") + ": {}".format(max_year))
+        raise ValidationError(_("Unsupported year") + " ({})".format(max_year))
 
     day = randint(1, 28)  # nosec
     month = randint(1, 12)  # nosec
@@ -621,10 +617,10 @@ def se_ssn_filter(v: str) -> str:
     return SE_SSN_FILTER.sub("", v.upper())
 
 
-def se_ssn_validator(v: str):
-    v = se_ssn_filter(v)
+def se_ssn_validator(v0: str):
+    v = se_ssn_filter(v0)
     if not SE_SSN_VALIDATOR.fullmatch(v):
-        raise ValidationError(_("Invalid personal identification number") + " (SE.1): {}".format(v), code="invalid_ssn")
+        raise ValidationError(_("Invalid personal identification number") + " ({})".format(v0), code="invalid_ssn")
     v = STRIP_NON_NUMBERS.sub("", v)
     dsum = 0
     for i in range(9):
@@ -643,7 +639,7 @@ def se_ssn_validator(v: str):
         checksum = 0
     # print('checksum', checksum)
     if int(v[-1:]) != checksum:
-        raise ValidationError(_("Invalid personal identification number") + " (SE.2): {}".format(v), code="invalid_ssn")
+        raise ValidationError(_("Invalid personal identification number") + " ({})".format(v0), code="invalid_ssn")
 
 
 def se_clearing_code_bank_info(account_number: str) -> Tuple[str, Optional[int]]:
