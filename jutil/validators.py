@@ -202,7 +202,7 @@ def iban_generator(country_code: str = "") -> str:
             list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys()))
         )
     if country_code not in IBAN_LENGTH_BY_COUNTRY:
-        raise ValidationError(_("Invalid country code") + ": {}".format(country_code), code="invalid_country_code")
+        raise ValidationError(_("Invalid country code") + " ({})".format(country_code), code="invalid_country_code")
     nlen = IBAN_LENGTH_BY_COUNTRY[country_code]
     if nlen > 26:
         raise ValidationError(_("IBAN checksum generation does not support >26 character IBANs"), code="invalid_iban")
