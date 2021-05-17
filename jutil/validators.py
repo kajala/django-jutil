@@ -222,7 +222,8 @@ def be_iban_bank_info(v: str) -> (str, str):
     from jutil.bank_const_be import BE_BIC_BY_ACCOUNT_NUMBER, BE_BANK_NAME_BY_BIC
     v = iban_filter(v)
     bic = BE_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
-    return (bic, BE_BANK_NAME_BY_BIC[bic]) if bic is not None else ('', '')
+    bankname= BE_BANK_NAME_BY_BIC.get(bic,'')
+    return (bic, bankname) if bic is not None else ('', '')
 
 
 def fi_ssn_filter(v: str) -> str:

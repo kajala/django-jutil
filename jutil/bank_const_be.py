@@ -901,4 +901,5 @@ BE_BANK_NAME_BY_BIC = {
     "VDSPBE91": "vdk bank",
     "VPAYBE21": "VIVA Payment Services",
     "WAFABEBB": "Attijariwafa bank Europe",
+    "NEECBEB2": "NEWB SCE",
 }
