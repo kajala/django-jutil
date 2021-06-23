@@ -22,6 +22,7 @@ PHONE_VALIDATOR = re.compile(r"\+?\d{6,}")
 PASSPORT_FILTER = re.compile(r"[^-A-Z0-9]")
 STRIP_NON_NUMBERS = re.compile(r"[^0-9]")
 STRIP_NON_ALPHANUMERIC = re.compile(r"[^0-9A-Za-z]")
+VARIABLE_NAME = re.compile(r"[^0-9A-Za-z_]")
 STRIP_WHITESPACE = re.compile(r"\s+")
 STRIP_PREFIX_ZEROS = re.compile(r"^0+")
 IBAN_FILTER = re.compile(r"[^A-Z0-9]")
@@ -109,6 +110,13 @@ def country_code_sanitizer(v: str) -> str:
 def bic_sanitizer(v: str) -> str:
     v = bic_filter(v)
     return v if 8 <= len(v) <= 11 else ""
+
+
+def variable_name_sanitizer(v: str) -> str:
+    v = VARIABLE_NAME.sub("", ascii_filter(v).replace(" ", "_"))
+    if v and v[0].isdigit():
+        v = "_" + v
+    return v
 
 
 def ascii_filter(v: str) -> str:

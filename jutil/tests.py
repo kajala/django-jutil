@@ -126,6 +126,7 @@ from jutil.validators import (
     iban_generator,
     bic_sanitizer,
     filter_country_company_org_id,
+    variable_name_sanitizer,
 )
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET
@@ -1268,6 +1269,16 @@ class Tests(TestCase, TestSetupMixin):
             call_command("list_files", dir_name, json=True, stdout=out, **call_kw)
             data = json.loads(out.getvalue())
             self.assertListEqual(data_ref, data)
+
+    def test_filters(self):
+        vals = [
+            (
+                "24: REGISTRO COMPLEMENTARIO DE INFORMACIÓN DE EQUIVALENCIA DE IMPORTE DEL APUNTE (OPCIONAL)",
+                "_24_REGISTRO_COMPLEMENTARIO_DE_INFORMACION_DE_EQUIVALENCIA_DE_IMPORTE_DEL_APUNTE_OPCIONAL",
+            ),
+        ]
+        for src, dst in vals:
+            self.assertEqual(variable_name_sanitizer(src), dst)
 
     def test_find_file(self):
         dir_name = os.path.join(settings.BASE_DIR, "jutil/locale")
