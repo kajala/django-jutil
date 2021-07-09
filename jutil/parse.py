@@ -52,21 +52,13 @@ def parse_datetime(v: str, tz: Any = None) -> datetime:
         if t is None:
             t_date: Optional[date] = django_parse_date(v)
             if t_date is None:
-                raise ValidationError(
-                    _(
-                        "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."
-                    )
-                    % {"value": v}
-                )
+                raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v})
             t = datetime.combine(t_date, time())
         if tz is None:
             tz = pytz.utc
         return t if t.tzinfo else tz.localize(t)
     except Exception:
-        raise ValidationError(
-            _("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.")
-            % {"value": v}
-        )
+        raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v})
 
 
 def parse_bool_or_none(v: str) -> Optional[bool]:

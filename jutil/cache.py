@@ -21,9 +21,7 @@ class CachedFieldsMixin:
         def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
             pass
 
-    def update_cached_fields(
-        self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None
-    ):
+    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None):
         """
         Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
         :param commit: Save update fields to DB
@@ -35,11 +33,7 @@ class CachedFieldsMixin:
             for k in fields:
                 f = "get_" + k
                 if not hasattr(self, f):
-                    raise Exception(
-                        "Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(
-                            k=k, obj=self
-                        )
-                    )
+                    raise Exception("Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(k=k, obj=self))
                 v = self.__getattribute__(f)()
                 setattr(self, k, v)
             if commit:

@@ -175,9 +175,7 @@ def iban_validator(v0: str):
     # validate prefix and length
     v = iban_filter(v0)
     if not v:
-        raise ValidationError(
-            _("Invalid IBAN account number") + " ({})".format(_("Missing value")), code="invalid_iban"
-        )
+        raise ValidationError(_("Invalid IBAN account number") + " ({})".format(_("Missing value")), code="invalid_iban")
     country = v[:2].upper()
     if country not in IBAN_LENGTH_BY_COUNTRY:
         raise ValidationError(_("Invalid country code") + " ({})".format(country), code="invalid_country_code")
@@ -206,9 +204,7 @@ def iban_generator(country_code: str = "") -> str:
     """
     # pick random country code if not set (with max IBAN length 27)
     if not country_code:
-        country_code = random.choice(  # nosec
-            list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys()))
-        )
+        country_code = random.choice(list(filter(lambda cc: IBAN_LENGTH_BY_COUNTRY[cc] <= 26, IBAN_LENGTH_BY_COUNTRY.keys())))  # nosec
     if country_code not in IBAN_LENGTH_BY_COUNTRY:
         raise ValidationError(_("Invalid country code") + " ({})".format(country_code), code="invalid_country_code")
     nlen = IBAN_LENGTH_BY_COUNTRY[country_code]
@@ -489,9 +485,7 @@ def fi_company_org_id_validator(v0: str):
     if remainder >= 2:
         check_digit = str(11 - remainder)
         if check_digit != v[-1:]:
-            raise ValidationError(
-                _("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id"
-            )
+            raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
 
 
 def fi_company_org_id_generator() -> str:

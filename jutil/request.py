@@ -52,9 +52,7 @@ def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
     try:
         if not hasattr(settings, "IPSTACK_TOKEN") or not settings.IPSTACK_TOKEN:
             raise Exception("get_geo_ip() requires IPSTACK_TOKEN defined in Django settings")
-        res = requests.get(
-            "http://api.ipstack.com/{}?access_key={}&format=1".format(ip, settings.IPSTACK_TOKEN), timeout=timeout
-        )
+        res = requests.get("http://api.ipstack.com/{}?access_key={}&format=1".format(ip, settings.IPSTACK_TOKEN), timeout=timeout)
         if res.status_code != 200:
             raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
         return res.json()

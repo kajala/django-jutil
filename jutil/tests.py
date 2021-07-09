@@ -578,9 +578,7 @@ class Tests(TestCase, TestSetupMixin):
         ]
         day_ranges = [7, 15, 30, 60, 90]
         for days in day_ranges:
-            named_ranges.append(
-                ("plus_minus_{}d".format(days), (t_tz - timedelta(days=days), t_tz + timedelta(days=days)))
-            )
+            named_ranges.append(("plus_minus_{}d".format(days), (t_tz - timedelta(days=days), t_tz + timedelta(days=days))))
             named_ranges.append(("prev_{}d".format(days), (t_tz - timedelta(days=days), t_tz)))
             named_ranges.append(("next_{}d".format(days), (t_tz, t_tz + timedelta(days=days))))
         for name, res in named_ranges:
@@ -710,9 +708,7 @@ class Tests(TestCase, TestSetupMixin):
             self.assertEqual(
                 fi_ssn_age(ssn, date_now),
                 age,
-                msg="{} age is {} on {} but fi_ssn_age result was {}".format(
-                    ssn, age, date_now, fi_ssn_age(ssn, date_now)
-                ),
+                msg="{} age is {} on {} but fi_ssn_age result was {}".format(ssn, age, date_now, fi_ssn_age(ssn, date_now)),
             )
 
     def test_se_banks(self):
@@ -1010,14 +1006,10 @@ class Tests(TestCase, TestSetupMixin):
                     iban_validator(acc)
                 except Exception as e:
                     print("iban_generator() returned", acc, "but iban_validator() raised exception", e)
-                    self.fail(
-                        "iban_validator(iban_generator()) should not raise Exception, account number was {}".format(acc)
-                    )
+                    self.fail("iban_validator(iban_generator()) should not raise Exception, account number was {}".format(acc))
         with self.assertRaisesMessage(ValidationError, _("Invalid country code")):
             iban_generator("XX")
-        with self.assertRaisesMessage(
-            ValidationError, _("IBAN checksum generation does not support >26 character IBANs")
-        ):
+        with self.assertRaisesMessage(ValidationError, _("IBAN checksum generation does not support >26 character IBANs")):
             iban_generator("AL")
 
     def test_make_email_recipient(self):
@@ -1148,9 +1140,7 @@ class Tests(TestCase, TestSetupMixin):
             self.assertIn("django_language", request.COOKIES)
             self.assertIn(request.COOKIES["django_language"], lang_code)
             self.assertIn("django_language", res.cookies)
-            self.assertEqual(
-                str(res.cookies["django_language"]), "Set-Cookie: django_language={}; Path=/".format(lang_code)
-            )
+            self.assertEqual(str(res.cookies["django_language"]), "Set-Cookie: django_language={}; Path=/".format(lang_code))
 
         # ActivateUserProfileTimezoneMiddleware
         user = self.user

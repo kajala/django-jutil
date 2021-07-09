@@ -83,22 +83,13 @@ def is_model_field_changed(instance, field_name: str) -> bool:
     return not qs.filter(**params).exists()
 
 
-def get_model_keys(
-    instance, cls: Optional[Type[Model]] = None, exclude_fields: tuple = ("id",), base_class_suffix: str = "_ptr"
-) -> List[str]:
+def get_model_keys(instance, cls: Optional[Type[Model]] = None, exclude_fields: tuple = ("id",), base_class_suffix: str = "_ptr") -> List[str]:
     if cls is None:
         cls = instance.__class__
     return [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
 
 
-def clone_model(
-    instance,
-    cls: Optional[Type[Model]] = None,
-    commit: bool = True,
-    exclude_fields: tuple = ("id",),
-    base_class_suffix: str = "_ptr",
-    **kw
-):
+def clone_model(instance, cls: Optional[Type[Model]] = None, commit: bool = True, exclude_fields: tuple = ("id",), base_class_suffix: str = "_ptr", **kw):
     """
     Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')

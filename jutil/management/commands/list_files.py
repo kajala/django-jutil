@@ -22,9 +22,7 @@ class Command(SafeCommand):
         recurse = kw["recurse"]
         ignore_case = kw["ignore_case"]
         use_media_root = kw["use_media_root"]
-        out = list_files(
-            dir_name, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse
-        )
+        out = list_files(dir_name, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse)
         if kw["json"]:
             json_str = json.dumps(out, indent=4)
             self.stdout.writelines([json_str])

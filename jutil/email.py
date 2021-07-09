@@ -29,9 +29,7 @@ def make_email_recipient(val: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
     return val
 
 
-def make_email_recipient_list(
-    recipients: Optional[Union[str, Sequence[Union[str, Tuple[str, str]]]]]
-) -> List[Tuple[str, str]]:
+def make_email_recipient_list(recipients: Optional[Union[str, Sequence[Union[str, Tuple[str, str]]]]]) -> List[Tuple[str, str]]:
     """
     Returns list of (name, email) tuples.
     :param recipients:
@@ -75,9 +73,7 @@ def send_email(  # noqa
     :return: Status code 202 if emails were sent successfully
     """
     if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:
-        return send_email_sendgrid(
-            recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions
-        )
+        return send_email_sendgrid(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
     return send_email_smtp(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
 
 
@@ -168,9 +164,7 @@ def send_email_sendgrid(  # noqa
         send_dt = (now() - send_time).total_seconds()
 
         if res.status_code == 202:
-            logger.info(
-                "EMAIL_SENT %s", {"time": send_dt, "to": recipients, "subject": subject, "status": res.status_code}
-            )
+            logger.info("EMAIL_SENT %s", {"time": send_dt, "to": recipients, "subject": subject, "status": res.status_code})
         else:
             logger.info(
                 "EMAIL_ERROR %s",

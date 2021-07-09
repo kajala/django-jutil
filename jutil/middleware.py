@@ -91,9 +91,7 @@ class EnsureLanguageCookieMiddleware:
         return self._languages
 
     def __call__(self, request):
-        lang_cookie_name = (
-            settings.LANGUAGE_COOKIE_NAME if hasattr(settings, "LANGUAGE_COOKIE_NAME") else "django_language"
-        )
+        lang_cookie_name = settings.LANGUAGE_COOKIE_NAME if hasattr(settings, "LANGUAGE_COOKIE_NAME") else "django_language"
         lang_cookie = request.COOKIES.get(lang_cookie_name)
         lang = request.GET.get(lang_cookie_name)
         if not lang:

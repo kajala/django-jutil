@@ -147,9 +147,7 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     raise ValueError("Invalid date range name: {}".format(name))
 
 
-def parse_date_range_arguments(
-    options: dict, default_range: str = "last_month"
-) -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
+def parse_date_range_arguments(options: dict, default_range: str = "last_month") -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
     """
     Parses date range from input and returns timezone-aware date range and
     interval list according to 'step' name argument (optional).

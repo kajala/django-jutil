@@ -4,9 +4,7 @@ from django.utils.translation import gettext as _
 from jutil.format import is_media_full_path, strip_media_root
 
 
-def list_files(
-    dir_name: str, suffix: str = "", ignore_case: bool = True, use_media_root: bool = False, recurse: bool = False
-) -> List[str]:
+def list_files(dir_name: str, suffix: str = "", ignore_case: bool = True, use_media_root: bool = False, recurse: bool = False) -> List[str]:
     """
     Lists all files under specified directory.
     Optionally filter files by suffix and recurse to subdirectories.
@@ -40,11 +38,7 @@ def list_files(
                 file_path = strip_media_root(ent.path) if use_media_root else os.path.abspath(ent.path)
                 out.append(file_path)
         elif recurse and ent.is_dir() and ent.name != "." and ent.name != "..":
-            out.extend(
-                list_files(
-                    ent.path, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse
-                )
-            )
+            out.extend(list_files(ent.path, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse))
     return out
 
 
