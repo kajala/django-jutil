@@ -491,7 +491,7 @@ def underscore_to_camel_case(s: str) -> str:
     """
     if s:
         p = s.split("_")
-        s = p[0] + "".join([capfirst(w) for w in p[1:]])
+        s = p[0] + "".join([capfirst(w) or "" for w in p[1:]])
     return s
 
 
