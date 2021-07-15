@@ -368,16 +368,7 @@ def format_table(  # noqa
     return "\n".join(lines3)
 
 
-def ucfirst(v: str) -> str:
-    """
-    Converts first character of the string to uppercase.
-    :param v: str
-    :return: str
-    """
-    return v[0:1].upper() + v[1:]
-
-
-ucfirst_lazy = lazy(ucfirst, str)
+capfirst_lazy = lazy(capfirst, str)
 
 
 def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
@@ -500,7 +491,7 @@ def underscore_to_camel_case(s: str) -> str:
     """
     if s:
         p = s.split("_")
-        s = p[0] + "".join([ucfirst(w) for w in p[1:]])
+        s = p[0] + "".join([capfirst(w) for w in p[1:]])
     return s
 
 

@@ -6,7 +6,6 @@ from decimal import Decimal
 from io import BytesIO, StringIO
 from os.path import join
 from urllib.parse import urlparse
-
 from django.core.management import call_command
 from django.utils import timezone
 from typing import List
@@ -75,7 +74,7 @@ from jutil.format import (
     dec5,
     dec6,
     format_table,
-    ucfirst_lazy,
+    capfirst_lazy,
     strip_media_root,
     get_media_full_path,
     camel_case_to_underscore,
@@ -84,6 +83,7 @@ from jutil.format import (
     format_dict_as_html,
     choices_label,
     is_media_full_path,
+    capfirst_lazy,
 )
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
@@ -938,8 +938,8 @@ class Tests(TestCase, TestSetupMixin):
             """.strip()
         self.assertEqual(out, out_ref)
 
-    def test_ucfirst_lazy(self):
-        s = gettext_lazy(ucfirst_lazy("missing value"))
+    def test_capfirst_lazy(self):
+        s = gettext_lazy(capfirst_lazy("missing value"))
         s_ref = gettext_lazy("Missing value")
         s_en = "Missing value"
         s_fi = "Puuttuva arvo"
