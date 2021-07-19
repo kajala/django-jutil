@@ -368,6 +368,16 @@ def format_table(  # noqa
     return "\n".join(lines3)
 
 
+def _capfirst_lazy(x):
+    """
+    capfirst() keeping strings lazy.
+    """
+    return x[0:1].upper() + x[1:] if x else ""
+
+
+capfirst_lazy = lazy(_capfirst_lazy, str)
+
+
 def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 1 decimal digits.
