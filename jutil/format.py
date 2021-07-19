@@ -370,7 +370,7 @@ def format_table(  # noqa
 
 def _capfirst_lazy(x):
     """
-    capfirst() keeping strings lazy.
+    capfirst() keeping lazy strings lazy.
     """
     return x[0:1].upper() + x[1:] if x else ""
 
