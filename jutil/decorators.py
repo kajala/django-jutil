@@ -1,11 +1,12 @@
 from django.utils.formats import date_format
 
 
-def date_format_short_date(short_description=None, admin_order_field=None):
+def formatted_date(short_description=None, admin_order_field=None, fmt: str = "SHORT_DATE_FORMAT"):
     """
-    Formats date/datetime as SHORT_DATE_FORMAT.
-    :param short_description: Short description of the function (optional, default is "short date").
-    :param short_description: Admin order field (optional).
+    Decorator for formatting date/datetime field in Django admin.
+    :param short_description: Short description of the function (default is "short date").
+    :param admin_order_field: Admin order field (optional).
+    :param fmt: Format to pass to date_format (default "SHORT_DATE_FORMAT")
 
     Usage example in Django Admin:
 
@@ -19,7 +20,7 @@ def date_format_short_date(short_description=None, admin_order_field=None):
             val = func(*args, **kwargs)
             if not val:
                 return ""
-            return date_format(val, "SHORT_DATE_FORMAT")
+            return date_format(val, fmt)
 
         if short_description is not None:
             short_date.short_description = short_description
