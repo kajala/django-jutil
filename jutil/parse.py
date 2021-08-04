@@ -13,14 +13,18 @@ TRUE_VALUES = (
     "true",
     "1",
     "yes",
+    "on",
+    "enabled",
 )
 
 FALSE_VALUES = (
-    "none",
-    "null",
     "false",
     "0",
     "no",
+    "off",
+    "disabled",
+    "none",
+    "null",
 )
 
 
