@@ -3,6 +3,8 @@ import re
 import traceback
 from datetime import datetime, timedelta
 from typing import Tuple, List, Any, Optional
+
+import pytz
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
@@ -108,12 +110,14 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     """
     Returns a timezone-aware date range by symbolic name.
     :param name: Name of the date range. See add_date_range_arguments().
-    :param today: Optional current datetime. Default is now().
+    :param today: Optional current datetime. Default is datetime.utcnow().
     :param tz: Optional timezone. Default is UTC.
     :return: datetime (begin, end)
     """
     if today is None:
         today = datetime.utcnow()
+    begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
+
     if name == "last_week":
         return last_week(today, tz)
     if name == "last_month":
@@ -129,42 +133,45 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     if name == "yesterday":
         return yesterday(today, tz)
     if name == "today":
-        begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
-        end = begin + timedelta(hours=24)
-        return localize_time_range(begin, end, tz)
+        return localize_time_range(begin, begin + timedelta(hours=24), tz)
+
     m = re.match(r"^plus_minus_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(today - timedelta(days=days), today + timedelta(days=days), tz)
+        return localize_time_range(begin - timedelta(days=days), today + timedelta(days=days), tz)
+
     m = re.match(r"^prev_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(today - timedelta(days=days), today, tz)
+        return localize_time_range(begin - timedelta(days=days), today, tz)
+
     m = re.match(r"^next_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(today, today + timedelta(days=days), tz)
+        return localize_time_range(begin, today + timedelta(days=days), tz)
+
     raise ValueError("Invalid date range name: {}".format(name))
 
 
-def parse_date_range_arguments(options: dict, default_range: str = "last_month") -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
+def parse_date_range_arguments(options: dict, default_range: str = "last_month", tz: Any = None) -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
     """
     Parses date range from input and returns timezone-aware date range and
     interval list according to 'step' name argument (optional).
     See add_date_range_arguments()
     :param options: Parsed arguments passed to the command
     :param default_range: Default datetime range to return if no other selected
+    :param tz: Optional timezone to use. Default is UTC.
     :return: begin, end, [(begin1,end1), (begin2,end2), ...]
     """
-    begin, end = get_date_range_by_name(default_range)
+    begin, end = get_date_range_by_name(default_range, tz=tz)
     for range_name in TIME_RANGE_NAMES:
         if options.get(range_name):
-            begin, end = get_date_range_by_name(range_name)
+            begin, end = get_date_range_by_name(range_name, tz=tz)
     if options.get("begin"):
-        begin = parse_datetime(options["begin"])  # type: ignore
+        begin = parse_datetime(options["begin"], tz)  # type: ignore
         end = now()
     if options.get("end"):
-        end = parse_datetime(options["end"])  # type: ignore
+        end = parse_datetime(options["end"], tz)  # type: ignore
 
     step_type = ""
     for step_name in TIME_STEP_NAMES:
