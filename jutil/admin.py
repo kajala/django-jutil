@@ -134,6 +134,9 @@ class ModelAdminBase(admin.ModelAdmin):
     def get_actions(self, request):
         return self.sort_actions_by_description(super().get_actions(request))
 
+    def fill_extra_context(self, request, extra_context):  # pylint: disable=unused-argument
+        return extra_context
+
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kwargs):  # pylint: disable=unused-argument
         """
         Changelist view which allow key-value arguments.
@@ -142,10 +145,12 @@ class ModelAdminBase(admin.ModelAdmin):
         :param kwargs: Key-value dict
         :return: See changelist_view()
         """
-        return self.changelist_view(request, extra_context)
+        return self.changelist_view(request, self.fill_extra_context(extra_context))
 
     def history_view(self, request, object_id, extra_context=None):
-        "The 'history' admin view for this model."
+        """
+        The 'history' admin view for this model.
+        """
         from django.contrib.admin.models import LogEntry  # noqa
 
         # First check if the user can see this history.
