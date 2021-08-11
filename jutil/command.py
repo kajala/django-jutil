@@ -3,8 +3,6 @@ import re
 import traceback
 from datetime import datetime, timedelta
 from typing import Tuple, List, Any, Optional
-
-import pytz
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings

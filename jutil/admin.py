@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Optional, Sequence, List
+from typing import Optional, Sequence, List, Dict, Any
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -134,18 +134,34 @@ class ModelAdminBase(admin.ModelAdmin):
     def get_actions(self, request):
         return self.sort_actions_by_description(super().get_actions(request))
 
-    def fill_extra_context(self, request, extra_context):  # pylint: disable=unused-argument
+    def fill_extra_context(self, request: HttpRequest, extra_context: Optional[Dict[str, Any]]):  # pylint: disable=unused-argument
+        """
+        Function called by customized add_view(), change_view() and kw_changelist_view()
+        to supplement extra_context dictionary by custom variables.
+        """
         return extra_context
+
+    def add_view(self, request: HttpRequest, form_url="", extra_context=None):
+        """
+        Custom add_view() which calls fill_extra_context().
+        """
+        return super().add_view(request, form_url, self.fill_extra_context(request, extra_context))
+
+    def change_view(self, request: HttpRequest, object_id, form_url="", extra_context=None):
+        """
+        Custom change_view() which calls fill_extra_context().
+        """
+        return super().change_view(request, object_id, form_url, self.fill_extra_context(request, extra_context))
 
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kwargs):  # pylint: disable=unused-argument
         """
-        Changelist view which allow key-value arguments.
+        Changelist view which allow key-value arguments and calls fill_extra_context().
         :param request: HttpRequest
         :param extra_context: Extra context dict
         :param kwargs: Key-value dict
         :return: See changelist_view()
         """
-        return self.changelist_view(request, self.fill_extra_context(extra_context))
+        return self.changelist_view(request, self.fill_extra_context(request, extra_context))
 
     def history_view(self, request, object_id, extra_context=None):
         """
