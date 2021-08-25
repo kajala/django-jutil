@@ -1266,6 +1266,10 @@ class Tests(TestCase, TestSetupMixin):
                 "24: REGISTRO COMPLEMENTARIO DE INFORMACIÓN DE EQUIVALENCIA DE IMPORTE DEL APUNTE (OPCIONAL)",
                 "_24_REGISTRO_COMPLEMENTARIO_DE_INFORMACION_DE_EQUIVALENCIA_DE_IMPORTE_DEL_APUNTE_OPCIONAL",
             ),
+            (
+                "a/12/312/2/12--12-/123",
+                "a1231221212123",
+            ),
         ]
         for src, dst in vals:
             self.assertEqual(variable_name_sanitizer(src), dst)
