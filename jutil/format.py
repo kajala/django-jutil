@@ -12,7 +12,7 @@ import subprocess
 from io import StringIO
 from typing import List, Any, Optional, Union, Dict, Sequence, Tuple, TypeVar
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
 from django.utils.safestring import mark_safe
@@ -437,7 +437,7 @@ def is_media_full_path(file_path: str) -> bool:
     Checks if file path is under (settings) MEDIA_ROOT.
     """
     if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
-        raise ValueError("MEDIA_ROOT not defined")
+        raise ImproperlyConfigured("MEDIA_ROOT not defined")
     full_path = os.path.abspath(file_path)
     return full_path.startswith(str(settings.MEDIA_ROOT))
 
@@ -453,10 +453,12 @@ def strip_media_root(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
+    if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
+        raise ImproperlyConfigured("MEDIA_ROOT not defined")
     full_path = os.path.abspath(file_path)
-    if not is_media_full_path(full_path):
+    if not full_path.startswith(str(settings.MEDIA_ROOT)):
         raise ValueError("Path {} not under MEDIA_ROOT".format(file_path))
-    file_path = full_path[len(settings.MEDIA_ROOT) :]
+    file_path = full_path[len(str(settings.MEDIA_ROOT)) :]
     if file_path.startswith("/"):
         return file_path[1:]
     return file_path
@@ -471,8 +473,10 @@ def get_media_full_path(file_path: str) -> str:
     :param file_path: str
     :return: str
     """
+    if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
+        raise ImproperlyConfigured("MEDIA_ROOT not defined")
     full_path = os.path.abspath(file_path) if os.path.isabs(file_path) else os.path.join(settings.MEDIA_ROOT, file_path)
-    if not is_media_full_path(full_path):
+    if not full_path.startswith(str(settings.MEDIA_ROOT)):
         raise ValueError("Path {} not under MEDIA_ROOT".format(file_path))
     return full_path
 
