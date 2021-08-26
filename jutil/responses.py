@@ -11,9 +11,10 @@ class FileSystemFileResponse(FileResponse):
     File system download HTTP response.
     :param full_path: Full path to file
     :param filename: Filename (optional) passed to client. Defaults to basename of the full path.
+    :param disposition: Content-Disposition, default attachment; filename=xxx
     """
 
-    def __init__(self, full_path: str, filename: str = "", **kw):
+    def __init__(self, full_path: str, filename: str = "", disposition: str = "", **kw):
         if not os.path.isfile(full_path):
             raise Http404(_("File {} not found").format(full_path))
         if not filename:
@@ -23,7 +24,7 @@ class FileSystemFileResponse(FileResponse):
         if content_type:
             self["Content-Type"] = content_type
         self["Content-Length"] = os.path.getsize(full_path)
-        self["Content-Disposition"] = "attachment; filename={}".format(filename)
+        self["Content-Disposition"] = disposition if disposition else "attachment; filename={}".format(disposition, filename)
 
 
 class CsvResponse(HttpResponse):
