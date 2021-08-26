@@ -24,7 +24,7 @@ class FileSystemFileResponse(FileResponse):
         if content_type:
             self["Content-Type"] = content_type
         self["Content-Length"] = os.path.getsize(full_path)
-        self["Content-Disposition"] = disposition if disposition else "attachment; filename={}".format(disposition, filename)
+        self["Content-Disposition"] = disposition if disposition else "attachment; filename={}".format(filename)
 
 
 class CsvResponse(HttpResponse):
