@@ -14,4 +14,4 @@ django-extensions
 python-dotenv
 pre-commit
 black
-
+openpyxl==3.0.7
