@@ -61,16 +61,15 @@ def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple
     return tz.localize(begin), tz.localize(end)
 
 
-def get_last_day_of_month(t: datetime) -> int:
+def get_last_day_of_month(today: Optional[datetime] = None) -> int:
     """
     Returns day number of the last day of the month
-    :param t: datetime
+    :param today: Default UTC now
     :return: int
     """
-    tn = t + timedelta(days=32)
-    tn = datetime(year=tn.year, month=tn.month, day=1)
-    tt = tn - timedelta(hours=1)
-    return tt.day
+    if today is None:
+        today = datetime.utcnow()
+    return monthrange(today.year, today.month)[1]
 
 
 def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -> datetime:
