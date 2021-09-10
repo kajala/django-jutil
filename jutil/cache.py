@@ -63,6 +63,7 @@ def update_cached_fields(*args):
         if a is not None:
             if hasattr(a, "__iter__"):
                 for e in a:
-                    e.update_cached_fields()
+                    if e is not None:
+                        e.update_cached_fields()
             else:
                 a.update_cached_fields()
