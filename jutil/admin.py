@@ -14,7 +14,7 @@ from django.contrib.admin.options import get_content_type_for_model
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
 from django.utils.text import capfirst
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.contrib.admin.models import LogEntry
 
 
@@ -52,7 +52,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
                 user_id=who.pk if who is not None else None,
                 content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
                 object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
-                object_repr=force_text(instance),
+                object_repr=force_str(instance),
                 action_flag=CHANGE,
                 change_message=msg,
             )
