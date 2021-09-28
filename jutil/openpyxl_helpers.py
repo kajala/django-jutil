@@ -40,7 +40,7 @@ class ExcelResponse(HttpResponse):
         self["Content-Disposition"] = disposition
 
 
-def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any, config: Optional[CellConfig]):
+def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any, config: Optional[CellConfig] = None):
     if config is None:
         config = CellConfig()
     c = sheet.cell(row_index + 1, column_index + 1)
