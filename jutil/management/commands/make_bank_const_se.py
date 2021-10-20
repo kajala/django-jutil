@@ -30,7 +30,7 @@ def se_iban_load_map(filename: str) -> list:
         "Länsförsäkringar Bank Aktiebolag": "Länsförsäkringar Bank AB",
         "MedMera Bank AB": "Med Mera Bank AB",
     }
-    with open(filename) as fp:
+    with open(filename, "rt", encoding="utf-8") as fp:
         for row in csv.reader(fp):
             if len(row) == 3:
                 name, series, acc_digits = row

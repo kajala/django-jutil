@@ -20,7 +20,7 @@ class FileSystemFileResponse(FileResponse):
         if not filename:
             filename = os.path.basename(full_path)
         content_type = mimetypes.guess_type(filename)[0]
-        super().__init__(open(full_path, "rb"), **kw)
+        super().__init__(open(full_path, "rb"), **kw)  # pylint: disable=consider-using-with
         if content_type:
             self["Content-Type"] = content_type
         self["Content-Length"] = os.path.getsize(full_path)

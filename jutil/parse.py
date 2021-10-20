@@ -61,8 +61,8 @@ def parse_datetime(v: str, tz: Any = None) -> datetime:
         if tz is None:
             tz = pytz.utc
         return t if t.tzinfo else tz.localize(t)
-    except Exception:
-        raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v})
+    except Exception as err:
+        raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v}) from err
 
 
 def parse_bool_or_none(v: str) -> Optional[bool]:

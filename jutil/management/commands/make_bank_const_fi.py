@@ -15,7 +15,7 @@ def fi_iban_load_map(filename: str) -> dict:
     :param filename: CSV file name of the BIC definitions. Columns: National ID, BIC Code, Institution Name
     """
     out = {}
-    with open(filename, "rt") as fp:
+    with open(filename, "rt", encoding="utf-8") as fp:
         lines = [line.strip().split(",") for line in fp.readlines()]
         lines.pop(0)  # ver
         head = lines.pop(0)

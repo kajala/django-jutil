@@ -8,10 +8,10 @@ import os
 try:
     import openpyxl  # type: ignore
 
-    if int(openpyxl.__version__.split(".")[0]) < 3:
+    if int(openpyxl.__version__.split(".", maxsplit=1)[0]) < 3:
         raise Exception("Invalid version")
-except Exception:
-    raise Exception("Using jutil.openpyxl_helpers requires openpyxl>3.0 installed")
+except Exception as err:
+    raise Exception("Using jutil.openpyxl_helpers requires openpyxl>3.0 installed") from err
 
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Alignment, NamedStyle  # type: ignore

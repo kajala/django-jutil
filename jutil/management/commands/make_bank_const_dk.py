@@ -14,7 +14,7 @@ def dk_iban_load_map(filename: str) -> list:
     :return: list of (code, name)
     """
     data_list = []
-    with open(filename) as fp:
+    with open(filename, "rt", encoding="utf-8") as fp:
         for row in csv.reader(fp):
             if len(row) >= 2 and is_int(row[0]) and row[1]:
                 data_list.append((row[0], row[1]))

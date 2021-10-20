@@ -33,7 +33,7 @@ class Command(SafeCommand):
         if kw["body"]:
             html = kw["body"]
         if kw["body_file"]:
-            html = open(kw["body_file"], "rt").read()
+            html = open(kw["body_file"], "rt", encoding="utf-8").read()  # pylint: disable=consider-using-with
         if kw["subject"]:
             subject = kw["subject"]
         text = strip_tags(html)
