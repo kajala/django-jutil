@@ -378,6 +378,15 @@ def _capfirst_lazy(x):
 capfirst_lazy = lazy(_capfirst_lazy, str)
 
 
+def dec0(a: Union[float, int, Decimal, str]) -> Decimal:
+    """
+    Converts number to Decimal with 0 decimal digits.
+    :param a: Number
+    :return: Decimal with 0 decimal digits
+    """
+    return Decimal(a).quantize(Decimal("1"))
+
+
 def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
     """
     Converts number to Decimal with 1 decimal digits.

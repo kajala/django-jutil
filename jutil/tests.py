@@ -84,6 +84,7 @@ from jutil.format import (
     choices_label,
     is_media_full_path,
     capfirst_lazy,
+    dec0,
 )
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
@@ -831,7 +832,8 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(format_timedelta(timedelta(seconds=90), seconds_label=""), "1min")
         self.assertEqual(format_timedelta(timedelta(seconds=0.090), seconds_label="s"), "0.090s")
 
-    def test_dec123456(self):
+    def test_dec0123456(self):
+        self.assertEqual(dec0(Decimal("1.2345")), Decimal("1"))
         self.assertEqual(dec1(Decimal("1.2345678")), Decimal("1.2"))
         self.assertEqual(dec2(Decimal("1.2345678")), Decimal("1.23"))
         self.assertEqual(dec3(Decimal("1.2345678")), Decimal("1.235"))
