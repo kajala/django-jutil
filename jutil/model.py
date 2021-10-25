@@ -1,8 +1,9 @@
 from datetime import timedelta, datetime
+
+from django.utils.encoding import force_str
 from time import sleep
 from typing import Type, List, Tuple, Any, Optional, Sequence
 from django.db.models import Model
-from django.utils.encoding import force_text
 from django.utils.timezone import now
 from jutil.format import choices_label
 
@@ -63,7 +64,7 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
             break
     if value is None:
         value = ""
-    val = force_text(value)
+    val = force_str(value)
     return label, val
 
 
