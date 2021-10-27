@@ -18,6 +18,9 @@ from jutil.dates import (
     this_year,
     this_week,
     get_time_steps,
+    next_year,
+    next_month,
+    next_week,
 )
 from jutil.email import send_email
 import getpass
@@ -128,10 +131,18 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
         return this_month(today, tz)
     if name == "this_year":
         return this_year(today, tz)
+    if name == "next_week":
+        return next_week(today, tz)
+    if name == "next_month":
+        return next_month(today, tz)
+    if name == "next_year":
+        return next_year(today, tz)
     if name == "yesterday":
         return yesterday(today, tz)
     if name == "today":
         return localize_time_range(begin, begin + timedelta(hours=24), tz)
+    if name == "tomorrow":
+        return localize_time_range(begin + timedelta(hours=24), begin + timedelta(hours=48), tz)
 
     m = re.match(r"^plus_minus_(\d+)d$", name)
     if m:

@@ -7,18 +7,22 @@ from django.utils.translation import gettext_lazy as _
 
 
 TIME_RANGE_CHOICES = [
-    ("last_month", _("last month")),
-    ("last_year", _("last year")),
-    ("this_month", _("this month")),
-    ("this_year", _("this year")),
-    ("last_week", _("last week")),
-    ("this_week", _("this week")),
     ("yesterday", _("yesterday")),
     ("today", _("today")),
+    ("tomorrow", _("tomorrow")),
+    ("last_week", _("last week")),
+    ("last_month", _("last month")),
+    ("last_year", _("last year")),
+    ("this_week", _("this week")),
+    ("this_month", _("this month")),
+    ("this_year", _("this year")),
+    ("next_week", _("next week")),
+    ("next_month", _("next month")),
+    ("next_year", _("next year")),
 ]
 # plus +- date ranges from current datetime:
 # (e.g. --yesterday is full day yesterday but --prev-1d is 24h less from current time)
-for d in [90, 60, 45, 30, 15, 7, 2, 1]:
+for d in [360, 180, 90, 60, 45, 30, 15, 7, 2, 1]:
     TIME_RANGE_CHOICES.extend(
         [
             ("prev_{}d".format(d), format_lazy("-{} {}", d, _("number.of.days"))),
@@ -138,8 +142,15 @@ def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
     if today is None:
         today = datetime.utcnow()
     begin = datetime(day=1, month=1, year=today.year)
-    next_year = today + timedelta(days=365)
-    end = datetime(day=1, month=1, year=next_year.year)
+    end = datetime(day=1, month=1, year=begin.year + 1)
+    return localize_time_range(begin, end, tz)
+
+
+def next_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+    if today is None:
+        today = datetime.utcnow()
+    begin = datetime(day=1, month=1, year=today.year + 1)
+    end = datetime(day=1, month=1, year=begin.year + 2)
     return localize_time_range(begin, end, tz)
 
 

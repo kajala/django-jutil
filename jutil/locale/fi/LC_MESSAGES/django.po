@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-01 19:44+0000\n"
+"POT-Creation-Date: 2021-10-27 23:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,59 +18,72 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: jutil/admin.py:149
+#: jutil/admin.py:192
 #, python-format
 msgid "Change history: %s"
 msgstr "Muutoshistoria: %s"
 
 #: jutil/dates.py:10
-msgid "last month"
-msgstr "edellinen kuukausi"
-
-#: jutil/dates.py:11
-msgid "last year"
-msgstr "edellinen vuosi"
-
-#: jutil/dates.py:12
-msgid "this month"
-msgstr "tämä kuukausi"
-
-#: jutil/dates.py:13
-msgid "this year"
-msgstr "tämä vuosi"
-
-#: jutil/dates.py:14
-msgid "last week"
-msgstr "edellinen viikko"
-
-#: jutil/dates.py:15
-msgid "this week"
-msgstr "tämä viikko"
-
-#: jutil/dates.py:16
 msgid "yesterday"
 msgstr "eilinen päivä"
 
-#: jutil/dates.py:17
+#: jutil/dates.py:11
 msgid "today"
 msgstr "tämä päivä"
 
-#: jutil/dates.py:18 jutil/dates.py:19 jutil/dates.py:20 jutil/dates.py:21
-#: jutil/dates.py:22 jutil/dates.py:23 jutil/dates.py:24 jutil/dates.py:25
-#: jutil/dates.py:26 jutil/dates.py:27 jutil/dates.py:28 jutil/dates.py:29
-#: jutil/dates.py:30 jutil/dates.py:31 jutil/dates.py:32
+#: jutil/dates.py:12
+msgid "tomorrow"
+msgstr "huominen"
+
+#: jutil/dates.py:13
+msgid "last week"
+msgstr "edellinen viikko"
+
+#: jutil/dates.py:14
+msgid "last month"
+msgstr "edellinen kuukausi"
+
+#: jutil/dates.py:15
+msgid "last year"
+msgstr "edellinen vuosi"
+
+#: jutil/dates.py:16
+msgid "this week"
+msgstr "tämä viikko"
+
+#: jutil/dates.py:17
+msgid "this month"
+msgstr "tämä kuukausi"
+
+#: jutil/dates.py:18
+msgid "this year"
+msgstr "tämä vuosi"
+
+#: jutil/dates.py:19
+msgid "next week"
+msgstr "seuraava viikko"
+
+#: jutil/dates.py:20
+msgid "next month"
+msgstr "seuraava kuukausi"
+
+#: jutil/dates.py:21
+msgid "next year"
+msgstr "seuraava vuosi"
+
+#: jutil/dates.py:28 jutil/dates.py:29 jutil/dates.py:30
 msgid "number.of.days"
 msgstr "päivää"
 
-#: jutil/dates.py:48
+#: jutil/dates.py:47
 msgid "daily"
 msgstr "päivittäin"
 
-#: jutil/dates.py:49
+#: jutil/dates.py:48
 msgid "weekly"
 msgstr "viikottain"
 
-#: jutil/dates.py:50
+#: jutil/dates.py:49
 msgid "monthly"
 msgstr "kuukausittain"
 
@@ -78,12 +91,20 @@ msgstr "kuukausittain"
 msgid "Invalid email recipient: {}"
 msgstr "Epäkelpo sähköposti: {}"
 
-#: jutil/parse.py:38
+#: jutil/files.py:19 jutil/files.py:56
+msgid "{} is not a directory"
+msgstr "{} ei ole hakemisto"
+
+#: jutil/files.py:22 jutil/files.py:59
+msgid "{} is not under MEDIA_ROOT"
+msgstr "{} ei ole MEDIA_ROOT hakemiston alla"
+
+#: jutil/parse.py:42
 #, python-format
 msgid "%(value)s is not one of the available choices"
 msgstr "%(value)s ei ole yksi valittavissa olevista arvoista"
 
-#: jutil/parse.py:56 jutil/parse.py:63 jutil/tests.py:656
+#: jutil/parse.py:59 jutil/parse.py:65 jutil/tests.py:753
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -91,71 +112,71 @@ msgid ""
 msgstr ""
 "%(value)s-arvon muoto ei kelpaa. Se tulee olla VVVV-KK-PP TT:MM[:ss[.uuuuuu]]"
 
-#: jutil/responses.py:17
+#: jutil/responses.py:19
 msgid "File {} not found"
 msgstr "Tiedostoa {} ei löydy"
 
-#: jutil/tests.py:218 jutil/validators.py:38
+#: jutil/tests.py:298 jutil/validators.py:40
 msgid "Invalid phone number"
 msgstr "Epäkelpo puhelinnumero"
 
-#: jutil/tests.py:225 jutil/validators.py:74
+#: jutil/tests.py:305 jutil/validators.py:75
 msgid "Invalid passport number"
 msgstr "Epäkelpo passin numero"
 
-#: jutil/tests.py:233 jutil/tests.py:276 jutil/tests.py:915
-#: jutil/validators.py:101 jutil/validators.py:173 jutil/validators.py:202
+#: jutil/tests.py:313 jutil/tests.py:356 jutil/tests.py:1012
+#: jutil/validators.py:102 jutil/validators.py:181 jutil/validators.py:209
 msgid "Invalid country code"
 msgstr "Epäkelpo maakoodi"
 
-#: jutil/tests.py:247 jutil/validators.py:426 jutil/validators.py:429
-#: jutil/validators.py:436 jutil/validators.py:440
+#: jutil/tests.py:327 jutil/validators.py:474 jutil/validators.py:477
+#: jutil/validators.py:484 jutil/validators.py:488
 msgid "Invalid company organization ID"
 msgstr "Epäkelpo yrityksen tunnus"
 
-#: jutil/tests.py:251 jutil/tests.py:274 jutil/tests.py:278 jutil/tests.py:619
-#: jutil/tests.py:621 jutil/tests.py:623 jutil/validators.py:170
-#: jutil/validators.py:176 jutil/validators.py:188 jutil/validators.py:230
-#: jutil/validators.py:236
+#: jutil/tests.py:331 jutil/tests.py:354 jutil/tests.py:358 jutil/tests.py:718
+#: jutil/tests.py:720 jutil/tests.py:722 jutil/validators.py:178
+#: jutil/validators.py:184 jutil/validators.py:196 jutil/validators.py:237
+#: jutil/validators.py:243
 msgid "Invalid IBAN account number"
 msgstr "Epäkelpo IBAN-tilinumero"
 
-#: jutil/tests.py:266 jutil/validators.py:460 jutil/validators.py:469
-#: jutil/validators.py:541 jutil/validators.py:560
+#: jutil/tests.py:346 jutil/validators.py:508 jutil/validators.py:535
+#: jutil/validators.py:625 jutil/validators.py:644
 msgid "Invalid personal identification number"
 msgstr "Epäkelpo henkilötunnus"
 
-#: jutil/tests.py:282 jutil/tests.py:284 jutil/tests.py:286
-#: jutil/validators.py:158
+#: jutil/tests.py:362 jutil/tests.py:364 jutil/tests.py:366
+#: jutil/validators.py:166
 msgid "Invalid bank BIC/SWIFT code"
 msgstr "Epäkelpo pankin BIC/SWIFT koodi"
 
-#: jutil/tests.py:761
+#: jutil/tests.py:858
 msgid "action time"
 msgstr "tapahtuman aika"
 
-#: jutil/tests.py:848 jutil/validators.py:37 jutil/validators.py:55
-#: jutil/validators.py:73 jutil/validators.py:100 jutil/validators.py:157
-#: jutil/validators.py:170
+#: jutil/tests.py:945 jutil/validators.py:39 jutil/validators.py:56
+#: jutil/validators.py:74 jutil/validators.py:101 jutil/validators.py:165
+#: jutil/validators.py:178
 msgid "Missing value"
 msgstr "Puuttuva arvo"
 
-#: jutil/tests.py:917 jutil/validators.py:205
+#: jutil/tests.py:1014 jutil/validators.py:212
 msgid "IBAN checksum generation does not support >26 character IBANs"
 msgstr "IBAN tarkistussumman generointi ei tue yli 26 merkkisiä IBANeja"
 
-#: jutil/validators.py:56
+#: jutil/validators.py:57
 msgid "Invalid email"
 msgstr "Epäkelpo sähköposti"
 
-#: jutil/validators.py:357 jutil/validators.py:360 jutil/validators.py:372
-#: jutil/validators.py:389 jutil/validators.py:393
+#: jutil/validators.py:402 jutil/validators.py:405 jutil/validators.py:417
+#: jutil/validators.py:435 jutil/validators.py:439
 msgid "Invalid payment reference: {}"
 msgstr "Epäkelpo maksuviite: {}"
 
-#: jutil/validators.py:474 jutil/validators.py:476
+#: jutil/validators.py:540 jutil/validators.py:542
 msgid "Unsupported year"
-msgstr ""
+msgstr "Epäkelpo vuosi"
 
 #~ msgid "'%(value)s' value has an invalid format"
 #~ msgstr "'%(value)s' arvo on virheellisessä muodossa"
