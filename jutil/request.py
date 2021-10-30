@@ -55,7 +55,12 @@ def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
         res = requests.get("http://api.ipstack.com/{}?access_key={}&format=1".format(ip, settings.IPSTACK_TOKEN), timeout=timeout)
         if res.status_code != 200:
             raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
-        return res.json()
+        data = res.json()
+        res_success = data.get("success", True)
+        if not res_success:
+            res_info = data.get("info") or ""
+            raise Exception(res_info)
+        return data
     except Exception as e:
         msg = "geoip({}) failed: {}".format(ip, e)
         logger.error(msg)
