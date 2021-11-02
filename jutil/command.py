@@ -107,7 +107,7 @@ def add_date_range_arguments(parser: CommandParser):
         parser.add_argument("--" + v.replace("_", "-"), action="store_true")
 
 
-def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
+def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:  # noqa
     """
     Returns a timezone-aware date range by symbolic name.
     :param name: Name of the date range. See add_date_range_arguments().
