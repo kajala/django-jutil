@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from django.conf import settings
 import requests
 import socket
@@ -8,6 +8,41 @@ from ipware import get_client_ip  # type: ignore
 from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
+
+
+class GeoIP:
+    """
+    Basic geolocation information of IP-address.
+    """
+
+    ip: str
+    country_name: str
+    country_code: str
+    time_zone: str
+    city: str
+    zip_code: str
+    latitude: float
+    longitude: float
+
+    def __init__(
+        self,
+        ip: str,
+        country_name: str,
+        country_code: str,
+        time_zone: str,
+        city: str,
+        zip_code: str,  # pylint: disable=too-many-arguments
+        latitude: float,
+        longitude: float,
+    ):
+        self.ip = ip
+        self.country_name = country_name
+        self.country_code = country_code
+        self.time_zone = time_zone
+        self.city = city
+        self.zip_code = zip_code
+        self.latitude = latitude
+        self.longitude = longitude
 
 
 def get_ip(request: Union[HttpRequest, Request]) -> str:
@@ -22,169 +57,122 @@ def get_ip(request: Union[HttpRequest, Request]) -> str:
     it was deprecated and had quite big update process to change all code to use ipware get_client_ip.
     I want to avoid such process again so added this wrapper.
 
-    :param request: Djangos HttpRequest or DRF Request
+    :param request: Django's HttpRequest or DRF Request
     :return: IP-address or None
     """
     return get_client_ip(request)[0]
 
 
-def get_geo_ip_from_ipgeolocation(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
+def get_geo_ip_from_ipgeolocation(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
     """
     Returns geo IP info or empty dict if geoip query fails.
     Uses ipgeolocation.io API and requires settings.IPGEOLOCATION_API_KEY set.
 
-    Example replies:
-
-        {
-            "ip": "76.184.236.184",
-            "continent_code": "NA",
-            "continent_name": "North America",
-            "country_code2": "US",
-            "country_code3": "USA",
-            "country_name": "United States",
-            "country_capital": "Washington, D.C.",
-            "state_prov": "Texas",
-            "district": "Collin",
-            "city": "Frisco",
-            "zipcode": "75034",
-            "latitude": "33.15048",
-            "longitude": "-96.83466",
-            "is_eu": false,
-            "calling_code": "+1",
-            "country_tld": ".us",
-            "languages": "en-US,es-US,haw,fr",
-            "country_flag": "https://ipgeolocation.io/static/flags/us_64.png",
-            "geoname_id": "9686447",
-            "isp": "Charter Communications Inc",
-            "connection_type": "",
-            "organization": "Charter Communications Inc",
-            "currency": {
-                "code": "USD",
-                "name": "US Dollar",
-                "symbol": "$"
-            },
-            "time_zone": {
-                "name": "America/Chicago",
-                "offset": -6,
-                "current_time": "2021-11-02 11:04:25.432-0500",
-                "current_time_unix": 1635869065.432,
-                "is_dst": true,
-                "dst_savings": 1
-            }
-        }
-
-        {
-            "ip": "194.100.27.41",
-            "continent_code": "EU",
-            "continent_name": "Europe",
-            "country_code2": "FI",
-            "country_code3": "FIN",
-            "country_name": "Finland",
-            "country_capital": "Helsinki",
-            "state_prov": "South Finland",
-            "district": "",
-            "city": "Helsinki",
-            "zipcode": "00100",
-            "latitude": "60.17116",
-            "longitude": "24.93265",
-            "is_eu": true,
-            "calling_code": "+358",
-            "country_tld": ".fi",
-            "languages": "fi-FI,sv-FI,smn",
-            "country_flag": "https://ipgeolocation.io/static/flags/fi_64.png",
-            "geoname_id": "6473658",
-            "isp": "DNA Oyj",
-            "connection_type": "",
-            "organization": "DNA Oyj",
-            "currency": {
-                "code": "EUR",
-                "name": "Euro",
-                "symbol": "\u20ac"
-            },
-            "time_zone": {
-                "name": "Europe/Helsinki",
-                "offset": 2,
-                "current_time": "2021-11-02 18:05:08.327+0200",
-                "current_time_unix": 1635869108.327,
-                "is_dst": false,
-                "dst_savings": 1
-            }
-        }
-
     :param ip: str
-    :param exceptions: if True raises Exception on failure
     :param timeout: timeout in seconds
-    :return: dict
+    :return: IPGeoInfo
     """
-    try:
-        if not hasattr(settings, "IPGEOLOCATION_API_KEY") or not settings.IPGEOLOCATION_API_KEY:
-            raise Exception("get_geo_ip_ipstack() requires IPGEOLOCATION_API_KEY defined in Django settings")
-        res = requests.get(f"https://api.ipgeolocation.io/ipgeo?apiKey={settings.IPGEOLOCATION_API_KEY}&ip={ip}", timeout=timeout)
-        if res.status_code != 200:
-            raise Exception("api.ipgeolocation.io HTTP {}".format(res.status_code))
-        data = res.json()
-        return data
-    except Exception as e:
-        logger.error("get_geo_ip_from_ipgeolocation(%s) failed: %s", ip, e)
-        if exceptions:
-            raise
-        return {}
+    if not hasattr(settings, "IPGEOLOCATION_API_KEY") or not settings.IPGEOLOCATION_API_KEY:
+        raise Exception("get_geo_ip_ipstack() requires IPGEOLOCATION_API_KEY defined in Django settings")
+    url = f"https://api.ipgeolocation.io/ipgeo?apiKey={settings.IPGEOLOCATION_API_KEY}&ip={ip}"
+    res = requests.get(url, timeout=timeout)
+    if verbose:
+        logger.info("GET %s HTTP %s: %s", url, res.status_code, res.text)
+    if res.status_code != 200:
+        logger.error("get_geo_ip_from_ipgeolocation(%s) failed: %s", ip, res.text)
+        raise Exception("api.ipgeolocation.io HTTP {}".format(res.status_code))
+    data = res.json()
+    return GeoIP(
+        ip,
+        country_name=data["country_name"],
+        country_code=data["country_code2"],
+        time_zone=(data.get("time_zone") or {}).get("name") or "",
+        city=data.get("city") or "",
+        zip_code=data.get("zipcode") or "",
+        latitude=float(data["latitude"]),
+        longitude=float(data["longitude"]),
+    )
 
 
-def get_geo_ip_from_ipstack(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
+def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
     """
     Returns geo IP info or empty dict if geoip query fails.
     Uses ipstack.com API and requires settings.IPSTACK_TOKEN set.
 
-    Example replies:
+    :param ip: str
+    :param timeout: timeout in seconds
+    :return: IPGeoInfo
+    """
+    if not hasattr(settings, "IPSTACK_TOKEN") or not settings.IPSTACK_TOKEN:
+        raise Exception("get_geo_ip_from_ipstack() requires IPSTACK_TOKEN defined in Django settings")
+    url = f"http://api.ipstack.com/{ip}?access_key={settings.IPSTACK_TOKEN}&format=1"
+    res = requests.get(url, timeout=timeout)
+    if verbose:
+        logger.info("GET %s HTTP %s: %s", url, res.status_code, res.text)
+    if res.status_code != 200:
+        logger.error("get_geo_ip_from_ipstack(%s) failed: %s", ip, res.text)
+        raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
+    data = res.json()
+    res_success = data.get("success", True)
+    if not res_success:
+        res_info = data.get("info") or ""
+        logger.error("get_geo_ip_from_ipstack(%s) failed: %s", ip, res_info)
+        raise Exception(res_info)
+    return GeoIP(
+        ip,
+        country_name=data["country_name"],
+        country_code=data["country_code"],
+        time_zone=data.get("time_zone") or "",
+        city=data.get("city") or "",
+        zip_code=data.get("zip") or "",
+        latitude=float(data["latitude"]),
+        longitude=float(data["longitude"]),
+    )
 
-        {'country_name': 'United States', 'country_code': 'US', 'region_code': 'TX', 'region_name': 'Texas',
-        'ip': '76.184.236.184', 'latitude': 33.1507, 'time_zone': 'America/Chicago', 'metro_code': 623, 'city':
-        'Frisco', 'longitude': -96.8236, 'zip_code': '75033'}
 
-        {'latitude': 60.1641, 'country_name': 'Finland', 'zip_code': '02920', 'region_name': 'Uusimaa', 'city':
-        'Espoo', 'metro_code': 0, 'ip': '194.100.27.41', 'time_zone': 'Europe/Helsinki', 'country_code': 'FI',
-        'longitude': 24.7136, 'region_code': '18'}
+def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
+    """
+    Returns geo IP info. Raises Exception if query fails.
+    Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
+
+    Example response (GeoIP.__dict__):
+
+            {
+                "ip": "194.100.27.41",
+                "country_name": "Finland",
+                "country_code": "FI",
+                "time_zone": "Europe/Helsinki",
+                "city": "Helsinki",
+                "zip_code": "00100",
+                "latitude": "60.17116",
+                "longitude": "24.93265"
+            }
 
     :param ip: str
-    :param exceptions: if True raises Exception on failure
     :param timeout: timeout in seconds
-    :return: dict
+    :return: IPGeoInfo
     """
-    try:
-        if not hasattr(settings, "IPSTACK_TOKEN") or not settings.IPSTACK_TOKEN:
-            raise Exception("get_geo_ip_from_ipstack() requires IPSTACK_TOKEN defined in Django settings")
-        res = requests.get(f"http://api.ipstack.com/{ip}?access_key={settings.IPSTACK_TOKEN}&format=1", timeout=timeout)
-        if res.status_code != 200:
-            raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
-        data = res.json()
-        res_success = data.get("success", True)
-        if not res_success:
-            res_info = data.get("info") or ""
-            raise Exception(res_info)
-        return data
-    except Exception as e:
-        logger.error("get_geo_ip_from_ipstack(%s) failed: %s", ip, e)
-        if exceptions:
-            raise
-        return {}
+    if hasattr(settings, "IPGEOLOCATION_API_KEY") and settings.IPGEOLOCATION_API_KEY:
+        return get_geo_ip_from_ipgeolocation(ip, timeout, verbose=verbose)
+    if hasattr(settings, "IPSTACK_TOKEN") and settings.IPSTACK_TOKEN:
+        return get_geo_ip_from_ipstack(ip, timeout, verbose=verbose)
+    raise Exception("get_geo_ip() requires either IPGEOLOCATION_TOKEN or IPSTACK_TOKEN defined in Django settings")
 
 
-def get_geo_ip(ip: str, exceptions: bool = False, timeout: int = 10) -> dict:
+def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
     """
-    Returns geo IP info or empty dict if geoip query fails.
+    Returns geo IP info or None if geoip query fails.
     Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
 
     :param ip: str
-    :param exceptions: if True raises Exception on failure
     :param timeout: timeout in seconds
-    :return: dict
+    :return: Optional[IPGeoInfo]
     """
-    if hasattr(settings, "IPGEOLOCATION_API_KEY") and settings.IPGEOLOCATION_API_KEY:
-        return get_geo_ip_from_ipgeolocation(ip, exceptions, timeout)
-    if hasattr(settings, "IPSTACK_TOKEN") and settings.IPSTACK_TOKEN:
-        return get_geo_ip_from_ipstack(ip, exceptions, timeout)
-    raise Exception("get_geo_ip() requires either IPGEOLOCATION_TOKEN or IPSTACK_TOKEN defined in Django settings")
+    try:
+        return get_geo_ip(ip, timeout)
+    except Exception as err:
+        logger.error("get_geo_ip_or_none(%s) failed: %s", ip, err)
+    return None
 
 
 def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[str, str, str]:
@@ -197,14 +185,15 @@ def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[s
     """
     if not ip:  # localhost
         return "", "", ""
-    host = ""
-    data = get_geo_ip(ip, exceptions=exceptions, timeout=timeout)
-    country_code = str(data.get("country_code2") or data.get("country_code") or "")
+    host, country_code = "", ""
     try:
-        res = socket.gethostbyaddr(ip)
-        host = res[0][:255] if ip else ""
+        geo = get_geo_ip(ip, timeout=timeout)
+        country_code = geo.country_code
+        if ip:
+            host_info = socket.gethostbyaddr(ip)
+            host = host_info[0][:255]
     except Exception as e:
-        logger.error("socket.gethostbyaddr(%s) failed: %s", ip, e)
+        logger.error("get_ip_info(%s) failed: %s", ip, e)
         if exceptions:
             raise e
     return ip, country_code, host

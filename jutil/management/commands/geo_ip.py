@@ -9,7 +9,8 @@ class Command(SafeCommand):
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument("ip", type=str)
+        parser.add_argument("--verbose", action="store_true")
 
     def do(self, *args, **kw):
-        data = get_geo_ip(kw["ip"])
-        self.stdout.write(json.dumps(data, indent=4))
+        geo_ip = get_geo_ip(kw["ip"], verbose=kw["verbose"])
+        self.stdout.write(json.dumps(geo_ip.__dict__, indent=4))
