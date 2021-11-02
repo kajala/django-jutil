@@ -24,14 +24,14 @@ class GeoIP:
     latitude: float
     longitude: float
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         ip: str,
         country_name: str,
         country_code: str,
         time_zone: str,
         city: str,
-        zip_code: str,  # pylint: disable=too-many-arguments
+        zip_code: str,
         latitude: float,
         longitude: float,
     ):
