@@ -10,7 +10,7 @@ def formatted_date(short_description=None, admin_order_field=None, fmt: str = "S
 
     Usage example in Django Admin:
 
-    @date_format_short_date(_("timestamp"), "timestamp")
+    @formatted_date(_("timestamp"), "timestamp")
     def timestamp_short(obj):
         return obj.timestamp
     """
