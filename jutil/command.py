@@ -3,6 +3,7 @@ import re
 import traceback
 from datetime import datetime, timedelta
 from typing import Tuple, List, Any, Optional
+from django.core.management import get_commands, load_command_class
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
@@ -33,9 +34,9 @@ logger = logging.getLogger(__name__)
 
 class SafeCommand(BaseCommand):
     """
-    BaseCommand which catches, logs and emails errors.
+    BaseCommand which activates LANGUAGE_CODE locale, catches, logs and emails errors.
     Uses list of emails from settings.ADMINS.
-    Implement do() in derived classes.
+    Implement do() in derived classes with identical args as normal handle().
     """
 
     def handle(self, *args, **kwargs):
@@ -193,3 +194,27 @@ def parse_date_range_arguments(options: dict, default_range: str = "last_month",
     else:
         steps = [(begin, end)]
     return begin, end, steps
+
+
+def get_command_by_name(command_name: str) -> BaseCommand:
+    """
+    Gets Django management BaseCommand derived command class instance by name.
+    """
+    all_commands = get_commands()
+    app_name = all_commands.get(command_name)
+    if app_name is None:
+        raise Exception(f"Django management command {command_name} not found")
+    command = app_name if isinstance(app_name, BaseCommand) else load_command_class(app_name, command_name)
+    assert isinstance(command, BaseCommand)
+    return command
+
+
+def get_command_name(command: BaseCommand) -> str:
+    """
+    Gets Django management BaseCommand name from instance.
+    """
+    module_name = command.__class__.__module__
+    res = module_name.rsplit(".", 1)
+    if len(res) != 2:
+        raise Exception(f"Failed to parse Django command name from {module_name}")
+    return res[1]

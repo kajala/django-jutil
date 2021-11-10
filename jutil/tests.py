@@ -6,7 +6,7 @@ from decimal import Decimal
 from io import BytesIO, StringIO
 from os.path import join
 from urllib.parse import urlparse
-from django.core.management import call_command
+from django.core.management import call_command, get_commands
 from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
@@ -21,7 +21,7 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError, ErrorDetail
-from django.core.management.base import CommandParser  # type: ignore
+from django.core.management.base import CommandParser, BaseCommand  # type: ignore
 from django.db import models
 from django.http.response import HttpResponse
 from django.test import TestCase
@@ -30,7 +30,7 @@ from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin
 from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
-from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments
+from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments, get_command_by_name, get_command_name
 from jutil.email import make_email_recipient_list
 from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
 from jutil.model import (
@@ -1295,6 +1295,12 @@ class Tests(TestCase, TestSetupMixin):
         for call_kw, data_ref in cases:
             data = find_file(**call_kw, dir_name=dir_name)
             self.assertListEqual(data_ref, data)
+
+    def test_command_utils(self):
+        for cmd_name in ["apps", "geo_ip", "list_files", "send_email", "setpass"]:
+            cls = get_command_by_name(cmd_name)
+            self.assertTrue(isinstance(cls, BaseCommand))
+            self.assertEqual(get_command_name(cls), cmd_name)
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
