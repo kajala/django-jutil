@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 from uuid import uuid1
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
@@ -24,8 +25,7 @@ class TestSetupMixin:
             email = email.split("@")[0]
         if not username:
             username = email
-        user = User.objects.create(username=username, email=email, **kwargs)
-        assert isinstance(user, User)
+        user = get_user_model().objects.create(username=username, email=email, **kwargs)
         user.set_password(password)
         user.save()
         return user

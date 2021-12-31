@@ -2,6 +2,7 @@ from collections import OrderedDict
 from typing import Optional, Sequence, List, Dict, Any
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 from django.urls import reverse, resolve
@@ -30,7 +31,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
     # use system user if 'who' is missing
     if who is None:
         username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"
-        who = User.objects.get_or_create(username=username)[0]
+        who = get_user_model().objects.get_or_create(username=username)[0]
 
     # allow passing individual instance
     if not isinstance(instances, list) and not isinstance(instances, tuple):
