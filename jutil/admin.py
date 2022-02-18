@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.urls import reverse, resolve
 from django.utils.html import format_html
@@ -17,6 +18,16 @@ from django.core.exceptions import PermissionDenied
 from django.utils.text import capfirst
 from django.utils.encoding import force_str
 from django.contrib.admin.models import LogEntry
+
+
+def get_admin_log(instance: object) -> QuerySet:
+    """
+    Returns admin log (LogEntry QuerySet) of the object.
+    """
+    return LogEntry.objects.filter(
+        content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
+        object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
+    )
 
 
 def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, **kw):

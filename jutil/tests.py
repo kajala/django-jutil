@@ -28,7 +28,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
-from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin
+from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin, get_admin_log
 from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments, get_command_by_name, get_command_name
 from jutil.email import make_email_recipient_list
@@ -800,6 +800,7 @@ class Tests(TestCase, TestSetupMixin):
         admin_log([obj], "Hello, world")
         admin_log([obj], "Hello, world", user=self.user, ip="127.0.0.1")
         admin_log(obj, "Hello, world", user=self.user, ip="127.0.0.1")
+        self.assertGreaterEqual(get_admin_log(obj).filter(change_message__contains="Hello, world").count(), 3)
         e = LogEntry.objects.all().filter(object_id=obj.id).last()
         self.assertIsNotNone(e)
         assert isinstance(e, LogEntry)
