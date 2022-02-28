@@ -40,6 +40,7 @@ from jutil.model import (
     get_object_or_none,
     wait_object_or_none,
 )
+from jutil.redis_helpers import redis_set_json, redis_get_json, redis_get_bytes, redis_set_bytes
 from jutil.request import get_ip_info
 from jutil.responses import CsvResponse
 from jutil.testing import TestSetupMixin
@@ -1302,6 +1303,16 @@ class Tests(TestCase, TestSetupMixin):
             cls = get_command_by_name(cmd_name)
             self.assertTrue(isinstance(cls, BaseCommand))
             self.assertEqual(get_command_name(cls), cmd_name)
+
+    def test_redis_helpers(self):
+        redis_set_json("jani", {"a": 1})
+        redis_set_json("jani2", "testing")
+        redis_set_bytes("jani3", b'{"a":2}')
+        self.assertDictEqual(redis_get_json("jani"), {"a": 1})
+        self.assertEqual(redis_get_json("jani2"), "testing")
+        self.assertEqual(redis_get_bytes("jani"), b'{"a": 1}')
+        self.assertEqual(redis_get_bytes("jani2"), b'"testing"')
+        self.assertDictEqual(redis_get_json("jani3"), {"a": 2})
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
