@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 try:
     import redis  # type: ignore
 
-    if int(redis.__version__.split(".", maxsplit=1)[0]) < 3:  # type: ignore
+    if int(redis.__version__.split(".", maxsplit=1)[0]) < 4:  # type: ignore
         raise Exception("Invalid version")
 except Exception as err:
     raise Exception("Using jutil.redis_helpers requires redis>=3.0.0 installed") from err
