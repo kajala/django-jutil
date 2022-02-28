@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 try:
     import redis  # type: ignore
 
-    if int(redis.__version__.split(".", maxsplit=1)[0]) < 4:  # type: ignore
+    if int(redis.__version__.split(".", maxsplit=1)[0]) < 3:  # type: ignore
         raise Exception("Invalid version")
 except Exception as err:
     raise Exception("Using jutil.redis_helpers requires redis>=3.0.0 installed") from err
@@ -64,9 +64,22 @@ def redis_set_bytes(name: str, value: bytes, ex: Optional[int] = None):
     return redis_instance().set(redis_prefix_key(name), value, ex=ex)
 
 
+def redis_get_bytes_or_none(name: str) -> Optional[bytes]:
+    """
+    Returns value of the key as bytes from Redis or None if value missing.
+
+    Uses default DB name as a key prefix. For example, if default DB name is "my_db"
+    then key "my_key" is stored in Redis as "my_db.my_key".
+
+    :param name: Key name without DB name prefix
+    :return: bytes or None if value missing
+    """
+    return redis_instance().get(redis_prefix_key(name))
+
+
 def redis_get_bytes(name: str) -> bytes:
     """
-    Returns value of the key as bytes from Redis.
+    Returns value of the key as bytes from Redis. Raise Exception if value is missing.
 
     Uses default DB name as a key prefix. For example, if default DB name is "my_db"
     then key "my_key" is stored in Redis as "my_db.my_key".
@@ -74,7 +87,10 @@ def redis_get_bytes(name: str) -> bytes:
     :param name: Key name without DB name prefix
     :return: bytes
     """
-    return redis_instance().get(redis_prefix_key(name))
+    buf = redis_get_bytes_or_none(name)
+    if buf is None:
+        raise Exception(f"{redis_prefix_key(name)} not in Redis")
+    return buf
 
 
 def redis_set_json(name: str, value: Any, ex: Optional[int] = None, cls=DjangoJSONEncoder):
@@ -95,9 +111,9 @@ def redis_set_json(name: str, value: Any, ex: Optional[int] = None, cls=DjangoJS
     return redis_instance().set(redis_prefix_key(name), value_bytes, ex=ex)
 
 
-def redis_get_json(name: str) -> Any:
+def redis_get_json_or_none(name: str) -> Any:
     """
-    Returns value of the key as JSON from Redis.
+    Returns value of the key as JSON from Redis or None if value missing.
 
     Uses default DB name as a key prefix. For example, if default DB name is "my_db"
     then key "my_key" is stored in Redis as "my_db.my_key".
@@ -109,12 +125,29 @@ def redis_get_json(name: str) -> Any:
     """
     try:
         buf = redis_instance().get(redis_prefix_key(name))
-        if buf is None:
-            return None
-        return json.loads(buf)
+        if buf is not None:
+            return json.loads(buf)
     except Exception as exc:
         logger.error("redis_get_json(%s) failed: %s", name, exc)
     return None
+
+
+def redis_get_json(name: str) -> Any:
+    """
+    Returns value of the key as JSON from Redis. Raise Exception if value is missing.
+
+    Uses default DB name as a key prefix. For example, if default DB name is "my_db"
+    then key "my_key" is stored in Redis as "my_db.my_key".
+
+    Stored value is assumed to be JSON and it is deserialized before returning.
+
+    :param name: Key name without DB name prefix
+    :return: bytes deserialized as JSON
+    """
+    buf = redis_instance().get(redis_prefix_key(name))
+    if buf is None:
+        raise Exception(f"{redis_prefix_key(name)} not in Redis")
+    return json.loads(buf)
 
 
 def redis_delete(name: str):

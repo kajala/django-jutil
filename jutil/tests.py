@@ -40,7 +40,7 @@ from jutil.model import (
     get_object_or_none,
     wait_object_or_none,
 )
-from jutil.redis_helpers import redis_set_json, redis_get_json, redis_get_bytes, redis_set_bytes
+from jutil.redis_helpers import redis_set_json, redis_get_json, redis_get_bytes, redis_set_bytes, redis_get_json_or_none, redis_get_bytes_or_none, redis_delete
 from jutil.request import get_ip_info
 from jutil.responses import CsvResponse
 from jutil.testing import TestSetupMixin
@@ -1305,6 +1305,10 @@ class Tests(TestCase, TestSetupMixin):
             self.assertEqual(get_command_name(cls), cmd_name)
 
     def test_redis_helpers(self):
+        for k in ["jani", "jani2", "jani3", "jani4"]:
+            redis_delete(k)
+        self.assertEqual(redis_get_json_or_none("jani2"), None)
+        self.assertEqual(redis_get_bytes_or_none("jani"), None)
         redis_set_json("jani", {"a": 1})
         redis_set_json("jani2", "testing")
         redis_set_bytes("jani3", b'{"a":2}')
