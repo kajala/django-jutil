@@ -25,8 +25,8 @@ class RedisCachedSimpleListFilter(SimpleListFilter):
         raise Exception("generate_lookups() must be implemented in RedisCachedSimpleListFilter derived class")
 
     def get_redis_key_name(self) -> str:
-        base_name = self.redis_key_name if self.redis_key_name else f"{self.__class__.__name__}"
-        return base_name + "." + get_language()
+        base_name = self.redis_key_name if self.redis_key_name else str(self.__class__.__name__)
+        return base_name + "." + (get_language() or "")
 
     def refresh_lookups(self, request, model_admin) -> List[Tuple[str, str]]:
         out: List[Tuple[str, str]] = []
