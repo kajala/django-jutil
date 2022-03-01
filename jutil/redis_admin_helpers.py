@@ -1,6 +1,5 @@
 import logging
 from typing import List, Tuple
-from django.conf import settings
 from django.utils.translation import get_language
 from django.contrib.admin import SimpleListFilter
 from jutil.redis_helpers import redis_get_json, redis_set_json
