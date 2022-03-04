@@ -36,7 +36,7 @@ class CachedFieldsMixin:
                     raise Exception("Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(k=k, obj=self))
                 v = self.__getattribute__(f)()
                 setattr(self, k, v)
-            if commit:
+            if commit and (fields is None or fields):
                 self.save(update_fields=fields)  # pytype: disable=attribute-error
         except Exception as e:
             logger.error("%s.update_cached_fields: %s", self.__class__, e)
