@@ -13,7 +13,7 @@ install_requires = parse_requirements("requirements.txt", session=False)
 
 setup(
     name="django-jutil",
-    version="3.10.10",
+    version="3.10.11",
     author="Jani Kajala",
     author_email="kajala@gmail.com",
     packages=find_packages(exclude=["project", "venv"]),
