@@ -113,11 +113,10 @@ def send_email_sendgrid(  # noqa
     except Exception as err:
         raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err
 
+    if not api_key and hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
+        api_key = settings.EMAIL_SENDGRID_API_KEY
     if not api_key:
-        if hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
-            api_key = settings.EMAIL_SENDGRID_API_KEY
-        if not api_key:
-            raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")
+        raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")
 
     if files is None:
         files = []
@@ -127,7 +126,7 @@ def send_email_sendgrid(  # noqa
     bcc_recipients_clean = make_email_recipient_list(bcc_recipients)
 
     try:
-        sg = sendgrid.SendGridAPIClient(api_key=settings.EMAIL_SENDGRID_API_KEY)
+        sg = sendgrid.SendGridAPIClient(api_key=api_key)
         text_content = Content("text/plain", text) if text else None
         html_content = Content("text/html", html) if html else None
 
@@ -162,8 +161,6 @@ def send_email_sendgrid(  # noqa
 
         send_time = now()
         mail_body = mail.get()
-        if hasattr(settings, "EMAIL_SENDGRID_API_DEBUG") and settings.EMAIL_SENDGRID_API_DEBUG:  # type: ignore
-            logger.info("SendGrid API payload: %s", mail_body)
         res = sg.client.mail.send.post(request_body=mail_body)
         send_dt = (now() - send_time).total_seconds()
 
