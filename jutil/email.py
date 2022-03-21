@@ -4,7 +4,6 @@ from typing import Optional, Union, Tuple, Sequence, List
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
-from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from base64 import b64encode
 from os.path import basename
@@ -159,17 +158,15 @@ def send_email_sendgrid(  # noqa
                 attachment.disposition = Disposition("attachment")
                 mail.add_attachment(attachment)
 
-        send_time = now()
         mail_body = mail.get()
         res = sg.client.mail.send.post(request_body=mail_body)
-        send_dt = (now() - send_time).total_seconds()
 
         if res.status_code == 202:
-            logger.info("EMAIL_SENT %s", {"time": send_dt, "to": recipients, "subject": subject, "status": res.status_code})
+            logger.info("EMAIL_SENT %s", {"to": recipients, "subject": subject, "status": res.status_code})
         else:
             logger.info(
                 "EMAIL_ERROR %s",
-                {"time": send_dt, "to": recipients, "subject": subject, "status": res.status_code, "body": res.body},
+                {"to": recipients, "subject": subject, "status": res.status_code, "body": res.body},
             )
 
     except Exception as err:
@@ -236,10 +233,8 @@ def send_email_smtp(  # noqa
         if html:
             mail.attach_alternative(content=html, mimetype="text/html")
 
-        send_time = now()
         mail.send(fail_silently=False)
-        send_dt = (now() - send_time).total_seconds()
-        logger.info("EMAIL_SENT %s", {"time": send_dt, "to": recipients, "subject": subject})
+        logger.info("EMAIL_SENT %s", {"to": recipients, "subject": subject})
 
     except Exception as e:
         logger.error("EMAIL_ERROR %s", {"to": recipients, "subject": subject, "exception": str(e)})
