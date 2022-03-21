@@ -5,7 +5,11 @@ import requests
 import socket
 from django.http.request import HttpRequest
 from ipware import get_client_ip  # type: ignore
-from rest_framework.request import Request
+
+try:
+    from rest_framework.request import Request  # type: ignore
+except Exception as err:
+    raise Exception("Using jutil.request requires djangorestframework installed") from err
 
 logger = logging.getLogger(__name__)
 

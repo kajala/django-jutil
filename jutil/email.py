@@ -9,7 +9,6 @@ from django.utils.translation import gettext as _
 from base64 import b64encode
 from os.path import basename
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +86,7 @@ def send_email_sendgrid(  # noqa
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
+    api_key: str = "",
 ) -> int:
     """
     Sends email using SendGrid API. Following requirements:
@@ -102,6 +102,7 @@ def send_email_sendgrid(  # noqa
     :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
     :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param api_key: Optional Sendgrid API key. Default settings.EMAIL_SENDGRID_API_KEY.
     :return: Status code 202 if emails were sent successfully
     """
     try:
@@ -112,8 +113,11 @@ def send_email_sendgrid(  # noqa
     except Exception as err:
         raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err
 
-    if not hasattr(settings, "EMAIL_SENDGRID_API_KEY") or not settings.EMAIL_SENDGRID_API_KEY:
-        raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings")
+    if not api_key:
+        if hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
+            api_key = settings.EMAIL_SENDGRID_API_KEY
+        if not api_key:
+            raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")
 
     if files is None:
         files = []
@@ -158,7 +162,7 @@ def send_email_sendgrid(  # noqa
 
         send_time = now()
         mail_body = mail.get()
-        if hasattr(settings, "EMAIL_SENDGRID_API_DEBUG") and settings.EMAIL_SENDGRID_API_DEBUG:
+        if hasattr(settings, "EMAIL_SENDGRID_API_DEBUG") and settings.EMAIL_SENDGRID_API_DEBUG:  # type: ignore
             logger.info("SendGrid API payload: %s", mail_body)
         res = sg.client.mail.send.post(request_body=mail_body)
         send_dt = (now() - send_time).total_seconds()

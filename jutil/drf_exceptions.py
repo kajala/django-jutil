@@ -1,9 +1,12 @@
 import logging
 from typing import Any
-
 from django.core.exceptions import ValidationError as DjangoValidationError
-from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.views import exception_handler as drf_exception_handler
+
+try:
+    from rest_framework.exceptions import ValidationError as DRFValidationError  # type: ignore
+    from rest_framework.views import exception_handler as drf_exception_handler  # type: ignore
+except Exception as err:
+    raise Exception("Using jutil.drf_exceptions requires djangorestframework installed") from err
 
 logger = logging.getLogger(__name__)
 

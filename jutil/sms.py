@@ -14,13 +14,13 @@ def send_sms(phone: str, message: str, sender: str = "", **kw):
     """
     if not hasattr(settings, "SMS_TOKEN"):
         raise Exception("Invalid configuration: settings.SMS_TOKEN missing")
+    if not sender and hasattr(settings, "SMS_SENDER_NAME"):
+        sender = settings.SMS_SENDER_NAME  # type: ignore
     if not sender:
-        sender = settings.SMS_SENDER_NAME
-    if not sender:
-        raise Exception("Invalid configuration: settings.SMS_SENDER_NAME missing")
+        raise Exception("Invalid configuration: settings.SMS_SENDER_NAME missing and sender not set explicitly either")
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Token " + settings.SMS_TOKEN,
+        "Authorization": "Token " + settings.SMS_TOKEN,  # type: ignore
     }
     data = {
         "dst": phone_filter(phone),

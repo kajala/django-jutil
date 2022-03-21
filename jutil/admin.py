@@ -41,7 +41,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
     """
     # use system user if 'who' is missing
     if who is None:
-        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"
+        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"  # type: ignore
         who = get_user_model().objects.get_or_create(username=username)[0]
 
     # allow passing individual instance

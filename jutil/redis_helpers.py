@@ -35,7 +35,7 @@ def redis_instance(connection_str: str = "") -> redis.Redis:
     :param connection_str: Default connection string is settings.REDIS_URL or 'redis://:@localhost:6379/1?max_connections=50'.
     """
     if not connection_str:
-        connection_str = settings.REDIS_URL if hasattr(settings, "REDIS_URL") else "redis://:@localhost:6379/1?max_connections=50"
+        connection_str = settings.REDIS_URL if hasattr(settings, "REDIS_URL") else "redis://:@localhost:6379/1?max_connections=50"  # type: ignore
     return redis.Redis(connection_pool=redis_connection_pool(connection_str))
 
 
