@@ -47,9 +47,22 @@ def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 
     return qs0.all().filter(**kwargs).first()
 
 
+def get_model_field_label(instance, field_name: str) -> str:
+    """
+    Returns model field verbose name.
+    :param instance: Model instance
+    :param field_name: Model attribute name
+    :return: verbose_name str or "" if no field
+    """
+    for f in instance._meta.fields:
+        if f.attname == field_name:
+            return f.verbose_name
+    return ""
+
+
 def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str]:
     """
-    Returns model field label and value (as text).
+    Returns model field label and value as str.
     :param instance: Model instance
     :param field_name: Model attribute name
     :return: (label, value) tuple
