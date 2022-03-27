@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
 
+from django.db.models.fields import Field
 from django.utils.encoding import force_str
 from time import sleep
 from typing import Type, List, Tuple, Any, Optional, Sequence
@@ -47,17 +48,30 @@ def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 
     return qs0.all().filter(**kwargs).first()
 
 
-def get_model_field_label(instance, field_name: str) -> str:
+def get_model_field_or_none(instance, field_name: str) -> Optional[Field]:
     """
-    Returns model field verbose name.
+    Returns model field.
     :param instance: Model instance
     :param field_name: Model attribute name
     :return: verbose_name str or "" if no field
     """
     for f in instance._meta.fields:
         if f.attname == field_name:
-            return f.verbose_name
-    return ""
+            return f
+    return None
+
+
+def get_model_field(instance, field_name: str) -> Field:
+    """
+    Returns model field.
+    :param instance: Model instance
+    :param field_name: Model attribute name
+    :return: verbose_name str or "" if no field
+    """
+    f = get_model_field_or_none(instance, field_name)
+    if f is None:
+        raise Exception(f"Field {field_name} not found from {instance}")
+    return f
 
 
 def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str]:
