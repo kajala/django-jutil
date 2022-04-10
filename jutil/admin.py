@@ -1,9 +1,11 @@
+import json
 from collections import OrderedDict
 from typing import Optional, Sequence, List, Dict, Any
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.urls import reverse, resolve
@@ -30,13 +32,13 @@ def get_admin_log(instance: object) -> QuerySet:
     )
 
 
-def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, **kw):
+def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, **kwargs):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances (None values are ignored)
     :param msg: Message to log
     :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
-    :param kw: Optional key-value attributes to append to message
+    :param kwargs: Optional key-value attributes to append to message
     :return: None
     """
     # use system user if 'who' is missing
@@ -48,15 +50,14 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
     if not isinstance(instances, list) and not isinstance(instances, tuple):
         instances = [instances]  # type: ignore
 
-    # append extra keyword attributes if any
-    att_str = ""
-    for k, v in kw.items():
+    # append extra context if any
+    cx: Dict[str, Any] = {}
+    for k, v in kwargs.items():
         if hasattr(v, "pk"):  # log only primary key for model instances, not whole str representation
             v = v.pk
-        att_str += "{}={}".format(k, v) if not att_str else ", {}={}".format(k, v)
-    if att_str:
-        att_str = " [{}]".format(att_str)
-    msg = str(msg) + att_str
+        cx[k] = v
+    if cx:
+        msg += " | " + json.dumps(cx, cls=DjangoJSONEncoder)
 
     for instance in instances:
         if instance:
