@@ -4,6 +4,7 @@ from typing import Optional, Union, Tuple, Sequence, List
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from base64 import b64encode
 from os.path import basename
@@ -123,6 +124,7 @@ def send_email_sendgrid(  # noqa
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
     bcc_recipients_clean = make_email_recipient_list(bcc_recipients)
+    subject = strip_tags(subject)
 
     try:
         sg = sendgrid.SendGridAPIClient(api_key=api_key)
@@ -149,14 +151,15 @@ def send_email_sendgrid(  # noqa
         mail.tracking_settings = TrackingSettings(click_tracking=ClickTracking(enable=False))
 
         for filename in files:
-            with open(filename, "rb") as fp:
-                attachment = Attachment()
-                attachment.file_type = FileType("application/octet-stream")
-                attachment.file_name = FileName(basename(filename))
-                attachment.file_content = FileContent(b64encode(fp.read()).decode())
-                attachment.content_id = ContentId(basename(filename))
-                attachment.disposition = Disposition("attachment")
-                mail.add_attachment(attachment)
+            if filename:
+                with open(filename, "rb") as fp:
+                    attachment = Attachment()
+                    attachment.file_type = FileType("application/octet-stream")
+                    attachment.file_name = FileName(basename(filename))
+                    attachment.file_content = FileContent(b64encode(fp.read()).decode())
+                    attachment.content_id = ContentId(basename(filename))
+                    attachment.disposition = Disposition("attachment")
+                    mail.add_attachment(attachment)
 
         mail_body = mail.get()
         res = sg.client.mail.send.post(request_body=mail_body)
@@ -218,6 +221,7 @@ def send_email_smtp(  # noqa
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
     bcc_recipients_clean = make_email_recipient_list(bcc_recipients)
+    subject = strip_tags(subject)
 
     try:
         mail = EmailMultiAlternatives(
@@ -229,7 +233,8 @@ def send_email_smtp(  # noqa
             cc=['"{}" <{}>'.format(*r) for r in cc_recipients_clean],
         )
         for filename in files:
-            mail.attach_file(filename)
+            if filename:
+                mail.attach_file(filename)
         if html:
             mail.attach_alternative(content=html, mimetype="text/html")
 
