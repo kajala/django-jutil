@@ -1,5 +1,4 @@
 from datetime import timedelta, datetime
-
 from django.db.models.fields import Field
 from django.utils.encoding import force_str
 from time import sleep
@@ -74,6 +73,28 @@ def get_model_field(instance, field_name: str) -> Field:
     return f
 
 
+def get_model_field_label(instance, field_name: str) -> str:
+    """
+    Returns model field label.
+    Resolves also function / property short_description meta fields.
+    :param instance: Model instance
+    :param field_name: Model attribute name
+    :return: label str
+    """
+    for f in instance._meta.fields:
+        if f.name == field_name or f.attname == field_name:
+            return f.verbose_name
+    try:
+        return getattr(getattr(getattr(instance.__class__, field_name), "fget"), "short_description")
+    except AttributeError:
+        pass
+    try:
+        return getattr(getattr(instance.__class__, field_name), "short_description")
+    except AttributeError:
+        pass
+    return field_name
+
+
 def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str]:
     """
     Returns model field label and value as str.
@@ -81,11 +102,10 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
     :param field_name: Model attribute name
     :return: (label, value) tuple
     """
-    label = field_name
+    label = get_model_field_label(instance, field_name)
     value = str(getattr(instance, field_name)) if hasattr(instance, field_name) else None
     for f in instance._meta.fields:
         if f.attname == field_name:
-            label = f.verbose_name
             if hasattr(f, "choices") and f.choices:
                 value = choices_label(f.choices, value)
             break
