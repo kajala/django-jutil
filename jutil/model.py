@@ -53,7 +53,7 @@ def get_model_field_or_none(instance, field_name: str) -> Optional[Field]:
     Returns model field.
     :param instance: Model instance
     :param field_name: Model attribute name
-    :return: verbose_name str or "" if no field
+    :return: Optional[Field]
     """
     for f in instance._meta.fields:
         if f.attname == field_name:
@@ -66,7 +66,7 @@ def get_model_field(instance, field_name: str) -> Field:
     Returns model field.
     :param instance: Model instance
     :param field_name: Model attribute name
-    :return: verbose_name str or "" if no field
+    :return: Field
     """
     f = get_model_field_or_none(instance, field_name)
     if f is None:
