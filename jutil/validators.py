@@ -658,7 +658,7 @@ def se_clearing_code_bank_info(account_number: str) -> Tuple[str, Optional[int]]
     """
     Returns Sweden bank info by clearing code.
     :param account_number: Swedish account number with clearing code as prefix
-    :return: (Bank name, account digit count) or ('', None) if not found
+    :return: (Bank name, account digit count) or ("", None) if not found
     """
     v = iban_filter(account_number)
     if v.startswith("SE"):

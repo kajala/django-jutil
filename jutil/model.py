@@ -82,7 +82,7 @@ def get_model_field_label(instance, field_name: str) -> str:
     :return: label str
     """
     for f in instance._meta.fields:
-        if f.name == field_name or f.attname == field_name:
+        if field_name in (f.name, f.attname):
             return f.verbose_name
     try:
         return getattr(getattr(getattr(instance.__class__, field_name), "fget"), "short_description")
@@ -105,7 +105,7 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
     label = get_model_field_label(instance, field_name)
     value = str(getattr(instance, field_name)) if hasattr(instance, field_name) else None
     for f in instance._meta.fields:
-        if f.attname == field_name or f.name == field_name:
+        if field_name in (f.attname, f.name):
             if hasattr(f, "choices") and f.choices:
                 value = choices_label(f.choices, value)
             break

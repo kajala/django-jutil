@@ -714,7 +714,7 @@ class Tests(TestCase, TestSetupMixin):
             )
 
     def test_se_banks(self):
-        self.assertEqual(se_clearing_code_bank_info("SE7912001200012350223035")[0], "Danske Bank")
+        self.assertEqual(iban_bank_info("SE7912001200012350223035")[1], "Danske Bank")
         self.assertEqual(se_clearing_code_bank_info("6789"), ("Handelsbanken", 9))
         se_iban_validator("SE45 5000 0000 0583 9825 7466")
         with self.assertRaisesMessage(ValidationError, _("Invalid IBAN account number")):
