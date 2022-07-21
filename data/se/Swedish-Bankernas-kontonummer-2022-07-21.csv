@@ -1,0 +1,53 @@
+Avanza Bank, 9550-9569,7
+ Bluestep Finans, 9680-9689,7
+ BNP Paribas Fortis, 9470-9479,7
+" Citibank International Plc, Sweden Branch7", 9040-9049,7
+" Danske Bank A/S, Sverige Filial"," 1200-1399
+ 2400-2499",7
+ Danske Bolån, 1200-1399,7
+" DNB Bank ASA, Filial Sverige", 9190-9199,7
+ Forex Bank AB, 9400-9449,7
+ Handelsbanken, 6000-6999,9
+ ICA Banken, 9270-9279,7
+ IKANO Banken, 9170-9179,7
+ Länsförsäkringar Bank," 9020-9029
+ 3400-3409
+ 9060-9069",7
+ Lån og Spar Bank Sverige, 9630-9639,7
+ Marginalen Bank, 9230-9239,7
+ Nordax Bank AB, 9640-9649,7
+ Nordea," 1100-1199
+ 1401-2099
+ 3000-3399
+ 3410-4999",7
+ Nordea - Personkonto kontonummer = personnummer, , 
+ Nordea - PlusGirot," 9500-9549
+ 9960-9969",10
+ Nordnet Bank, 9100-9109,7
+ Resurs Bank AB, 9280-9289,7
+ Royal Bank of Scotland, 9090-9099,7
+ Santander Consumer Bank AS, 9460-9469,7
+ SBAB, 9250-9259,7
+ SEB," 5000-5999
+ 9120-9124
+ 9130-9149",7
+ Skandiabanken AB, 9150-9169,7
+ Sparbanken Syd, 9570-9579, 10*
+ Sparbanken Öresund, 9300-9349, 10*
+" Swedbank
+ När du gör överföringar eller skickar lön till Swedbanks konton,
+ som börjar på 7, kan du välja mellan att skriva in
+ hela kontonumret (elva siffror) eller att skriva in tre nollor
+ mellan clearingnummer (de första fyra siffrorna) och kontonummer.", 7000-7999,7
+" Swedbank och fristående Sparbanker, t ex Leksands Sparbank
+ och Roslagsbanken. Det förekommer att Swedbank har en femte siffra
+ i clearingnummer som börjar på 8, t ex 8327-9.
+ Den femte siffran ska inte  registreras i Hembanken.
+ När du gör en överföring till Swedbank ska kontonummer
+ som börjar på 8 alltid bestå av  sammanlagt fjorton siffror.
+ Om det innehåller färre siffror ska du fylla ut
+ med nollor mellan clearingnumret (de första fyra siffrorna) och
+ resterande siffror i kontonumret.", 8000-8999,10
+ Svea Bank, 9660-9669,7
+" Ålandsbanken Abp (Finland), svensk filial", 2300-2399,7
+* För kontonummer med färre antal siffror än 10 lägger Hembanken automatiskt till nollor mellan clearin,,

@@ -1,4 +1,4 @@
-SE_BANK_CLEARING_LIST = (  # 46
+SE_BANK_CLEARING_LIST = (  # 48
     ("Nordea AB", "1100", "1199", 7),
     ("Danske Bank", "1200", "1399", 7),
     ("Nordea AB", "1401", "2099", 7),
@@ -9,12 +9,12 @@ SE_BANK_CLEARING_LIST = (  # 46
     ("Nordea AB", "3301", "3399", 7),
     ("Länsförsäkringar Bank AB", "3400", "3409", 7),
     ("Nordea AB", "3460", "3599", 7),
-    ("Nordea AB", "3600", "3999", 7),  # 3977
+    ("Nordea AB", "3600", "3999", 7),
     ("Nordea AB", "4000", "4999", 7),
     ("SEB", "5000", "5999", 7),
     ("Handelsbanken", "6000", "6999", 9),
     ("Swedbank", "7000", "7999", 7),
-    ("Swedbank", "8000", "8999", 8),  # Swedbank acc # can be 10 digits but clearing max 5
+    ("Swedbank", "8000", "8999", 8),
     ("Länsförsäkringar Bank AB", "9020", "9029", 7),
     ("Citibank", "9040", "9049", 7),
     ("Länsförsäkringar Bank AB", "9060", "9069", 7),

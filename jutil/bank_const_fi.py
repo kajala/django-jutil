@@ -645,7 +645,7 @@ FI_BIC_BY_ACCOUNT_NUMBER = {  # 644
     "899": "DABAFIHH",
 }
 
-FI_BANK_NAME_BY_BIC = {  # 13
+FI_BANK_NAME_BY_BIC = {  # 14
     "AABAFI22": "Ålandsbanken",
     "BIGKFIH1": "Bigbank",
     "DABAFIHH": "Danske Bank",

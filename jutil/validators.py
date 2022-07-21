@@ -611,6 +611,16 @@ SE_SSN_FILTER = re.compile(r"[^-0-9]")
 SE_SSN_VALIDATOR = re.compile(r"^\d{6}[-]\d{3}[\d]$")
 
 
+def se_iban_bank_info(v: str) -> Tuple[str, str]:
+    """
+    Returns BIC code and bank name from SE IBAN number.
+    :param v: IBAN account number
+    :return: (BIC code, bank name) or ('', '') if not found
+    """
+    bank_name = se_clearing_code_bank_info(v)[0]
+    return "", bank_name
+
+
 def se_iban_validator(v: str):
     validate_country_iban(v, "SE")
 
@@ -646,11 +656,13 @@ def se_ssn_validator(v0: str):
 
 def se_clearing_code_bank_info(account_number: str) -> Tuple[str, Optional[int]]:
     """
-    Returns Sweden bank info by clearning code.
+    Returns Sweden bank info by clearing code.
     :param account_number: Swedish account number with clearing code as prefix
     :return: (Bank name, account digit count) or ('', None) if not found
     """
-    v = digit_filter(account_number)
+    v = iban_filter(account_number)
+    if v.startswith("SE"):
+        v = v[4:]
     clearing = v[:4]
     for name, begin, end, acc_digits in SE_BANK_CLEARING_LIST:
         if begin <= clearing <= end:
