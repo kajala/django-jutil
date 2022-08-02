@@ -182,6 +182,8 @@ def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
 def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[str, str, str]:
     """
     Returns (ip, country_code, host) tuple of the IP address.
+    Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
+
     :param ip: IP address
     :param exceptions: Raise Exception or not
     :param timeout: Timeout in seconds. Note that timeout only affects geo IP part, not getting host name.
