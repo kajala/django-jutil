@@ -137,7 +137,7 @@ def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -
 def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
     """
     Returns geo IP info. Raises Exception if query fails.
-    Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
+    Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
     Example response (GeoIP.__dict__):
 
@@ -166,7 +166,7 @@ def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
 def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
     """
     Returns geo IP info or None if geoip query fails.
-    Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
+    Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
     :param ip: str
     :param timeout: timeout in seconds
@@ -182,7 +182,7 @@ def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
 def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[str, str, str]:
     """
     Returns (ip, country_code, host) tuple of the IP address.
-    Uses either ipgeolocation.io (if IPGEOLOCATION_TOKEN set) or ipstack.com (if IPSTACK_TOKEN set)
+    Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
     :param ip: IP address
     :param exceptions: Raise Exception or not
