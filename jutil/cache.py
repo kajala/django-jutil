@@ -21,17 +21,20 @@ class CachedFieldsMixin:
         def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
             pass
 
-    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None, force: bool = False):
+    def update_cached_fields(
+        self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None, force: bool = False
+    ) -> List[str]:
         """
         Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
         :param commit: Save update fields to DB
         :param exceptions: Raise exceptions or not
         :param updated_fields: List of cached fields to update. Pass None for all cached fields.
         :param force: Force commit of all cached fields even if nothing changed
+        :return: List of changed fields
         """
+        changed_fields: List[str] = []
         try:
             fields = updated_fields or self.cached_fields
-            changed_fields: List[str] = []
             for k in fields:
                 f = "get_" + k
                 if not hasattr(self, f):
@@ -42,18 +45,21 @@ class CachedFieldsMixin:
                     changed_fields.append(k)
             if commit and changed_fields:
                 self.save(update_fields=changed_fields)  # pytype: disable=attribute-error
+            return changed_fields
         except Exception as err:
             logger.warning("%s update_cached_fields failed for %s: %s", self.__class__.__name__, self, err)
             if exceptions:
                 raise err
+            return changed_fields
 
-    def update_cached_fields_pre_save(self, update_fields: Optional[Sequence[str]]):
+    def update_cached_fields_pre_save(self, update_fields: Optional[Sequence[str]]) -> List[str]:
         """
         Call on pre_save signal for objects (to automatically refresh on save).
         :param update_fields: list of fields to update
         """
         if hasattr(self, "pk") and self.pk and update_fields is None:
-            self.update_cached_fields(commit=False, exceptions=False)
+            return self.update_cached_fields(commit=False, exceptions=False)
+        return []
 
 
 def update_cached_fields(*args):
