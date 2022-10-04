@@ -56,6 +56,7 @@ class CachedFieldsMixin:
         """
         Call on pre_save signal for objects (to automatically refresh on save).
         :param update_fields: list of fields to update
+        :return: List of changed fields
         """
         if hasattr(self, "pk") and self.pk and update_fields is None:
             return self.update_cached_fields(commit=False, exceptions=False)
