@@ -68,6 +68,28 @@ Test Code Coverage
 * `coverage run manage.py; coverage report`
 
 
+Notes About Email Configurations
+================================
+
+# Microsoft 365 (2022)
+EMAIL_HOST = "smtp.office365.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = (microsoft 365 email account)
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = (email password)
+EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 60
+
+# SendGrid (2022)
+EMAIL_SENDGRID_API_KEY = (api_key)
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = (sendgrid api key)
+
+
 Changes
 =======
 

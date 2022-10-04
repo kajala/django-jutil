@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, TYPE_CHECKING, Any, Sequence
+from typing import Optional, TYPE_CHECKING, Any, Sequence, List
 
 logger = logging.getLogger(__name__)
 
@@ -21,27 +21,31 @@ class CachedFieldsMixin:
         def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
             pass
 
-    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None):
+    def update_cached_fields(self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None, force: bool = False):
         """
         Updates cached fields using get_xxx calls for each cached field (in cached_fields list).
         :param commit: Save update fields to DB
         :param exceptions: Raise exceptions or not
         :param updated_fields: List of cached fields to update. Pass None for all cached fields.
+        :param force: Force commit of all cached fields even if nothing changed
         """
         try:
             fields = updated_fields or self.cached_fields
+            changed_fields: List[str] = []
             for k in fields:
                 f = "get_" + k
                 if not hasattr(self, f):
                     raise Exception("Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(k=k, obj=self))
                 v = self.__getattribute__(f)()
-                setattr(self, k, v)
-            if commit and (fields is None or fields):
-                self.save(update_fields=fields)  # pytype: disable=attribute-error
-        except Exception as e:
-            logger.error("%s.update_cached_fields: %s", self.__class__, e)
+                if force or getattr(self, k) != v:
+                    setattr(self, k, v)
+                    changed_fields.append(k)
+            if commit and changed_fields:
+                self.save(update_fields=changed_fields)  # pytype: disable=attribute-error
+        except Exception as err:
+            logger.warning("%s update_cached_fields failed for %s: %s", self.__class__.__name__, self, err)
             if exceptions:
-                raise e
+                raise err
 
     def update_cached_fields_pre_save(self, update_fields: Optional[Sequence[str]]):
         """
