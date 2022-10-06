@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$1" == "--force" ]; then
+    rm -rf ./.pytype
+    rm -rf ./.mypy_cache
+fi
+
 # create 4-grid
 # run prospector, pytype, mypy and tests
 tmux new-session \; \
