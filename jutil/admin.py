@@ -71,13 +71,14 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
             )
 
 
-def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder) -> str:
+def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder, max_serialized_field_length: Optional[int] = None) -> str:
     """
     JSON serializes (changed) fields of a model instance for logging purposes.
     Referenced objects with primary key (pk) attribute are formatted using only that field as value.
     :param obj: Model instance
     :param field_names: List of field names to store
     :param cls: Serialization class. Default DjangoJSONEncoder.
+    :param max_serialized_field_length: Optional maximum length for individual serialized str value. Longer fields are cut with terminating [...]
     :return: str
     """
     out: Dict[str, Any] = {}
@@ -85,13 +86,15 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
         val = getattr(obj, k) if hasattr(obj, k) else None
         if hasattr(val, "pk"):
             val = val.pk
+        if max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
+            val = val[:max_serialized_field_length] + " [...]"
         out[k] = val
     return json.dumps(out, cls=cls)
 
 
-def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder):  # pylint: disable=too-many-locals
+def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000):  # noqa
     from ipware import get_client_ip  # type: ignore  # noqa
-    from django.contrib.admin.utils import _get_changed_field_labels_from_form  # noqa
+    from django.contrib.admin.utils import _get_changed_field_labels_from_form  # type: ignore  # noqa
     from jutil.model import get_model_field_names  # noqa
 
     changed_data = form.changed_data
@@ -100,7 +103,7 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
 
     ip = get_client_ip(request)[0]
     instance = form.instance if hasattr(form, "instance") and form.instance is not None else None
-    values_str = admin_obj_serialize_fields(form.instance, changed_data, cls) if instance is not None else ""
+    values_str = admin_obj_serialize_fields(form.instance, changed_data, cls, max_serialized_field_length) if instance is not None else ""
     values = json.loads(values_str) if values_str else {}
     change_message = []
     if add:
@@ -111,7 +114,7 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
         with translation.override(None):
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    values = json.loads(admin_obj_serialize_fields(added_object, get_model_field_names(added_object), cls))
+                    values = json.loads(admin_obj_serialize_fields(added_object, get_model_field_names(added_object), cls, max_serialized_field_length))
                     change_message.append(
                         {
                             "added": {
@@ -123,7 +126,7 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
                         }
                     )
                 for changed_object, changed_fields in formset.changed_objects:
-                    values = json.loads(admin_obj_serialize_fields(changed_object, changed_fields, cls))
+                    values = json.loads(admin_obj_serialize_fields(changed_object, changed_fields, cls, max_serialized_field_length))
                     change_message.append(
                         {
                             "changed": {
@@ -184,7 +187,7 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
 class ModelAdminBase(admin.ModelAdmin):
     """
     ModelAdmin with some customizations:
-    * Customized change message which logs changed values and user IP as well (can be disabled by extended_log=False, serialization done by serialization_cls)
+    * Customized change message which logs changed values and user IP as well (can be disabled by extended_log=False)
     * Length-limited latest-first history view (customizable by max_history_length)
     * Actions sorted alphabetically by localized description
     * Additional fill_extra_context() method which can be used to share common extra context for add_view(), change_view() and changelist_view()
@@ -195,10 +198,11 @@ class ModelAdminBase(admin.ModelAdmin):
     extended_log = True
     max_history_length = 1000
     serialization_cls = DjangoJSONEncoder
+    max_serialized_field_length = 1000
 
     def construct_change_message(self, request, form, formsets, add=False):
         if self.extended_log:
-            return admin_construct_change_message_ex(request, form, formsets, add, self.serialization_cls)
+            return admin_construct_change_message_ex(request, form, formsets, add, self.serialization_cls, self.max_serialized_field_length)
         return super().construct_change_message(request, form, formsets, add)
 
     def sort_actions_by_description(self, actions: dict) -> OrderedDict:
