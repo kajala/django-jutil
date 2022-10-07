@@ -131,7 +131,7 @@ def is_model_field_changed(instance, field_name: str) -> bool:
     return not qs.filter(**params).exists()
 
 
-def get_model_keys(instance, cls: Optional[Type[Model]] = None, exclude_fields: Sequence[str] = ("id",), base_class_suffix: str = "_ptr") -> List[str]:
+def get_model_field_names(instance, cls: Optional[Type[Model]] = None, exclude_fields: Sequence[str] = ("id",), base_class_suffix: str = "_ptr") -> List[str]:
     if cls is None:
         cls = instance.__class__
     return [f.name for f in cls._meta.fields if f.name not in exclude_fields and not f.name.endswith(base_class_suffix)]
@@ -152,7 +152,7 @@ def clone_model(
     """
     if cls is None:
         cls = instance.__class__
-    keys = get_model_keys(instance, cls=cls, exclude_fields=exclude_fields, base_class_suffix=base_class_suffix)
+    keys = get_model_field_names(instance, cls=cls, exclude_fields=exclude_fields, base_class_suffix=base_class_suffix)
     new_instance = cls()
     for k in keys:
         setattr(new_instance, k, getattr(instance, k))

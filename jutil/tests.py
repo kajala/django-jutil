@@ -28,7 +28,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory, Client
 from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
-from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, AdminLogEntryMixin, get_admin_log
+from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, get_admin_log
 from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
 from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments, get_command_by_name, get_command_name
 from jutil.email import make_email_recipient_list
@@ -1085,13 +1085,6 @@ class Tests(TestCase, TestSetupMixin):
         assert isinstance(content, str)
         self.assertEqual(content.count("VisibleLogMessage"), 5)
         self.assertEqual(content.count("InvisibleLogMessage"), 0)
-
-    def test_admin_log_entry_mixin(self):
-        user = self.user
-        AdminLogEntryMixin.fields_changed(user, ["username"], who=None)
-        e = LogEntry.objects.filter(object_id=user.id).last()
-        assert isinstance(e, LogEntry)
-        self.assertEqual(e.change_message, 'username: "test@example.com"')
 
     def test_auth(self):
         req = self.create_dummy_request()

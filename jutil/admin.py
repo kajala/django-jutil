@@ -9,6 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.urls import reverse, resolve
+from django.utils import translation
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -32,12 +33,13 @@ def get_admin_log(instance: object) -> QuerySet:
     )
 
 
-def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, **kwargs):
+def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, action_flag: int = CHANGE, **kwargs):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances (None values are ignored)
     :param msg: Message to log
     :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
+    :param action_flag: ADDITION / CHANGE / DELETION action flag. Default CHANGED.
     :param kwargs: Optional key-value attributes to append to message
     :return: None
     """
@@ -51,13 +53,11 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
         instances = [instances]  # type: ignore
 
     # append extra context if any
-    cx: Dict[str, Any] = {}
+    extra_context: List[str] = []
     for k, v in kwargs.items():
-        if hasattr(v, "pk"):  # log only primary key for model instances, not whole str representation
-            v = v.pk
-        cx[k] = v
-    if cx:
-        msg += " | " + json.dumps(cx, cls=DjangoJSONEncoder)
+        extra_context.append(str(k) + "=" + str(v))
+    if extra_context:
+        msg += " | " + ", ".join(extra_context)
 
     for instance in instances:
         if instance:
@@ -66,30 +66,86 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
                 content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
                 object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
                 object_repr=force_str(instance),
-                action_flag=CHANGE,
+                action_flag=action_flag,
                 change_message=msg,
             )
 
 
-def admin_log_changed_fields(obj: object, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
+def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder) -> str:
     """
-    Logs changed fields of a model instance to admin log.
+    JSON serializes (changed) fields of a model instance for logging purposes.
+    Referenced objects with primary key (pk) attribute are formatted using only that field as value.
     :param obj: Model instance
-    :param field_names: Field names
-    :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
-    :param kwargs: Optional key-value attributes to append to message
-    :return:
+    :param field_names: List of field names to store
+    :param cls: Serialization class. Default DjangoJSONEncoder.
+    :return: str
     """
-    from jutil.model import get_model_field_label_and_value  # noqa
-
-    fv: List[str] = []
+    out: Dict[str, Any] = {}
     for k in field_names:
-        label, value = get_model_field_label_and_value(obj, k)
-        fv.append('{}: "{}"'.format(label, value))
-    msg = ", ".join(fv)
-    if "ip" in kwargs:
-        msg += " (IP {ip})".format(ip=kwargs.pop("ip"))
-    admin_log([obj], msg, who, **kwargs)  # type: ignore
+        val = getattr(obj, k) if hasattr(obj, k) else None
+        if hasattr(val, "pk"):
+            val = val.pk
+        out[k] = val
+    return json.dumps(out, cls=cls)
+
+
+def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder):  # pylint: disable=too-many-locals
+    from ipware import get_client_ip  # type: ignore  # noqa
+    from django.contrib.admin.utils import _get_changed_field_labels_from_form  # noqa
+    from jutil.model import get_model_field_names  # noqa
+
+    changed_data = form.changed_data
+    with translation.override(None):
+        changed_field_labels = _get_changed_field_labels_from_form(form, changed_data)
+
+    ip = get_client_ip(request)[0]
+    instance = form.instance if hasattr(form, "instance") and form.instance is not None else None
+    values_str = admin_obj_serialize_fields(form.instance, changed_data, cls) if instance is not None else ""
+    values = json.loads(values_str) if values_str else {}
+    change_message = []
+    if add:
+        change_message.append({"added": {"values": values, "ip": ip}})
+    elif form.changed_data:
+        change_message.append({"changed": {"fields": changed_field_labels, "values": values, "ip": ip}})
+    if formsets:
+        with translation.override(None):
+            for formset in formsets:
+                for added_object in formset.new_objects:
+                    values = json.loads(admin_obj_serialize_fields(added_object, get_model_field_names(added_object), cls))
+                    change_message.append(
+                        {
+                            "added": {
+                                "name": str(added_object._meta.verbose_name),
+                                "object": str(added_object),
+                                "values": values,
+                                "ip": ip,
+                            }
+                        }
+                    )
+                for changed_object, changed_fields in formset.changed_objects:
+                    values = json.loads(admin_obj_serialize_fields(changed_object, changed_fields, cls))
+                    change_message.append(
+                        {
+                            "changed": {
+                                "name": str(changed_object._meta.verbose_name),
+                                "object": str(changed_object),
+                                "fields": _get_changed_field_labels_from_form(formset.forms[0], changed_fields),
+                                "values": values,
+                                "ip": ip,
+                            }
+                        }
+                    )
+                for deleted_object in formset.deleted_objects:
+                    change_message.append(
+                        {
+                            "deleted": {
+                                "name": str(deleted_object._meta.verbose_name),
+                                "object": str(deleted_object),
+                                "ip": ip,
+                            }
+                        }
+                    )
+    return change_message
 
 
 def admin_obj_url(obj: Optional[object], route: str = "", base_url: str = "") -> str:
@@ -127,11 +183,23 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
 
 class ModelAdminBase(admin.ModelAdmin):
     """
-    ModelAdmin with save-on-top default enabled and customized (length-limited) history view.
+    ModelAdmin with some customizations:
+    * Customized change message which logs changed values and user IP as well (can be disabled by extended_log=False, serialization done by serialization_cls)
+    * Length-limited latest-first history view (customizable by max_history_length)
+    * Actions sorted alphabetically by localized description
+    * Additional fill_extra_context() method which can be used to share common extra context for add_view(), change_view() and changelist_view()
+    * Save-on-top enabled by default (save_on_top=True)
     """
 
     save_on_top = True
+    extended_log = True
     max_history_length = 1000
+    serialization_cls = DjangoJSONEncoder
+
+    def construct_change_message(self, request, form, formsets, add=False):
+        if self.extended_log:
+            return admin_construct_change_message_ex(request, form, formsets, add, self.serialization_cls)
+        return super().construct_change_message(request, form, formsets, add)
 
     def sort_actions_by_description(self, actions: dict) -> OrderedDict:
         """
@@ -166,6 +234,9 @@ class ModelAdminBase(admin.ModelAdmin):
         """
         return super().change_view(request, object_id, form_url, self.fill_extra_context(request, extra_context))
 
+    def changelist_view(self, request, extra_context=None):
+        return super().changelist_view(request, self.fill_extra_context(request, extra_context))
+
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kwargs):  # pylint: disable=unused-argument
         """
         Changelist view which allow key-value arguments and calls fill_extra_context().
@@ -174,35 +245,38 @@ class ModelAdminBase(admin.ModelAdmin):
         :param kwargs: Key-value dict
         :return: See changelist_view()
         """
+        extra_context = extra_context or {}
+        extra_context.update(kwargs)
         return self.changelist_view(request, self.fill_extra_context(request, extra_context))
 
     def history_view(self, request, object_id, extra_context=None):
-        """
-        The 'history' admin view for this model.
-        """
         from django.contrib.admin.models import LogEntry  # noqa
 
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))
         if obj is None:
-            return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
+            return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)  # noqa
 
         if not self.has_view_or_change_permission(request, obj):
             raise PermissionDenied
 
         # Then get the history for this object.
-        opts = model._meta
+        opts = model._meta  # noqa
         app_label = opts.app_label
         action_list = (
-            LogEntry.objects.filter(object_id=unquote(object_id), content_type=get_content_type_for_model(model))
+            LogEntry.objects.filter(
+                object_id=unquote(object_id),
+                content_type=get_content_type_for_model(model),
+            )
             .select_related()
-            .order_by("-action_time")[: self.max_history_length]
-        )
+            .order_by("-action_time")
+        )[: self.max_history_length]
 
         context = {
             **self.admin_site.each_context(request),
             "title": _("Change history: %s") % obj,
+            "subtitle": None,
             "action_list": action_list,
             "module_name": str(capfirst(opts.verbose_name_plural)),
             "object": obj,
@@ -219,7 +293,7 @@ class ModelAdminBase(admin.ModelAdmin):
             or [
                 "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
                 "admin/%s/object_history.html" % app_label,
-                "admin/object_history.html",
+                "jutil/admin/object_history.html",
             ],
             context,
         )
@@ -245,13 +319,3 @@ class InlineModelAdminParentAccessMixin:
         if resolved.args:
             return mgr.filter(pk=resolved.args[0]).first()
         return None
-
-
-class AdminLogEntryMixin:
-    """
-    Model mixin for logging Django admin changes of Models.
-    Call fields_changed() on change events.
-    """
-
-    def fields_changed(self, field_names: Sequence[str], who: Optional[User] = None, **kwargs):
-        admin_log_changed_fields(self, field_names, who, **kwargs)
