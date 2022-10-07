@@ -48,6 +48,19 @@ Install
 pip install django-jutil
 
 
+Notes About Features
+====================
+
+Extended Admin Logging
+----------------------
+jutil.ModelAdminBase supports (by default) extended logging using Django's native LogEntry' change_message 
+JSON field. Normally Django logs only field verbose names but jutil implementation
+logs changed field names and values and user IP as well to the same change_message JSON field.
+To actually show output from this extended logging data you need to format change_message using 
+format_change_message_ex filter. The default ModelAdminBase object history template (jutil/admin/object_history.html) uses it. 
+
+
+
 Static Code Analysis
 ====================
 
