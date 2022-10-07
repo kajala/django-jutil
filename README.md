@@ -14,7 +14,7 @@ Features
 * Simplified admin changes history logging (admin_log)
 * ModelAdmin with length limited history view (ModelAdminBase)
 * Simplified object URL/link generation within admin (admin_obj_link and admin_obj_url)
-* Extended admin log with changed fields and user IP (ModelAdminBase)
+* Extended admin log with changed field values and user IP (ModelAdminBase)
 * Admin file download mixin with file permission checks (AdminFileDownloadMixin)
 * User authentication helpers (require_auth, AuthUserMixin)
 * Mixin for cached model fields management (CachedFieldsMixin)
