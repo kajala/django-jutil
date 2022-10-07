@@ -85,8 +85,8 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
     for k in field_names:
         val = getattr(obj, k) if hasattr(obj, k) else None
         if hasattr(val, "pk"):
-            val = val.pk
-        if max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
+            val = {"pk": val.pk, "str": str(val)}
+        elif max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
             val = val[:max_serialized_field_length] + " [...]"
         out[k] = val
     return json.dumps(out, cls=cls)
