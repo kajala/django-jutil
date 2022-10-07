@@ -20,8 +20,11 @@ def format_change_message_ex(action: LogEntry) -> str:
         for sub_message in change_message:
             if "added" in sub_message:
                 if sub_message["added"]:
-                    sub_message["added"]["name"] = gettext(sub_message["added"]["name"])
-                    messages.append(gettext("Added {name} “{object}”.").format(**sub_message["added"]))
+                    if "name" in sub_message["added"]:
+                        sub_message["added"]["name"] = gettext(sub_message["added"]["name"])
+                        messages.append(gettext("Added {name} “{object}”.").format(**sub_message["added"]))
+                    else:
+                        messages.append(gettext("Added."))
                     if "values" in sub_message["added"]:
                         values_str = json.dumps(list(sub_message["added"]["values"].values()))
                         messages.append("Initial values: {}.".format(values_str))
