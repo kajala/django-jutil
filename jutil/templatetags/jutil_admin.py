@@ -25,7 +25,7 @@ def format_change_message_ex(action: LogEntry) -> str:
                     if "values" in sub_message["added"]:
                         messages.append("Initial values: {}.".format(list(sub_message["added"]["values"].values())))
                     if "ip" in sub_message["added"]:
-                        messages.append("IP: {}.".format(sub_message["added"]["ip"]))
+                        messages.append("User IP: {}.".format(sub_message["added"]["ip"]))
                 else:
                     messages.append(gettext("Added."))
 
@@ -48,7 +48,7 @@ def format_change_message_ex(action: LogEntry) -> str:
                 sub_message["deleted"]["name"] = gettext(sub_message["deleted"]["name"])
                 messages.append(gettext("Deleted {name} “{object}”.").format(**sub_message["deleted"]))
                 if sub_message["deleted"] and "ip" in sub_message["deleted"]:
-                    messages.append("IP: {}.".format(sub_message["deleted"]["ip"]))
+                    messages.append("User IP: {}.".format(sub_message["deleted"]["ip"]))
 
         change_message = " ".join(msg[0].upper() + msg[1:] for msg in messages)
         return change_message or gettext("No fields changed.")
