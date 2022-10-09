@@ -1,5 +1,6 @@
 import json
 from collections import OrderedDict
+from decimal import Decimal
 from typing import Optional, Sequence, List, Dict, Any
 from django.conf import settings
 from django.contrib import admin
@@ -84,10 +85,13 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
     out: Dict[str, Any] = {}
     for k in field_names:
         val = getattr(obj, k) if hasattr(obj, k) else None
-        if hasattr(val, "pk"):
-            val = {"pk": val.pk, "str": str(val)}
-        elif max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
-            val = val[:max_serialized_field_length] + " [...]"
+        if val is not None:
+            if hasattr(val, "pk"):
+                val = {"pk": val.pk, "str": str(val)}
+            elif not isinstance(val, (Decimal, float, int, bool)):
+                val = str(val)
+            if max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
+                val = val[:max_serialized_field_length] + " [...]"
         out[k] = val
     return json.dumps(out, cls=cls)
 
