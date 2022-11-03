@@ -14,7 +14,7 @@ from django.utils import translation
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.contrib.admin.models import CHANGE
+from django.contrib.admin.models import CHANGE, ADDITION
 from django.template.response import TemplateResponse
 from django.contrib.admin.options import get_content_type_for_model
 from django.contrib.admin.utils import unquote
@@ -22,6 +22,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.text import capfirst
 from django.utils.encoding import force_str
 from django.contrib.admin.models import LogEntry
+from jutil.model import get_model_field_label
 
 
 def get_admin_log(instance: object) -> QuerySet:
@@ -32,6 +33,14 @@ def get_admin_log(instance: object) -> QuerySet:
         content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
         object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
     )
+
+
+def admin_log_system_user():
+    """
+    Returns admin log system user (username either settings.DJANGO_SYSTEM_USER, default value "system")
+    """
+    username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"  # type: ignore
+    return get_user_model().objects.get_or_create(username=username)[0]
 
 
 def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, action_flag: int = CHANGE, **kwargs):
@@ -46,8 +55,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None,
     """
     # use system user if 'who' is missing
     if who is None:
-        username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"  # type: ignore
-        who = get_user_model().objects.get_or_create(username=username)[0]
+        who = admin_log_system_user()
 
     # allow passing individual instance
     if not isinstance(instances, list) and not isinstance(instances, tuple):
@@ -96,7 +104,73 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
     return json.dumps(out, cls=cls)
 
 
-def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000):  # noqa
+def admin_log_has_field_values(instance) -> bool:  # pylint: disable=too-many-nested-blocks
+    """
+    Returns True if the instance has any field values stored as JSON in the admin log.
+    See: admin_construct_change_message_ex, admin_log_field_values
+    """
+    content_type_id = get_content_type_for_model(instance).pk
+    for e in LogEntry.objects.filter(content_type_id=content_type_id, object_id=instance.pk).order_by("id").distinct():
+        assert isinstance(e, LogEntry)
+        try:
+            change_message = json.loads(e.change_message)  # type: ignore  # noqa
+        except json.JSONDecodeError:
+            continue
+        if isinstance(change_message, list):
+            for msg in change_message:
+                if isinstance(msg, dict):
+                    added_or_changed = msg.get("added") or msg.get("changed") or {}
+                    if added_or_changed:
+                        values = added_or_changed.get("values") or {}
+                        if values and isinstance(values, dict):
+                            return True
+    return False
+
+
+def admin_log_field_values(
+    instance, changed_data: Optional[List[str]] = None, who: Optional[User] = None, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000
+) -> LogEntry:  # noqa
+    """
+    Logs instance field values as JSON in the admin log.
+    :param instance: Model instance
+    :param changed_data: List of changed field names. If None then ADDITION is assumed as action.
+    :param who: User who did the change. Default is system user.
+    :param cls: JSON encoder. Default: Django implementation
+    :param max_serialized_field_length: Max length for long text fields.
+    :return: LogEntry
+    """
+    from jutil.model import get_model_field_names  # type: ignore  # noqa
+
+    if changed_data:
+        action_flag = CHANGE
+        field_names = changed_data
+    else:
+        action_flag = ADDITION
+        field_names = get_model_field_names(instance)
+
+    values_str = admin_obj_serialize_fields(instance, field_names, cls, max_serialized_field_length)
+    values = json.loads(values_str) if values_str else {}
+    if changed_data:
+        with translation.override(None):
+            changed_field_labels = [str(get_model_field_label(instance, k)) for k in changed_data]
+        change_message = [{"changed": {"name": str(instance._meta.verbose_name), "object": str(instance), "fields": changed_field_labels, "values": values}}]
+    else:
+        change_message = [{"added": {"values": values}}]
+    # use system user if 'who' is missing
+    if who is None:
+        who = admin_log_system_user()
+    content_type_id = get_content_type_for_model(instance).pk
+    return LogEntry.objects.log_action(
+        user_id=who.pk,
+        content_type_id=content_type_id,
+        object_id=instance.pk,
+        object_repr=str(instance),
+        action_flag=action_flag,
+        change_message=change_message,
+    )
+
+
+def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000) -> List[Any]:  # noqa
     from ipware import get_client_ip  # type: ignore  # noqa
     from django.contrib.admin.utils import _get_changed_field_labels_from_form  # type: ignore  # noqa
     from jutil.model import get_model_field_names  # noqa
