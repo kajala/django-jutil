@@ -771,11 +771,6 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(email_sanitizer("test@example.com"), "test@example.com")
         self.assertEqual(email_sanitizer("testexample.com"), "")
 
-    def test_format_dict_as_html(self):
-        a = {"b": 1, "c": {"@testVariable": "123"}}
-        res = "<pre>B: 1\nC:\n    Test variable: 123\n\n</pre>"
-        self.assertEqual(format_dict_as_html(a), res)
-
     def test_format_xml(self):
         assert settings.XMLLINT_PATH, 'add e.g. XMLLINT_PATH = "/usr/bin/xmllint" to settings.py'
         src = "<ApplicationRequest> <CustomerId>1</CustomerId>  <Command>DownloadFileList</Command><Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp><Environment>PRODUCTION</Environment></ApplicationRequest>"

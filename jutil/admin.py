@@ -110,7 +110,8 @@ def admin_log_has_field_values(instance) -> bool:  # pylint: disable=too-many-ne
     See: admin_construct_change_message_ex, admin_log_field_values
     """
     content_type_id = get_content_type_for_model(instance).pk
-    for e in LogEntry.objects.filter(content_type_id=content_type_id, object_id=instance.pk).order_by("id").distinct():
+    qs = LogEntry.objects.filter(content_type_id=content_type_id, object_id=instance.pk)
+    for e in qs.order_by("id").distinct():  # pylint: disable=too-many-nested-blocks
         assert isinstance(e, LogEntry)
         try:
             change_message = json.loads(e.change_message)  # type: ignore  # noqa
