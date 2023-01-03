@@ -5,14 +5,14 @@ import logging
 import os
 import re
 import tempfile
-from collections import OrderedDict
 from datetime import timedelta
 from decimal import Decimal
 import subprocess
 from io import StringIO
-from typing import List, Any, Optional, Union, Dict, Sequence, Tuple, TypeVar
+from typing import List, Any, Optional, Union, Sequence, Tuple, TypeVar, Dict
 from django.conf import settings
 from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
 from django.utils.safestring import mark_safe
@@ -184,50 +184,12 @@ def format_as_html_json(value: Any) -> str:
     :param value: Any value which can be converted to JSON by json.dumps
     :return: str
     """
-    return mark_safe(html.escape(json.dumps(value, indent=4)).replace("\n", "<br/>").replace(" ", "&nbsp;"))
+    return mark_safe(html.escape(json.dumps(value, indent=4, cls=DjangoJSONEncoder)).replace("\n", "<br/>").replace(" ", "&nbsp;"))
 
 
-def _format_dict_as_html_key(k: str) -> str:
-    if k.startswith("@"):
-        k = k[1:]
-    k = k.replace("_", " ")
-    k = re.sub(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r" \1", k)
-    parts = k.split(" ")
-    out: List[str] = [str(capfirst(parts[0].strip()))]
-    for p in parts[1:]:
-        p2 = p.strip().lower()
-        if p2:
-            out.append(p2)
-    return " ".join(out)
-
-
-def _format_dict_as_html_r(data: Dict[str, Any], margin: str = "", format_keys: bool = True) -> str:
-    if not isinstance(data, dict):
-        return "{}{}\n".format(margin, data)
-    out = ""
-    for k, v in OrderedDict(sorted(data.items())).items():
-        if isinstance(v, dict):
-            out += "{}{}:\n".format(margin, _format_dict_as_html_key(k) if format_keys else k)
-            out += _format_dict_as_html_r(v, margin + "    ", format_keys=format_keys)
-            out += "\n"
-        elif isinstance(v, list):
-            for v2 in v:
-                out += "{}{}:\n".format(margin, _format_dict_as_html_key(k) if format_keys else k)
-                out += _format_dict_as_html_r(v2, margin + "    ", format_keys=format_keys)
-            out += "\n"
-        else:
-            out += "{}{}: {}\n".format(margin, _format_dict_as_html_key(k) if format_keys else k, v)
-    return out
-
-
-def format_dict_as_html(data: Dict[str, Any], format_keys: bool = True) -> str:
-    """
-    Formats dict to simple human readable pre-formatted html (<pre> tag).
-    :param data: dict
-    :param format_keys: Re-format 'additionalInfo' and 'additional_info' type of keys as 'Additional info'
-    :return: str (html)
-    """
-    return "<pre>" + _format_dict_as_html_r(data, format_keys=format_keys) + "</pre>"
+def format_dict_as_html(value: Dict[str, Any]) -> str:
+    logging.warning("format_dict_as_html() is deprecated, use format_as_html_json()")
+    return format_as_html_json(value)
 
 
 def format_csv(rows: List[List[Any]], dialect: str = "excel") -> str:
