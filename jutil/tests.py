@@ -86,6 +86,7 @@ from jutil.format import (
     is_media_full_path,
     capfirst_lazy,
     dec0,
+    upper_lazy,
 )
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
@@ -937,6 +938,18 @@ class Tests(TestCase, TestSetupMixin):
 -----------------------------------------------------
             """.strip()
         self.assertEqual(out, out_ref)
+
+    def test_upper_lazy(self):
+        s = gettext_lazy(upper_lazy("missing value"))
+        s_ref = gettext_lazy("MISSING VALUE")
+        s_en = "MISSING VALUE"
+        s_fi = "PUUTTUVA ARVO"
+        with override("fi"):
+            self.assertEqual(s, s_fi)
+            self.assertEqual(s, s_ref)
+        with override("en"):
+            self.assertEqual(s, s_en)
+            self.assertEqual(s, s_ref)
 
     def test_capfirst_lazy(self):
         s = gettext_lazy(capfirst_lazy("missing value"))

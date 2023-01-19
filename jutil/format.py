@@ -337,7 +337,15 @@ def _capfirst_lazy(x):
     return x[0:1].upper() + x[1:] if x else ""
 
 
+def _upper_lazy(x):
+    """
+    str.upper() keeping lazy strings lazy.
+    """
+    return str(x).upper() if x else ""
+
+
 capfirst_lazy = lazy(_capfirst_lazy, str)
+upper_lazy = lazy(_upper_lazy, str)
 
 
 def dec0(a: Union[float, int, Decimal, str]) -> Decimal:
