@@ -1,5 +1,7 @@
 from datetime import datetime, date
 from decimal import Decimal
+from tempfile import NamedTemporaryFile
+from zipfile import ZipFile, ZIP_DEFLATED
 from django.http import HttpResponse
 from django.utils.html import strip_tags
 from typing import Any, List, Optional
@@ -16,7 +18,7 @@ except Exception as err:
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Alignment, NamedStyle  # type: ignore
 from openpyxl.worksheet.worksheet import Worksheet  # type: ignore
-from openpyxl.writer.excel import save_virtual_workbook  # type: ignore
+from openpyxl.writer.excel import ExcelWriter
 
 
 class CellConfig:
@@ -34,10 +36,24 @@ class ExcelResponse(HttpResponse):
         if not content_type:
             content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         super().__init__(
-            content=save_virtual_workbook(book),
+            content=save_workbook_to_bytes(book),
             content_type=content_type,
         )
         self["Content-Disposition"] = disposition
+
+
+def save_workbook_to_bytes(workbook: Workbook) -> bytes:
+    """
+    Return an in-memory workbook.
+    """
+    tmp = NamedTemporaryFile()
+    archive = ZipFile(tmp, "w", ZIP_DEFLATED, allowZip64=True)
+    writer = ExcelWriter(workbook, archive)
+    writer.save()
+    tmp.seek(0)
+    virtual_workbook = tmp.read()
+    tmp.close()
+    return virtual_workbook
 
 
 def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any, config: Optional[CellConfig] = None):

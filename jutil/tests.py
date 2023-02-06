@@ -1320,6 +1320,18 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(redis_get_bytes("jani2"), b'"testing"')
         self.assertDictEqual(redis_get_json("jani3"), {"a": 2})
 
+    def test_openpyxl_helpers(self):
+        from jutil.openpyxl_helpers import rows_to_workbook, save_workbook_to_bytes  # type: ignore  # noqa
+        from openpyxl import load_workbook  # type: ignore  # noqa
+
+        rows = [["hello", "world"], [True, 1.0, 2]]
+        wb = rows_to_workbook(rows)
+        buf = save_workbook_to_bytes(wb)
+        wb2 = load_workbook(filename=BytesIO(buf))
+        self.assertEqual(wb2.active.cell(1, 1).value, "hello")
+        self.assertEqual(wb2.active.cell(2, 2).value, 1.0)
+        self.assertEqual(wb2.active.cell(2, 3).value, 2)
+
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
 dummy_admin_func_b.short_description = "B"  # type: ignore
