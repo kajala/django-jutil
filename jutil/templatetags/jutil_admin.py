@@ -6,14 +6,20 @@ from django.utils.text import get_text_list
 from django.template.defaultfilters import register
 
 
-def format_change_message_ex_values_dict(values: dict) -> str:
+def format_change_message_ex_values_dict(model: Any, values: dict) -> str:
     out: List[Any] = []
-    for v in values.values():
+    for k, v in values.items():
         if isinstance(v, dict) and "pk" in v and "str" in v:
             obj_pk = v["pk"]
             obj_str = v["str"]
             out.append(f'"{obj_str}" [id={obj_pk}]')
         else:
+            field = getattr(model, k).field if hasattr(model, k) and hasattr(getattr(model, k), "field") else None  # type: ignore  # noqa
+            if hasattr(field, "choices") and field.choices:
+                choice_label = dict(field.choices).get(v) or ""
+                if choice_label:
+                    out.append(f'"{v}" ({choice_label})')
+                    continue
             out.append(json.dumps(v))
     return ", ".join(out)
 
@@ -29,6 +35,8 @@ def format_change_message_ex(action: LogEntry) -> str:  # noqa
             change_message = json.loads(action.change_message)
         except json.JSONDecodeError:
             return action.change_message
+        obj = action.get_edited_object()
+        model = obj._meta.model  # type: ignore  # noqa
         messages = []
         for sub_message in change_message:
             if "added" in sub_message:
@@ -39,7 +47,7 @@ def format_change_message_ex(action: LogEntry) -> str:  # noqa
                     else:
                         messages.append(gettext("Added."))
                     if "values" in sub_message["added"]:
-                        values_str = format_change_message_ex_values_dict(sub_message["added"]["values"])
+                        values_str = format_change_message_ex_values_dict(model, sub_message["added"]["values"])
                         messages.append("Initial values: {}.".format(values_str))
                     if "ip" in sub_message["added"]:
                         messages.append("User IP: {}.".format(sub_message["added"]["ip"]))
@@ -57,7 +65,7 @@ def format_change_message_ex(action: LogEntry) -> str:  # noqa
                 else:
                     messages.append(gettext("Changed {fields}.").format(**sub_message["changed"]))
                 if "values" in sub_message["changed"]:
-                    values_str = format_change_message_ex_values_dict(sub_message["changed"]["values"])
+                    values_str = format_change_message_ex_values_dict(model, sub_message["changed"]["values"])
                     messages.append("New values: {}.".format(values_str))
                 if "ip" in sub_message["changed"]:
                     messages.append("User IP: {}.".format(sub_message["changed"]["ip"]))

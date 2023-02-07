@@ -18,7 +18,7 @@ except Exception as err:
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Alignment, NamedStyle  # type: ignore
 from openpyxl.worksheet.worksheet import Worksheet  # type: ignore
-from openpyxl.writer.excel import ExcelWriter
+from openpyxl.writer.excel import ExcelWriter  # type: ignore
 
 
 class CellConfig:
@@ -46,13 +46,14 @@ def save_workbook_to_bytes(workbook: Workbook) -> bytes:
     """
     Return an in-memory workbook.
     """
-    tmp = NamedTemporaryFile()
-    archive = ZipFile(tmp, "w", ZIP_DEFLATED, allowZip64=True)
-    writer = ExcelWriter(workbook, archive)
-    writer.save()
-    tmp.seek(0)
-    virtual_workbook = tmp.read()
-    tmp.close()
+    with NamedTemporaryFile() as tmp:
+        with ZipFile(tmp, "w", ZIP_DEFLATED, allowZip64=True) as archive:
+            writer = ExcelWriter(workbook, archive)
+            writer.save()
+            tmp.seek(0)
+            virtual_workbook = tmp.read()
+            archive.close()
+        tmp.close()
     return virtual_workbook
 
 
