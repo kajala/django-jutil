@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 class RedisCachedSimpleListFilter(SimpleListFilter):
     """
     Simple list filter which caches lookup-options to Redis.
-    Use as SimpleListFilter but implement lookups() method in generate_lookups() instead (both have same signature).
+    Use as SimpleListFilter but implement lookups(self, request, model_admin) method in generate_lookups(self, request, model_admin) instead.
+    SimpleListFilter queryset(self, request, queryset) should be implemented as normal.
     """
 
     redis_key_name = ""  # Redis key to store data. Default is class name.
