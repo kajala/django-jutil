@@ -106,7 +106,7 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
     value = str(getattr(instance, field_name)) if hasattr(instance, field_name) else None
     for f in instance._meta.fields:
         if field_name in (f.attname, f.name):
-            if hasattr(f, "choices") and f.choices:
+            if hasattr(f, "choices") and f.choices and value is not None:
                 value = choices_label(f.choices, value)
             break
     if value is None:

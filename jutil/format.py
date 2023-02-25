@@ -9,7 +9,7 @@ from datetime import timedelta
 from decimal import Decimal
 import subprocess
 from io import StringIO
-from typing import List, Any, Optional, Union, Sequence, Tuple, TypeVar, Dict
+from typing import List, Any, Optional, Union, Sequence, Tuple, Dict
 from django.conf import settings
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.serializers.json import DjangoJSONEncoder
@@ -19,9 +19,6 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 
 logger = logging.getLogger(__name__)
-
-S = TypeVar("S")
-T = TypeVar("T")
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> str:
@@ -486,12 +483,12 @@ def underscore_to_camel_case(s: str) -> str:
     return s
 
 
-def choices_label(choices: Sequence[Tuple[S, T]], value: S) -> Union[T, str]:
+def choices_label(choices: Sequence[Tuple[str, Any]], value: str) -> Union[Any, str]:
     """
     Iterates (value,label) list and returns label matching the choice
     :param choices: [(choice1, label1), (choice2, label2), ...]
     :param value: Value to find
-    :return: label or None
+    :return: label or ""
     """
     for key, label in choices:
         if key == value:
