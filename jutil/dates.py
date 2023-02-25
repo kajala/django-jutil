@@ -25,9 +25,9 @@ TIME_RANGE_CHOICES = [
 for d in [360, 180, 90, 60, 45, 30, 15, 7, 2, 1]:
     TIME_RANGE_CHOICES.extend(
         [
-            ("prev_{}d".format(d), format_lazy("-{} {}", d, _("number.of.days"))),
-            ("plus_minus_{}d".format(d), format_lazy("+-{} {}", d, _("number.of.days"))),
-            ("next_{}d".format(d), format_lazy("+{} {}", d, _("number.of.days"))),
+            ("prev_{}d".format(d), format_lazy("-{} {}", d, _("number.of.days"))),  # type: ignore
+            ("plus_minus_{}d".format(d), format_lazy("+-{} {}", d, _("number.of.days"))),  # type: ignore
+            ("next_{}d".format(d), format_lazy("+{} {}", d, _("number.of.days"))),  # type: ignore
         ]
     )
 

@@ -21,6 +21,7 @@ from django.utils.text import capfirst
 logger = logging.getLogger(__name__)
 
 S = TypeVar("S")
+T = TypeVar("T")
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> str:
@@ -485,7 +486,7 @@ def underscore_to_camel_case(s: str) -> str:
     return s
 
 
-def choices_label(choices: Sequence[Tuple[S, str]], value: S) -> str:
+def choices_label(choices: Sequence[Tuple[S, T]], value: S) -> Union[T, str]:
     """
     Iterates (value,label) list and returns label matching the choice
     :param choices: [(choice1, label1), (choice2, label2), ...]

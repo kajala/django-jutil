@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument,arguments-differ,consider-using-with,unused-variable,unspecified-encoding
 import json
 import logging
 import os
@@ -6,13 +7,13 @@ from decimal import Decimal
 from io import BytesIO, StringIO
 from os.path import join
 from urllib.parse import urlparse
-from django.core.management import call_command, get_commands
+from django.core.management import call_command
 from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
 from jutil.drf_exceptions import transform_exception_to_drf
-from jutil.files import list_files, find_file
+from jutil.files import find_file
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 import pytz
@@ -51,7 +52,6 @@ from jutil.dates import (
     per_delta,
     per_month,
     this_week,
-    next_month,
     next_week,
     this_month,
     last_month,
@@ -75,13 +75,11 @@ from jutil.format import (
     dec5,
     dec6,
     format_table,
-    capfirst_lazy,
     strip_media_root,
     get_media_full_path,
     camel_case_to_underscore,
     underscore_to_camel_case,
     format_as_html_json,
-    format_dict_as_html,
     choices_label,
     is_media_full_path,
     capfirst_lazy,
@@ -92,7 +90,6 @@ from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
     fi_payment_reference_number,
     se_ssn_validator,
-    se_ssn_filter,
     fi_iban_validator,
     se_iban_validator,
     iban_filter_readable,
@@ -132,7 +129,7 @@ from jutil.validators import (
     variable_name_sanitizer,
 )
 from xml.etree.ElementTree import Element
-from xml.etree import ElementTree as ET
+from xml.etree import ElementTree as ET  # noqa
 from django.contrib import admin
 
 
@@ -382,7 +379,6 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(iban_filter_readable(""), "")
 
     def test_urls(self):
-        url = "http://yle.fi/uutiset/3-8045550?a=123&b=456"
         self.assertEqual(
             modify_url("http://yle.fi/uutiset/3-8045550?a=123&b=456", {"a": "123", "b": "456"}),
             "http://yle.fi/uutiset/3-8045550?a=123&b=456",
@@ -681,7 +677,7 @@ class Tests(TestCase, TestSetupMixin):
         for ref_no in invalid_fi_refs:
             try:
                 fi_payment_reference_validator(ref_no)
-                self.assertFalse(True, "{} should have failed validation".format(ref_no))
+                self.fail("{} should have failed validation".format(ref_no))
             except ValidationError:
                 pass
 
@@ -774,8 +770,8 @@ class Tests(TestCase, TestSetupMixin):
 
     def test_format_xml(self):
         assert settings.XMLLINT_PATH, 'add e.g. XMLLINT_PATH = "/usr/bin/xmllint" to settings.py'
-        src = "<ApplicationRequest> <CustomerId>1</CustomerId>  <Command>DownloadFileList</Command><Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp><Environment>PRODUCTION</Environment></ApplicationRequest>"
-        dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'
+        src = "<ApplicationRequest> <CustomerId>1</CustomerId>  <Command>DownloadFileList</Command><Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp><Environment>PRODUCTION</Environment></ApplicationRequest>"  # noqa
+        dst_ref = '<?xml version="1.0"?>\n<ApplicationRequest>\n  <CustomerId>1</CustomerId>\n  <Command>DownloadFileList</Command>\n  <Timestamp>2019-11-27T04:32:18.613452+02:00</Timestamp>\n  <Environment>PRODUCTION</Environment>\n</ApplicationRequest>\n'  # noqa
         dst = format_xml(src)
         self.assertEqual(dst, dst_ref)
         dst = format_xml_bytes(src.encode())
@@ -1107,7 +1103,7 @@ class Tests(TestCase, TestSetupMixin):
         try:
             model_admin = AuthUserMixin()
             model_admin.request = req
-            user = model_admin.auth_user
+            user = model_admin.auth_user  # noqa
             self.fail("get_auth_user fail")
         except NotAuthenticated:
             pass
@@ -1181,7 +1177,7 @@ class Tests(TestCase, TestSetupMixin):
             [date(2020, 11, 3), "apples", 5, dec2("10.10"), dec2("50.50")],
         ]
         res = CsvResponse(a, "test.csv")
-        content_ref = b"date,description,count,unit price,total price\r\n2019-12-15,oranges,1000,0.99,990.00\r\n2020-01-03,apples,4,1.10,4.40\r\n2020-11-03,apples,5,10.10,50.50\r\n"
+        content_ref = b"date,description,count,unit price,total price\r\n2019-12-15,oranges,1000,0.99,990.00\r\n2020-01-03,apples,4,1.10,4.40\r\n2020-11-03,apples,5,10.10,50.50\r\n"  # noqa
         self.assertEqual(content_ref, res.content)
         print(res.content.decode())
 
