@@ -60,15 +60,18 @@ def send_email(  # noqa
     Sends email. Supports both SendGrid API client and SMTP connection.
     See send_email_sendgrid() for SendGrid specific requirements.
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
     :param subject: Subject of the email
     :param text: Body (text), optional
     :param html: Body (html), optional
     :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
     :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
+    or list of name-email pairs (e.g. settings.ADMINS)
     :return: Status code 202 if emails were sent successfully
     """
     if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:
@@ -93,15 +96,18 @@ def send_email_sendgrid(  # noqa
     * pip install sendgrid>=6.3.1,<7.0.0
     * settings.EMAIL_SENDGRID_API_KEY must be set and
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
     :param subject: Subject of the email
     :param text: Body (text), optional
     :param html: Body (html), optional
     :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
     :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
+    or list of name-email pairs (e.g. settings.ADMINS)
     :param api_key: Optional Sendgrid API key. Default settings.EMAIL_SENDGRID_API_KEY.
     :return: Status code 202 if emails were sent successfully
     """
@@ -204,15 +210,18 @@ def send_email_smtp(  # noqa
         EMAIL_HOST_PASSWORD = 'xxxx'  # noqa
         EMAIL_USE_TLS = True
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
     :param subject: Subject of the email
     :param text: Body (text), optional
     :param html: Body (html), optional
     :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
     :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)  # noqa
+    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    (e.g. settings.ADMINS)
+    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
+    or list of name-email pairs (e.g. settings.ADMINS)
     :return: Status code 202 if emails were sent successfully
     """
     if files is None:
