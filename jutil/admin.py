@@ -1,11 +1,11 @@
 import json
 from collections import OrderedDict
 from decimal import Decimal
-from typing import Optional, Sequence, List, Dict, Any
+from typing import Optional, Sequence, List, Dict, Any, Union
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.http import HttpRequest
@@ -43,7 +43,7 @@ def admin_log_system_user():
     return get_user_model().objects.get_or_create(username=username)[0]
 
 
-def admin_log(instances: Sequence[object], msg: str, who: Optional[User] = None, action_flag: int = CHANGE, **kwargs):
+def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, AnonymousUser]] = None, action_flag: int = CHANGE, **kwargs):
     """
     Logs an entry to admin logs of model(s).
     :param instances: Model instance or list of instances (None values are ignored)
