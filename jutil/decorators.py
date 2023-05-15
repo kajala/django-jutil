@@ -2,11 +2,12 @@ from django.utils.formats import date_format
 
 
 def formatted_date(description=None, ordering=None, fmt: str = "SHORT_DATE_FORMAT"):
-    """
-    Decorator for formatting date/datetime field in Django admin.
-    :param description: Short description of the function (default is "short date").
-    :param ordering: Admin order field (optional).
-    :param fmt: Format to pass to date_format (default "SHORT_DATE_FORMAT")
+    """Decorator for formatting date/datetime field in Django admin.
+
+    Args:
+        description: Short description of the function (default is "short date").
+        ordering: Admin order field (optional).
+        fmt: Format to pass to date_format (default "SHORT_DATE_FORMAT")
 
     Usage example in Django Admin:
 

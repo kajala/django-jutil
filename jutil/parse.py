@@ -43,13 +43,16 @@ def parse_bool(v: str) -> bool:
 
 
 def parse_datetime(v: str, tz: Any = None) -> datetime:
-    """
-    Parses ISO date/datetime string to timezone-aware datetime.
+    """Parses ISO date/datetime string to timezone-aware datetime.
     Supports YYYY-MM-DD date strings where time part is missing.
     Returns always timezone-aware datetime (assumes UTC if timezone missing).
-    :param v: Input string to parse
-    :param tz: Default pytz timezone or if None then use UTC as default
-    :return: datetime with timezone
+
+    Args:
+        v: Input string to parse
+        tz: Default pytz timezone or if None then use UTC as default
+
+    Returns:
+        datetime with timezone
     """
     try:
         t = django_parse_datetime(v)
@@ -66,10 +69,13 @@ def parse_datetime(v: str, tz: Any = None) -> datetime:
 
 
 def parse_bool_or_none(v: str) -> Optional[bool]:
-    """
-    Parses boolean value, or returns None if parsing fails.
-    :param v: Input string
-    :return: bool or None
+    """Parses boolean value, or returns None if parsing fails.
+
+    Args:
+        v: Input string
+
+    Returns:
+        bool or None
     """
     s = str(v).lower()
     if s in TRUE_VALUES:
@@ -80,13 +86,16 @@ def parse_bool_or_none(v: str) -> Optional[bool]:
 
 
 def parse_datetime_or_none(v: str, tz: Any = None) -> Optional[datetime]:
-    """
-    Parses ISO date/datetime string to timezone-aware datetime.
+    """Parses ISO date/datetime string to timezone-aware datetime.
     Supports YYYY-MM-DD date strings where time part is missing.
     Returns timezone-aware datetime (assumes UTC if timezone missing) or None if parsing fails.
-    :param v: Input string to parse
-    :param tz: Default pytz timezone or if None then use UTC as default
-    :return: datetime with timezone or None
+
+    Args:
+        v: Input string to parse
+        tz: Default pytz timezone or if None then use UTC as default
+
+    Returns:
+        datetime with timezone or None
     """
     try:
         t = django_parse_datetime(v)

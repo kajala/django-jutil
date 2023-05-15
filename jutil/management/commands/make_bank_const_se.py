@@ -10,11 +10,14 @@ from jutil.bank_const_se import SE_BANK_CLEARING_LIST
 
 
 def se_iban_load_map(filename: str) -> list:
-    """
-    Loads Swedish monetary institution codes in CSV format.
-    :param filename: CSV file name of the BIC definitions.
+    """Loads Swedish monetary institution codes in CSV format.
+
+    Args:
+        filename: CSV file name of the BIC definitions.
     Columns: Institution Name, Range Begin-Range End (inclusive), Account digits count
-    :return: List of (bank name, clearing code begin, clearing code end, account digits)
+
+    Returns:
+        List of (bank name, clearing code begin, clearing code end, account digits)
     """
     out = []
     name_repl = {

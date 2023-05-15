@@ -56,8 +56,7 @@ class SafeCommand(BaseCommand):
 
 
 def add_date_range_arguments(parser: CommandParser):
-    """
-    Adds following arguments to the CommandParser:
+    """Adds following arguments to the CommandParser:
 
     Ranges:
       --begin BEGIN
@@ -97,8 +96,11 @@ def add_date_range_arguments(parser: CommandParser):
       --weekly
       --monthly
 
-    :param parser:
-    :return:
+    Args:
+        parser
+
+    Returns:
+
     """
     parser.add_argument("--begin", type=str)
     parser.add_argument("--end", type=str)
@@ -109,12 +111,15 @@ def add_date_range_arguments(parser: CommandParser):
 
 
 def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:  # noqa
-    """
-    Returns a timezone-aware date range by symbolic name.
-    :param name: Name of the date range. See add_date_range_arguments().
-    :param today: Optional current datetime. Default is datetime.utcnow().
-    :param tz: Optional timezone. Default is UTC.
-    :return: datetime (begin, end)
+    """Returns a timezone-aware date range by symbolic name.
+
+    Args:
+        name: Name of the date range. See add_date_range_arguments().
+        today: Optional current datetime. Default is datetime.utcnow().
+        tz: Optional timezone. Default is UTC.
+
+    Returns:
+        datetime (begin, end)
     """
     if today is None:
         today = datetime.utcnow()
@@ -164,14 +169,17 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
 
 
 def parse_date_range_arguments(options: dict, default_range: str = "last_month", tz: Any = None) -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:
-    """
-    Parses date range from input and returns timezone-aware date range and
+    """Parses date range from input and returns timezone-aware date range and
     interval list according to 'step' name argument (optional).
     See add_date_range_arguments()
-    :param options: Parsed arguments passed to the command
-    :param default_range: Default datetime range to return if no other selected
-    :param tz: Optional timezone to use. Default is UTC.
-    :return: begin, end, [(begin1,end1), (begin2,end2), ...]
+
+    Args:
+        options: Parsed arguments passed to the command
+        default_range: Default datetime range to return if no other selected
+        tz: Optional timezone to use. Default is UTC.
+
+    Returns:
+        begin, end, [(begin1,end1), (begin2,end2), ...]
     """
     begin, end = get_date_range_by_name(default_range, tz=tz)
     for range_name in TIME_RANGE_NAMES:
@@ -197,9 +205,7 @@ def parse_date_range_arguments(options: dict, default_range: str = "last_month",
 
 
 def get_command_by_name(command_name: str) -> BaseCommand:
-    """
-    Gets Django management BaseCommand derived command class instance by name.
-    """
+    """Gets Django management BaseCommand derived command class instance by name."""
     all_commands = get_commands()
     app_name = all_commands.get(command_name)
     if app_name is None:
@@ -210,9 +216,7 @@ def get_command_by_name(command_name: str) -> BaseCommand:
 
 
 def get_command_name(command: BaseCommand) -> str:
-    """
-    Gets Django management BaseCommand name from instance.
-    """
+    """Gets Django management BaseCommand name from instance."""
     module_name = command.__class__.__module__
     res = module_name.rsplit(".", 1)
     if len(res) != 2:

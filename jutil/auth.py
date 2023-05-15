@@ -20,10 +20,13 @@ def get_auth_user(request: Union[Request, HttpRequest]) -> User:
 
 
 def get_auth_user_or_none(request: Union[Request, HttpRequest]) -> Optional[User]:
-    """
-    Returns authenticated User or None if not authenticated.
-    :param request: HttpRequest
-    :return: User
+    """Returns authenticated User or None if not authenticated.
+
+    Args:
+        request: HttpRequest
+
+    Returns:
+        User
     """
     if not request.user or not request.user.is_authenticated:
         return None
@@ -33,8 +36,9 @@ def get_auth_user_or_none(request: Union[Request, HttpRequest]) -> Optional[User
 class AuthUserMixin:
     @property
     def auth_user(self) -> User:
-        """
-        Returns authenticated user.
-        :return: User
+        """Returns authenticated user.
+
+        Returns:
+            User
         """
         return get_auth_user(self.request)  # type: ignore

@@ -35,8 +35,7 @@ class EnsureOriginMiddleware:
 
 
 class LogExceptionMiddleware:
-    """
-    Logs exception and sends email to admins about it.
+    """Logs exception and sends email to admins about it.
     Uses list of emails from settings.ADMINS.
     """
 
@@ -47,10 +46,11 @@ class LogExceptionMiddleware:
         return self.get_response(request)
 
     def process_exception(self, request, e):
-        """
-        Logs exception error message and sends email to ADMINS if hostname is not testserver and DEBUG=False.
-        :param request: HttpRequest
-        :param e: Exception
+        """Logs exception error message and sends email to ADMINS if hostname is not testserver and DEBUG=False.
+
+        Args:
+            request: HttpRequest
+            e: Exception
         """
         assert isinstance(request, HttpRequest)
         method = str(request.method).upper()
@@ -66,8 +66,7 @@ class LogExceptionMiddleware:
 
 
 class EnsureLanguageCookieMiddleware:
-    """
-    Ensures language cookie (by name settings.LANGUAGE_COOKIE_NAME) is set.
+    """Ensures language cookie (by name settings.LANGUAGE_COOKIE_NAME) is set.
     Sets it as settings.LANGUAGE_CODE if missing.
     Allows changing settings by passing querystring parameter named settings.LANGUAGE_COOKIE_NAME
     (default: django_language).
@@ -110,9 +109,7 @@ class EnsureLanguageCookieMiddleware:
 
 
 class ActivateUserProfileTimezoneMiddleware:
-    """
-    Uses 'timezone' string in request.user.profile to activate user-specific timezone.
-    """
+    """Uses 'timezone' string in request.user.profile to activate user-specific timezone."""
 
     def __init__(self, get_response=None):
         self.get_response = get_response
@@ -144,9 +141,7 @@ class ActivateUserProfileTimezoneMiddleware:
 
 
 class TestClientLoggerMiddleware:
-    """
-    Logs requests to be used with Django test framework client.
-    """
+    """Logs requests to be used with Django test framework client."""
 
     ignored_paths = {
         "/admin/jsi18n/",

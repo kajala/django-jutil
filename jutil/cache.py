@@ -64,11 +64,14 @@ class CachedFieldsMixin:
 
 
 def update_cached_fields(*args):
-    """
-    Calls update_cached_fields() for each object passed in as argument.
+    """Calls update_cached_fields() for each object passed in as argument.
     Supports also iterable objects by checking __iter__ attribute.
-    :param args: List of objects
-    :return: None
+
+    Args:
+        *args: List of objects
+
+    Returns:
+        None
     """
     for a in args:
         if a is not None:

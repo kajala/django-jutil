@@ -5,15 +5,18 @@ from jutil.format import is_media_full_path, strip_media_root
 
 
 def list_files(dir_name: str, suffix: str = "", ignore_case: bool = True, use_media_root: bool = False, recurse: bool = False) -> List[str]:
-    """
-    Lists all files under specified directory.
+    """Lists all files under specified directory.
     Optionally filter files by suffix and recurse to subdirectories.
-    :param dir_name: Directory path
-    :param suffix: Case-sensitive suffix (optional)
-    :param ignore_case: Case-insensitive suffix. Default is True.
-    :param use_media_root: Instead of full path return files relative to media root.
-    :param recurse: Recurse subdirectories (optional)
-    :return: List of file names found
+
+    Args:
+        dir_name: Directory path
+        suffix: Case-sensitive suffix (optional)
+        ignore_case: Case-insensitive suffix. Default is True.
+        use_media_root: Instead of full path return files relative to media root.
+        recurse: Recurse subdirectories (optional)
+
+    Returns:
+        List of file names found
     """
     if not os.path.isdir(dir_name):
         raise ValueError(_("{} is not a directory").format(dir_name))
@@ -43,14 +46,17 @@ def list_files(dir_name: str, suffix: str = "", ignore_case: bool = True, use_me
 
 
 def find_file(filename: str, dir_name: str = ".", use_media_root: bool = False, recurse: bool = False) -> List[str]:
-    """
-    Finds file under specified directory.
+    """Finds file under specified directory.
     Optionally filter files by suffix and recurse to subdirectories.
-    :param filename: File name to find. You can also specify relative paths e.g. "en/LC_MESSAGES/django.po"
-    :param dir_name: Directory path. Default '.'
-    :param use_media_root: Instead of full path return files relative to media root.
-    :return: List of file names found
-    :param recurse: Recurse subdirectories (optional)
+
+    Args:
+        filename: File name to find. You can also specify relative paths e.g. "en/LC_MESSAGES/django.po"
+        dir_name: Directory path. Default '.'
+        use_media_root: Instead of full path return files relative to media root.
+        recurse: Recurse subdirectories (optional)
+
+    Returns:
+        List of file names found
     """
     if not os.path.isdir(dir_name):
         raise ValueError(_("{} is not a directory").format(dir_name))

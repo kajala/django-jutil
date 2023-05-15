@@ -7,11 +7,14 @@ from jutil.validators import is_int
 
 
 def dk_iban_load_map(filename: str) -> list:
-    """
-    Loads Denmark monetary institution codes in CSV format.
-    :param filename: CSV file name of the BIC definitions.
+    """Loads Denmark monetary institution codes in CSV format.
+
+    Args:
+        filename: CSV file name of the BIC definitions.
     Columns: 4-digit code, bank name, ...
-    :return: list of (code, name)
+
+    Returns:
+        list of (code, name)
     """
     data_list = []
     with open(filename, "rt", encoding="utf-8") as fp:

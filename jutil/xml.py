@@ -5,11 +5,14 @@ from xml.etree.ElementTree import Element, SubElement
 
 
 def _xml_element_value(el: Element, is_int: bool = False) -> Any:
-    """
-    Gets XML Element value.
-    :param el: Element
-    :param is_int: If True return value is converted to int (if possible)
-    :return: value of the element (int/str)
+    """Gets XML Element value.
+
+    Args:
+        el: Element
+        is_int: If True return value is converted to int (if possible)
+
+    Returns:
+        value of the element (int/str)
     """
     # None
     if el.text is None:
@@ -26,11 +29,14 @@ def _xml_element_value(el: Element, is_int: bool = False) -> Any:
 
 
 def _xml_tag_filter(s: str, strip_namespaces: bool) -> str:
-    """
-    Returns tag name and optionally strips namespaces.
-    :param s: Tag name
-    :param strip_namespaces: Strip namespace prefix
-    :return: str
+    """Returns tag name and optionally strips namespaces.
+
+    Args:
+        s: Tag name
+        strip_namespaces: Strip namespace prefix
+
+    Returns:
+        str
     """
     if strip_namespaces:
         ns_end = s.find("}")
@@ -53,7 +59,6 @@ def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-loca
     value_key: str,
     attribute_prefix: str,
 ):
-
     tag = _xml_tag_filter(el.tag, strip_namespaces)
 
     # complex type?
@@ -111,8 +116,7 @@ def xml_to_dict(  # pylint: disable=too-many-arguments,too-many-locals
     attribute_prefix: str = "@",
     document_tag: bool = False,
 ) -> Dict[str, Any]:
-    """
-    Parses XML string to dict. In case of simple elements (no children, no attributes) value is stored as is.
+    """Parses XML string to dict. In case of simple elements (no children, no attributes) value is stored as is.
     For complex elements value is stored in key '@', attributes '@xxx' and children as sub-dicts.
     Optionally strips namespaces.
 
@@ -215,8 +219,7 @@ def _xml_element_set_data_r(el: Element, data: dict, value_key: str, attribute_p
 
 
 def dict_to_element(doc: dict, value_key: str = "@", attribute_prefix: str = "@") -> Element:
-    """
-    Generates XML Element from dict.
+    """Generates XML Element from dict.
     Generates complex elements by assuming element attributes are prefixed with '@', and value is stored to plain '@'
     in case of complex element. Children are sub-dicts.
 

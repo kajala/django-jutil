@@ -50,8 +50,7 @@ class GeoIP:
 
 
 def get_ip(request: Union[HttpRequest, Request]) -> str:
-    """
-    Returns best-guess IP for given request.
+    """Returns best-guess IP for given request.
     Uses ipware library get_client_ip.
     If you need to know is IP routable or not, use ipware get_client_ip directly.
     See ipware documentation for more info.
@@ -61,20 +60,25 @@ def get_ip(request: Union[HttpRequest, Request]) -> str:
     it was deprecated and had quite big update process to change all code to use ipware get_client_ip.
     I want to avoid such process again so added this wrapper.
 
-    :param request: Django's HttpRequest or DRF Request
-    :return: IP-address or None
+    Args:
+        request: Django's HttpRequest or DRF Request
+
+    Returns:
+        IP-address or None
     """
     return get_client_ip(request)[0]
 
 
 def get_geo_ip_from_ipgeolocation(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
-    """
-    Returns geo IP info or empty dict if geoip query fails.
+    """Returns geo IP info or empty dict if geoip query fails.
     Uses ipgeolocation.io API and requires settings.IPGEOLOCATION_API_KEY set.
 
-    :param ip: str
-    :param timeout: timeout in seconds
-    :return: IPGeoInfo
+    Args:
+        ip: str
+        timeout: timeout in seconds
+
+    Returns:
+        IPGeoInfo
     """
     if not hasattr(settings, "IPGEOLOCATION_API_KEY") or not settings.IPGEOLOCATION_API_KEY:
         raise Exception("get_geo_ip_ipstack() requires IPGEOLOCATION_API_KEY defined in Django settings")
@@ -99,13 +103,15 @@ def get_geo_ip_from_ipgeolocation(ip: str, timeout: int = 10, verbose: bool = Fa
 
 
 def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
-    """
-    Returns geo IP info or empty dict if geoip query fails.
+    """Returns geo IP info or empty dict if geoip query fails.
     Uses ipstack.com API and requires settings.IPSTACK_TOKEN set.
 
-    :param ip: str
-    :param timeout: timeout in seconds
-    :return: IPGeoInfo
+    Args:
+        ip: str
+        timeout: timeout in seconds
+
+    Returns:
+        IPGeoInfo
     """
     if not hasattr(settings, "IPSTACK_TOKEN") or not settings.IPSTACK_TOKEN:
         raise Exception("get_geo_ip_from_ipstack() requires IPSTACK_TOKEN defined in Django settings")
@@ -135,8 +141,7 @@ def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -
 
 
 def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
-    """
-    Returns geo IP info. Raises Exception if query fails.
+    """Returns geo IP info. Raises Exception if query fails.
     Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
     Example response (GeoIP.__dict__):
@@ -152,9 +157,12 @@ def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
                 "longitude": "24.93265"
             }
 
-    :param ip: str
-    :param timeout: timeout in seconds
-    :return: IPGeoInfo
+    Args:
+        ip: str
+        timeout: timeout in seconds
+
+    Returns:
+        IPGeoInfo
     """
     if hasattr(settings, "IPGEOLOCATION_API_KEY") and settings.IPGEOLOCATION_API_KEY:
         return get_geo_ip_from_ipgeolocation(ip, timeout, verbose=verbose)
@@ -164,13 +172,15 @@ def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
 
 
 def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
-    """
-    Returns geo IP info or None if geoip query fails.
+    """Returns geo IP info or None if geoip query fails.
     Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
-    :param ip: str
-    :param timeout: timeout in seconds
-    :return: Optional[IPGeoInfo]
+    Args:
+        ip: str
+        timeout: timeout in seconds
+
+    Returns:
+        Optional[IPGeoInfo]
     """
     try:
         return get_geo_ip(ip, timeout)
@@ -180,14 +190,16 @@ def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:
 
 
 def get_ip_info(ip: str, exceptions: bool = False, timeout: int = 10) -> Tuple[str, str, str]:
-    """
-    Returns (ip, country_code, host) tuple of the IP address.
+    """Returns (ip, country_code, host) tuple of the IP address.
     Uses either ipgeolocation.io (if IPGEOLOCATION_API_KEY set) or ipstack.com (if IPSTACK_TOKEN set)
 
-    :param ip: IP address
-    :param exceptions: Raise Exception or not
-    :param timeout: Timeout in seconds. Note that timeout only affects geo IP part, not getting host name.
-    :return: (ip, country_code, host)
+    Args:
+        ip: IP address
+        exceptions: Raise Exception or not
+        timeout: Timeout in seconds. Note that timeout only affects geo IP part, not getting host name.
+
+    Returns:
+        (ip, country_code, host)
     """
     if not ip:  # localhost
         return "", "", ""

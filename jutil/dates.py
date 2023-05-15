@@ -66,10 +66,13 @@ def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple
 
 
 def get_last_day_of_month(today: Optional[datetime] = None) -> int:
-    """
-    Returns day number of the last day of the month
-    :param today: Default UTC now
-    :return: int
+    """Returns day number of the last day of the month
+
+    Args:
+        today: Default UTC now
+
+    Returns:
+        int
     """
     if today is None:
         today = datetime.utcnow()
@@ -77,12 +80,15 @@ def get_last_day_of_month(today: Optional[datetime] = None) -> int:
 
 
 def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -> datetime:
-    """
-    Returns end-of-month (last microsecond) of given datetime (or current datetime UTC if no parameter is passed).
-    :param today: Some date in the month (defaults current datetime)
-    :param n: +- number of months to offset from current month. Default 0.
-    :param tz: Timezone (defaults pytz UTC)
-    :return: datetime
+    """Returns end-of-month (last microsecond) of given datetime (or current datetime UTC if no parameter is passed).
+
+    Args:
+        today: Some date in the month (defaults current datetime)
+        n: +- number of months to offset from current month. Default 0.
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        datetime
     """
     if today is None:
         today = datetime.utcnow()
@@ -103,12 +109,15 @@ def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -
 
 
 def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns this week begin (inclusive) and end (exclusive).
+    """Returns this week begin (inclusive) and end (exclusive).
     Week is assumed to start from Monday (ISO).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -118,11 +127,14 @@ def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns current month begin (inclusive) and end (exclusive).
-    :param today: Some date in the month (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns current month begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date in the month (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -133,11 +145,14 @@ def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
 
 def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns this year begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns this year begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -155,11 +170,14 @@ def next_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns next week begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns next week begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -169,11 +187,14 @@ def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def next_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns next month begin (inclusive) and end (exclusive).
-    :param today: Some date in the month (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns next month begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date in the month (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -186,11 +207,14 @@ def next_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
 
 def last_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns last week begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns last week begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -200,11 +224,14 @@ def last_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def last_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns last month begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns last month begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -215,11 +242,14 @@ def last_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
 
 def last_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns last year begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns last year begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -230,11 +260,14 @@ def last_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
-    """
-    Returns yesterday begin (inclusive) and end (exclusive).
-    :param today: Some date (defaults current datetime)
-    :param tz: Timezone (defaults pytz UTC)
-    :return: begin (inclusive), end (exclusive)
+    """Returns yesterday begin (inclusive) and end (exclusive).
+
+    Args:
+        today: Some date (defaults current datetime)
+        tz: Timezone (defaults pytz UTC)
+
+    Returns:
+        begin (inclusive), end (exclusive)
     """
     if today is None:
         today = datetime.utcnow()
@@ -245,12 +278,15 @@ def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
 
 def add_month(t: datetime, n: int = 1) -> datetime:
-    """
-    Adds +- n months to datetime.
+    """Adds +- n months to datetime.
     Clamps days to number of days in given month.
-    :param t: datetime
-    :param n: +- number of months to offset from current month. Default 1.
-    :return: datetime
+
+    Args:
+        t: datetime
+        n: +- number of months to offset from current month. Default 1.
+
+    Returns:
+        datetime
     """
     t2 = t
     for count in range(abs(n)):  # pylint: disable=unused-variable
@@ -267,14 +303,15 @@ def add_month(t: datetime, n: int = 1) -> datetime:
 
 
 def per_delta(start: datetime, end: datetime, delta: timedelta):
-    """
-    Iterates over time range in steps specified in delta.
+    """Iterates over time range in steps specified in delta.
 
-    :param start: Start of time range (inclusive)
-    :param end: End of time range (exclusive)
-    :param delta: Step interval
+    Args:
+        start: Start of time range (inclusive)
+        end: End of time range (exclusive)
+        delta: Step interval
 
-    :return: Iterable collection of [(start+td*0, start+td*1), (start+td*1, start+td*2), ..., end)
+    Returns:
+        Iterable collection of [(start+td*0, start+td*1), (start+td*1, start+td*2), ..., end)
     """
     curr = start
     while curr < end:
@@ -284,15 +321,16 @@ def per_delta(start: datetime, end: datetime, delta: timedelta):
 
 
 def per_month(start: datetime, end: datetime, n: int = 1):
-    """
-    Iterates over time range in one month steps.
+    """Iterates over time range in one month steps.
     Clamps to number of days in given month.
 
-    :param start: Start of time range (inclusive)
-    :param end: End of time range (exclusive)
-    :param n: Number of months to step. Default is 1.
+    Args:
+        start: Start of time range (inclusive)
+        end: End of time range (exclusive)
+        n: Number of months to step. Default is 1.
 
-    :return: Iterable collection of [(month+0, month+1), (month+1, month+2), ..., end)
+    Returns:
+        Iterable collection of [(month+0, month+1), (month+1, month+2), ..., end)
     """
     curr = start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     while curr < end:
@@ -302,13 +340,16 @@ def per_month(start: datetime, end: datetime, n: int = 1):
 
 
 def get_time_steps(step_type: str, begin: datetime, end: datetime) -> List[Tuple[datetime, datetime]]:
-    """
-    Returns time stamps by time step type [TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY].
+    """Returns time stamps by time step type [TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY].
     For example daily steps for a week returns 7 [begin, end) ranges for each day of the week.
-    :param step_type: One of TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY
-    :param begin: datetime
-    :param end: datetime
-    :return: List of [begin, end), one for reach time step unit
+
+    Args:
+        step_type: One of TIME_STEP_DAILY, TIME_STEP_WEEKLY, TIME_STEP_MONTHLY
+        begin: datetime
+        end: datetime
+
+    Returns:
+        List of [begin, end), one for reach time step unit
     """
     after_end = end
     if TIME_STEP_DAILY == step_type:

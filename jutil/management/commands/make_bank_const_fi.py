@@ -7,12 +7,13 @@ from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 
 
 def fi_iban_load_map(filename: str) -> dict:
-    """
-    Loads Finnish monetary institution codes and BICs in CSV format.
+    """Loads Finnish monetary institution codes and BICs in CSV format.
     Map which is based on 3 digits as in FIXX<3 digits>.
     Can be used to map Finnish IBAN number to bank information.
     Format: dict('<3 digits': (BIC, name), ...)
-    :param filename: CSV file name of the BIC definitions. Columns: National ID, BIC Code, Institution Name
+
+    Args:
+        filename: CSV file name of the BIC definitions. Columns: National ID, BIC Code, Institution Name
     """
     out = {}
     with open(filename, "rt", encoding="utf-8") as fp:

@@ -9,11 +9,14 @@ from jutil.format import choices_label
 
 
 def get_object_or_none(cls: Any, **kwargs) -> Any:
-    """
-    Returns model instance or None if not found.
-    :param cls: Class or queryset
-    :param kwargs: Filters for get() call
-    :return: Object or None
+    """Returns model instance or None if not found.
+
+    Args:
+        cls: Class or queryset
+        **kwargs: Filters for get() call
+
+    Returns:
+        Object or None
     """
     try:
         qs = cls._default_manager.all() if hasattr(cls, "_default_manager") else cls  # pylint: disable=protected-access
@@ -23,15 +26,18 @@ def get_object_or_none(cls: Any, **kwargs) -> Any:
 
 
 def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 1.0, **kwargs) -> Any:
-    """
-    Returns model instance or None if not found after specified timeout.
+    """Returns model instance or None if not found after specified timeout.
     Waits timeout before returning if no object available.
     Waiting is done by sleeping specified intervals.
-    :param cls: Class or queryset
-    :param timeout: Timeout in seconds
-    :param sleep_interval: Sleep interval in seconds
-    :param kwargs: Filters for get() call
-    :return: Object or None
+
+    Args:
+        cls: Class or queryset
+        timeout: Timeout in seconds
+        sleep_interval: Sleep interval in seconds
+        **kwargs: Filters for get() call
+
+    Returns:
+        Object or None
     """
     t0: Optional[datetime] = None
     t1: Optional[datetime] = None
@@ -48,11 +54,14 @@ def wait_object_or_none(cls: Any, timeout: float = 5.0, sleep_interval: float = 
 
 
 def get_model_field_or_none(instance, field_name: str) -> Optional[Field]:
-    """
-    Returns model field.
-    :param instance: Model instance
-    :param field_name: Model attribute name
-    :return: Optional[Field]
+    """Returns model field.
+
+    Args:
+        instance: Model instance
+        field_name: Model attribute name
+
+    Returns:
+        Optional[Field]
     """
     for f in instance._meta.fields:
         if f.attname == field_name:
@@ -61,11 +70,14 @@ def get_model_field_or_none(instance, field_name: str) -> Optional[Field]:
 
 
 def get_model_field(instance, field_name: str) -> Field:
-    """
-    Returns model field.
-    :param instance: Model instance
-    :param field_name: Model attribute name
-    :return: Field
+    """Returns model field.
+
+    Args:
+        instance: Model instance
+        field_name: Model attribute name
+
+    Returns:
+        Field
     """
     f = get_model_field_or_none(instance, field_name)
     if f is None:
@@ -74,12 +86,15 @@ def get_model_field(instance, field_name: str) -> Field:
 
 
 def get_model_field_label(instance, field_name: str) -> str:
-    """
-    Returns model field label.
+    """Returns model field label.
     Resolves also function / property short_description meta fields.
-    :param instance: Model instance
-    :param field_name: Model attribute name
-    :return: label str
+
+    Args:
+        instance: Model instance
+        field_name: Model attribute name
+
+    Returns:
+        label str
     """
     for f in instance._meta.fields:
         if field_name in (f.name, f.attname):
@@ -96,11 +111,14 @@ def get_model_field_label(instance, field_name: str) -> str:
 
 
 def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str]:
-    """
-    Returns model field label and value as str.
-    :param instance: Model instance
-    :param field_name: Model attribute name
-    :return: (label, value) tuple
+    """Returns model field label and value as str.
+
+    Args:
+        instance: Model instance
+        field_name: Model attribute name
+
+    Returns:
+        (label, value) tuple
     """
     label = get_model_field_label(instance, field_name)
     value = str(getattr(instance, field_name)) if hasattr(instance, field_name) else None
@@ -116,12 +134,15 @@ def get_model_field_label_and_value(instance, field_name: str) -> Tuple[str, str
 
 
 def is_model_field_changed(instance, field_name: str) -> bool:
-    """
-    Compares model instance field value to value stored in DB.
+    """Compares model instance field value to value stored in DB.
     If object has not been stored in DB (yet) field is considered unchanged.
-    :param instance: Model instance
-    :param field_name: Model attribute name
-    :return: True if field value has been changed compared to value stored in DB.
+
+    Args:
+        instance: Model instance
+        field_name: Model attribute name
+
+    Returns:
+        True if field value has been changed compared to value stored in DB.
     """
     assert hasattr(instance, field_name)
     if not hasattr(instance, "pk") or instance.pk is None:
@@ -140,15 +161,18 @@ def get_model_field_names(instance, cls: Optional[Type[Model]] = None, exclude_f
 def clone_model(
     instance, cls: Optional[Type[Model]] = None, commit: bool = True, exclude_fields: Sequence[str] = ("id",), base_class_suffix: str = "_ptr", **kw
 ):
-    """
-    Assigns model fields to new object. Ignores exclude_fields list and
+    """Assigns model fields to new object. Ignores exclude_fields list and
     attributes ending with pointer suffix (default '_ptr')
-    :param instance: Instance to copy
-    :param cls: Class (opt)
-    :param commit: Save or not
-    :param exclude_fields: List of fields to exclude
-    :param base_class_suffix: End of name for base class pointers, e.g. model Car(Vehicle) has implicit vehicle_ptr
-    :return: New instance
+
+    Args:
+        instance: Instance to copy
+        cls: Class (opt)
+        commit: Save or not
+        exclude_fields: List of fields to exclude
+        base_class_suffix: End of name for base class pointers, e.g. model Car(Vehicle) has implicit vehicle_ptr
+
+    Returns:
+        New instance
     """
     if cls is None:
         cls = instance.__class__

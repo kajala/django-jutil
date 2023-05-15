@@ -29,10 +29,13 @@ def make_email_recipient(val: Union[str, Tuple[str, str]]) -> Tuple[str, str]:
 
 
 def make_email_recipient_list(recipients: Optional[Union[str, Sequence[Union[str, Tuple[str, str]]]]]) -> List[Tuple[str, str]]:
-    """
-    Returns list of (name, email) tuples.
-    :param recipients:
-    :return: list of (name, email)
+    """Returns list of (name, email) tuples.
+
+    Args:
+        recipients
+
+    Returns:
+        list of (name, email)
     """
     out: List[Tuple[str, str]] = []
     if recipients is not None:
@@ -56,23 +59,25 @@ def send_email(  # noqa
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
 ) -> int:
-    """
-    Sends email. Supports both SendGrid API client and SMTP connection.
+    """Sends email. Supports both SendGrid API client and SMTP connection.
     See send_email_sendgrid() for SendGrid specific requirements.
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
-    :param subject: Subject of the email
-    :param text: Body (text), optional
-    :param html: Body (html), optional
-    :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
-    :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    Args:
+        recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
+        subject: Subject of the email
+        text: Body (text), optional
+        html: Body (html), optional
+        sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
+        files: Paths to files to attach
+        cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
     (e.g. settings.ADMINS)
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
     (e.g. settings.ADMINS)
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
     or list of name-email pairs (e.g. settings.ADMINS)
-    :return: Status code 202 if emails were sent successfully
+
+    Returns:
+        Status code 202 if emails were sent successfully
     """
     if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:
         return send_email_sendgrid(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
@@ -91,25 +96,27 @@ def send_email_sendgrid(  # noqa
     exceptions: bool = False,
     api_key: str = "",
 ) -> int:
-    """
-    Sends email using SendGrid API. Following requirements:
+    """Sends email using SendGrid API. Following requirements:
     * pip install sendgrid>=6.3.1,<7.0.0
     * settings.EMAIL_SENDGRID_API_KEY must be set and
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
-    :param subject: Subject of the email
-    :param text: Body (text), optional
-    :param html: Body (html), optional
-    :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
-    :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    Args:
+        recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
+        subject: Subject of the email
+        text: Body (text), optional
+        html: Body (html), optional
+        sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
+        files: Paths to files to attach
+        cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
+        api_key: Optional Sendgrid API key. Default settings.EMAIL_SENDGRID_API_KEY.
     (e.g. settings.ADMINS)
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
     (e.g. settings.ADMINS)
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
     or list of name-email pairs (e.g. settings.ADMINS)
-    :param api_key: Optional Sendgrid API key. Default settings.EMAIL_SENDGRID_API_KEY.
-    :return: Status code 202 if emails were sent successfully
+
+    Returns:
+        Status code 202 if emails were sent successfully
     """
     try:
         import sendgrid  # type: ignore  # pylint: disable=import-outside-toplevel
@@ -198,8 +205,7 @@ def send_email_smtp(  # noqa
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
 ) -> int:
-    """
-    Sends email using SMTP connection using standard Django email settings.
+    """Sends email using SMTP connection using standard Django email settings.
 
     For example, to send email via Gmail:
     (Note that you might need to generate app-specific password at https://myaccount.google.com/apppasswords)
@@ -210,19 +216,22 @@ def send_email_smtp(  # noqa
         EMAIL_HOST_PASSWORD = 'xxxx'  # noqa
         EMAIL_USE_TLS = True
 
-    :param recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
-    :param subject: Subject of the email
-    :param text: Body (text), optional
-    :param html: Body (html), optional
-    :param sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
-    :param files: Paths to files to attach
-    :param cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+    Args:
+        recipients: List of "To" recipients. Single email (str); or comma-separated email list (str); or list of name-email pairs (e.g. settings.ADMINS)
+        subject: Subject of the email
+        text: Body (text), optional
+        html: Body (html), optional
+        sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
+        files: Paths to files to attach
+        cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
+        exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
     (e.g. settings.ADMINS)
-    :param bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
     (e.g. settings.ADMINS)
-    :param exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
     or list of name-email pairs (e.g. settings.ADMINS)
-    :return: Status code 202 if emails were sent successfully
+
+    Returns:
+        Status code 202 if emails were sent successfully
     """
     if files is None:
         files = []

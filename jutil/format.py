@@ -24,12 +24,15 @@ T = TypeVar("T")
 
 
 def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> str:
-    """
-    Limits name length to specified length. Tries to keep name as human-readable an natural as possible.
-    :param first_name: First name
-    :param last_name: Last name
-    :param max_length: Maximum length
-    :return: Full name of shortened version depending on length
+    """Limits name length to specified length. Tries to keep name as human-readable an natural as possible.
+
+    Args:
+        first_name: First name
+        last_name: Last name
+        max_length: Maximum length
+
+    Returns:
+        Full name of shortened version depending on length
     """
     # dont allow commas in limited names
     first_name = first_name.replace(",", " ")
@@ -68,14 +71,17 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> s
 
 
 def format_timedelta(dt: timedelta, days_label: str = "d", hours_label: str = "h", minutes_label: str = "min", seconds_label: str = "s") -> str:
-    """
-    Formats timedelta to readable format, e.g. 1h30min15s.
-    :param dt: timedelta
-    :param days_label: Label for days. Leave empty '' if value should be skipped / ignored.
-    :param hours_label: Label for hours. Leave empty '' if value should be skipped / ignored.
-    :param minutes_label: Label for minutes. Leave empty '' if value should be skipped / ignored.
-    :param seconds_label: Label for seconds. Leave empty '' if value should be skipped / ignored.
-    :return: str
+    """Formats timedelta to readable format, e.g. 1h30min15s.
+
+    Args:
+        dt: timedelta
+        days_label: Label for days. Leave empty '' if value should be skipped / ignored.
+        hours_label: Label for hours. Leave empty '' if value should be skipped / ignored.
+        minutes_label: Label for minutes. Leave empty '' if value should be skipped / ignored.
+        seconds_label: Label for seconds. Leave empty '' if value should be skipped / ignored.
+
+    Returns:
+        str
     """
     parts = (
         (86400, days_label),
@@ -101,13 +107,16 @@ def format_timedelta(dt: timedelta, days_label: str = "d", hours_label: str = "h
 
 
 def format_xml(content: str, encoding: str = "UTF-8", exceptions: bool = False) -> str:
-    """
-    Formats XML document as human-readable plain text.
+    """Formats XML document as human-readable plain text.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
-    :param content: XML data as str
-    :param encoding: XML file encoding
-    :param exceptions: Raise exceptions on error
-    :return: str (Formatted XML str)
+
+    Args:
+        content: XML data as str
+        encoding: XML file encoding
+        exceptions: Raise exceptions on error
+
+    Returns:
+        str (Formatted XML str)
     """
     assert isinstance(content, str)
     try:
@@ -126,13 +135,16 @@ def format_xml(content: str, encoding: str = "UTF-8", exceptions: bool = False) 
 
 
 def format_xml_bytes(content: bytes, encoding: str = "UTF-8", exceptions: bool = False) -> bytes:
-    """
-    Formats XML document as human-readable plain text and returns result in bytes.
+    """Formats XML document as human-readable plain text and returns result in bytes.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
-    :param content: XML data as bytes
-    :param encoding: XML file encoding
-    :param exceptions: Raise exceptions on error
-    :return: bytes (Formatted XML as bytes)
+
+    Args:
+        content: XML data as bytes
+        encoding: XML file encoding
+        exceptions: Raise exceptions on error
+
+    Returns:
+        bytes (Formatted XML as bytes)
     """
     assert isinstance(content, bytes)
     try:
@@ -151,15 +163,18 @@ def format_xml_bytes(content: bytes, encoding: str = "UTF-8", exceptions: bool =
 
 
 def format_xml_file(full_path: str, encoding: str = "UTF-8", exceptions: bool = False) -> bytes:
-    """
-    Formats XML file as human-readable plain text and returns result in bytes.
+    """Formats XML file as human-readable plain text and returns result in bytes.
     Tries to format XML file first, if formatting fails the file content is returned as is.
     If the file does not exist empty bytes is returned.
     If settings.XMLLINT_PATH is defined xmllint is used for formatting (higher quality). Otherwise minidom toprettyxml is used.
-    :param full_path: Full path to XML file
-    :param encoding: XML file encoding
-    :param exceptions: Raise exceptions on error
-    :return: bytes
+
+    Args:
+        full_path: Full path to XML file
+        encoding: XML file encoding
+        exceptions: Raise exceptions on error
+
+    Returns:
+        bytes
     """
     try:
         if hasattr(settings, "XMLLINT_PATH") and settings.XMLLINT_PATH:
@@ -179,10 +194,13 @@ def format_xml_file(full_path: str, encoding: str = "UTF-8", exceptions: bool = 
 
 
 def format_as_html_json(value: Any) -> str:
-    """
-    Returns value as JSON-formatted value in HTML.
-    :param value: Any value which can be converted to JSON by json.dumps
-    :return: str
+    """Returns value as JSON-formatted value in HTML.
+
+    Args:
+        value: Any value which can be converted to JSON by json.dumps
+
+    Returns:
+        str
     """
     return mark_safe(html.escape(json.dumps(value, indent=4, cls=DjangoJSONEncoder)).replace("\n", "<br/>").replace(" ", "&nbsp;"))
 
@@ -193,11 +211,14 @@ def format_dict_as_html(value: Dict[str, Any]) -> str:
 
 
 def format_csv(rows: List[List[Any]], dialect: str = "excel") -> str:
-    """
-    Formats rows to CSV string content.
-    :param rows: List[List[Any]]
-    :param dialect: See csv.writer dialect
-    :return: str
+    """Formats rows to CSV string content.
+
+    Args:
+        rows: List[List[Any]]
+        dialect: See csv.writer dialect
+
+    Returns:
+        str
     """
     f = StringIO()
     writer = csv.writer(f, dialect=dialect)
@@ -218,22 +239,24 @@ def format_table(  # noqa
     left_align: Optional[List[int]] = None,
     center_align: Optional[List[int]] = None,
 ) -> str:
-    """
-    Formats "ASCII-table" rows by padding column widths to longest column value, optionally limiting column widths.
+    """Formats "ASCII-table" rows by padding column widths to longest column value, optionally limiting column widths.
     Optionally separates colums with ' | ' character and header row with '-' characters.
     Supports left, right and center alignment. Useful for console apps / debugging.
 
-    :param rows: List[List[Any]]
-    :param max_col: Max column value width. Pass None for unlimited length.
-    :param max_line: Maximum single line length. Exceeding columns truncated. Pass None for unlimited length.
-    :param col_sep: Column separator string.
-    :param row_sep: Row separator character used before first row, end, after first row (if has_label_row).
-    :param row_begin: Row begin string, inserted before each row.
-    :param row_end: Row end string, appended after each row.
-    :param has_label_row: Set to True if table starts with column label row.
-    :param left_align: Indexes of left-aligned columns. By default all are right aligned.
-    :param center_align: Indexes of center-aligned columns. By default all are right aligned.
-    :return: str
+    Args:
+        rows: List[List[Any]]
+        max_col: Max column value width. Pass None for unlimited length.
+        max_line: Maximum single line length. Exceeding columns truncated. Pass None for unlimited length.
+        col_sep: Column separator string.
+        row_sep: Row separator character used before first row, end, after first row (if has_label_row).
+        row_begin: Row begin string, inserted before each row.
+        row_end: Row end string, appended after each row.
+        has_label_row: Set to True if table starts with column label row.
+        left_align: Indexes of left-aligned columns. By default all are right aligned.
+        center_align: Indexes of center-aligned columns. By default all are right aligned.
+
+    Returns:
+        str
     """
     # validate parameters
     assert max_col is None or max_col > 2
@@ -331,16 +354,12 @@ def format_table(  # noqa
 
 
 def _capfirst_lazy(x):
-    """
-    capfirst() keeping lazy strings lazy.
-    """
+    """capfirst() keeping lazy strings lazy."""
     return x[0:1].upper() + x[1:] if x else ""
 
 
 def _upper_lazy(x):
-    """
-    str.upper() keeping lazy strings lazy.
-    """
+    """str.upper() keeping lazy strings lazy."""
     return str(x).upper() if x else ""
 
 
@@ -349,72 +368,91 @@ upper_lazy = lazy(_upper_lazy, str)
 
 
 def dec0(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 0 decimal digits.
-    :param a: Number
-    :return: Decimal with 0 decimal digits
+    """Converts number to Decimal with 0 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 0 decimal digits
     """
     return Decimal(a).quantize(Decimal("1"))
 
 
 def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 1 decimal digits.
-    :param a: Number
-    :return: Decimal with 1 decimal digits
+    """Converts number to Decimal with 1 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 1 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.0"))
 
 
 def dec2(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 2 decimal digits.
-    :param a: Number
-    :return: Decimal with 2 decimal digits
+    """Converts number to Decimal with 2 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 2 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.00"))
 
 
 def dec3(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 3 decimal digits.
-    :param a: Number
-    :return: Decimal with 3 decimal digits
+    """Converts number to Decimal with 3 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 3 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.000"))
 
 
 def dec4(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 4 decimal digits.
-    :param a: Number
-    :return: Decimal with 4 decimal digits
+    """Converts number to Decimal with 4 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 4 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.0000"))
 
 
 def dec5(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 5 decimal digits.
-    :param a: Number
-    :return: Decimal with 4 decimal digits
+    """Converts number to Decimal with 5 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 4 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.00000"))
 
 
 def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
-    """
-    Converts number to Decimal with 6 decimal digits.
-    :param a: Number
-    :return: Decimal with 4 decimal digits
+    """Converts number to Decimal with 6 decimal digits.
+
+    Args:
+        a: Number
+
+    Returns:
+        Decimal with 4 decimal digits
     """
     return Decimal(a).quantize(Decimal("1.000000"))
 
 
 def is_media_full_path(file_path: str) -> bool:
-    """
-    Checks if file path is under (settings) MEDIA_ROOT.
-    """
+    """Checks if file path is under (settings) MEDIA_ROOT."""
     if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
         raise ImproperlyConfigured("MEDIA_ROOT not defined")
     full_path = os.path.abspath(file_path)
@@ -422,15 +460,18 @@ def is_media_full_path(file_path: str) -> bool:
 
 
 def strip_media_root(file_path: str) -> str:
-    """
-    If file path starts with (settings) MEDIA_ROOT,
+    """If file path starts with (settings) MEDIA_ROOT,
     the MEDIA_ROOT part gets stripped and only relative path is returned.
     Otherwise file path is returned as is. This enabled stored file names in more
     portable format for different environment / storage.
     If MEDIA_ROOT is missing or empty, the filename is returned as is.
     Reverse operation of this is get_media_full_path().
-    :param file_path: str
-    :return: str
+
+    Args:
+        file_path: str
+
+    Returns:
+        str
     """
     if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
         raise ImproperlyConfigured("MEDIA_ROOT not defined")
@@ -444,13 +485,16 @@ def strip_media_root(file_path: str) -> str:
 
 
 def get_media_full_path(file_path: str) -> str:
-    """
-    Returns the absolute path from a (relative) path to (settings) MEDIA_ROOT.
+    """Returns the absolute path from a (relative) path to (settings) MEDIA_ROOT.
     This enabled stored file names in more portable format for different environment / storage.
     If MEDIA_ROOT is missing or non-media path is passed to function, exception is raised.
     Reverse operation of this is strip_media_root().
-    :param file_path: str
-    :return: str
+
+    Args:
+        file_path: str
+
+    Returns:
+        str
     """
     if not hasattr(settings, "MEDIA_ROOT") or not settings.MEDIA_ROOT:
         raise ImproperlyConfigured("MEDIA_ROOT not defined")
@@ -461,10 +505,13 @@ def get_media_full_path(file_path: str) -> str:
 
 
 def camel_case_to_underscore(s: str) -> str:
-    """
-    Converts camelCaseWord to camel_case_word.
-    :param s: str
-    :return: str
+    """Converts camelCaseWord to camel_case_word.
+
+    Args:
+        s: str
+
+    Returns:
+        str
     """
     if s:
         s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
@@ -474,10 +521,13 @@ def camel_case_to_underscore(s: str) -> str:
 
 
 def underscore_to_camel_case(s: str) -> str:
-    """
-    Converts under_score_word to underScoreWord.
-    :param s: str
-    :return: str
+    """Converts under_score_word to underScoreWord.
+
+    Args:
+        s: str
+
+    Returns:
+        str
     """
     if s:
         p = s.split("_")
@@ -486,11 +536,14 @@ def underscore_to_camel_case(s: str) -> str:
 
 
 def choices_label(choices: Sequence[Tuple[T, Any]], value: T) -> Union[Any, str]:
-    """
-    Iterates (value,label) list and returns label matching the choice
-    :param choices: [(choice1, label1), (choice2, label2), ...]
-    :param value: Value to find
-    :return: label or ""
+    """Iterates (value,label) list and returns label matching the choice
+
+    Args:
+        choices: [(choice1, label1), (choice2, label2), ...]
+        value: Value to find
+
+    Returns:
+        label or ""
     """
     for key, label in choices:
         if key == value:

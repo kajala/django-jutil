@@ -91,10 +91,13 @@ def bic_filter(v: str) -> str:
 
 
 def country_code_validator(v0: str):
-    """
-    Accepts both ISO-2 and ISO-3 formats.
-    :param v: str
-    :return: None
+    """Accepts both ISO-2 and ISO-3 formats.
+
+    Args:
+        v: str
+
+    Returns:
+        None
     """
     v = country_code_filter(v0)
     if not (2 <= len(v) <= 3):
@@ -120,11 +123,14 @@ def variable_name_sanitizer(v: str) -> str:
 
 
 def ascii_filter(v: str) -> str:
-    """
-    Replaces Unicode accent characters with plain ASCII.
+    """Replaces Unicode accent characters with plain ASCII.
     For example remove_accents('HELÉN') == 'HELEN'.
-    :param v: str
-    :return: str
+
+    Args:
+        v: str
+
+    Returns:
+        str
     """
     return unicodedata.normalize("NFKD", v).encode("ASCII", "ignore").decode()
 
@@ -155,10 +161,13 @@ def iban_filter_readable(acct) -> str:
 
 
 def bic_validator(v0: str):
-    """
-    Validates bank BIC/SWIFT code (8-11 characters).
-    :param v: str
-    :return: None
+    """Validates bank BIC/SWIFT code (8-11 characters).
+
+    Args:
+        v: str
+
+    Returns:
+        None
     """
     v = bic_filter(v0)
     if not (8 <= len(v) <= 11):
@@ -167,10 +176,13 @@ def bic_validator(v0: str):
 
 
 def iban_validator(v0: str):
-    """
-    Validates IBAN format bank account number.
-    :param v: str
-    :return: None
+    """Validates IBAN format bank account number.
+
+    Args:
+        v: str
+
+    Returns:
+        None
     """
     # validate prefix and length
     v = iban_filter(v0)
@@ -197,10 +209,13 @@ def iban_validator(v0: str):
 
 
 def iban_generator(country_code: str = "") -> str:
-    """
-    Generates IBAN format bank account number (for testing).
-    :param country_code: 2-character country code (optional)
-    :return: str
+    """Generates IBAN format bank account number (for testing).
+
+    Args:
+        country_code: 2-character country code (optional)
+
+    Returns:
+        str
     """
     # pick random country code if not set (with max IBAN length 27)
     if not country_code:
@@ -245,10 +260,13 @@ def validate_country_iban(v0: str, country: str):
 
 
 def iban_bank_info(v: str) -> Tuple[str, str]:
-    """
-    Returns BIC code and bank name from IBAN number.
-    :param v: IBAN account number
-    :return: (BIC code, bank name) or ('', '') if not found / unsupported country
+    """Returns BIC code and bank name from IBAN number.
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        (BIC code, bank name) or ('', '') if not found / unsupported country
     """
     v = iban_filter(v)
     prefix = v[:2]
@@ -260,10 +278,13 @@ def iban_bank_info(v: str) -> Tuple[str, str]:
 
 
 def iban_bic(v: str) -> str:
-    """
-    Returns BIC code from IBAN number.
-    :param v: IBAN account number
-    :return: BIC code or '' if not found
+    """Returns BIC code from IBAN number.
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        BIC code or '' if not found
     """
     info = iban_bank_info(v)
     return info[0] if info else ""
@@ -287,10 +308,13 @@ def validate_country_company_org_id(country_code: str, v: str):
 
 
 def is_int(v: Any) -> bool:
-    """
-    Returns True if value is int or can be converted to int.
-    :param v: Any
-    :return: bool
+    """Returns True if value is int or can be converted to int.
+
+    Args:
+        v: Any
+
+    Returns:
+        bool
     """
     try:
         return str(int(v)) == str(v)
@@ -299,10 +323,13 @@ def is_int(v: Any) -> bool:
 
 
 def is_iban(v: str) -> bool:
-    """
-    Returns True if account number is valid IBAN format.
-    :param v: str
-    :return: bool
+    """Returns True if account number is valid IBAN format.
+
+    Args:
+        v: str
+
+    Returns:
+        bool
     """
     try:
         iban_validator(v)
@@ -312,10 +339,13 @@ def is_iban(v: str) -> bool:
 
 
 def is_email(v: str) -> bool:
-    """
-    Returns True if v is email address.
-    :param v: str
-    :return: bool
+    """Returns True if v is email address.
+
+    Args:
+        v: str
+
+    Returns:
+        bool
     """
     v = email_filter(v)
     return bool(v and EMAIL_VALIDATOR.fullmatch(v))
@@ -336,10 +366,13 @@ def be_iban_validator(v: str):
 
 
 def be_iban_bank_info(v: str) -> Tuple[str, str]:
-    """
-    Returns BIC code and bank name from BE IBAN number.
-    :param v: IBAN account number
-    :return: (BIC code, bank name) or ('', '') if not found
+    """Returns BIC code and bank name from BE IBAN number.
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        (BIC code, bank name) or ('', '') if not found
     """
     v = iban_filter(v)
     bic = BE_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
@@ -363,11 +396,14 @@ def dk_clearing_code_bank_name(v: str) -> str:
 
 
 def dk_iban_bank_info(v: str) -> Tuple[str, str]:
-    """
-    Returns empty string (BIC not available) and bank name from DK IBAN number.
+    """Returns empty string (BIC not available) and bank name from DK IBAN number.
     DK5000400440116243
-    :param v: IBAN account number
-    :return: ('', bank name) or ('', '') if not found
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        ('', bank name) or ('', '') if not found
     """
     return "", dk_clearing_code_bank_name(v)
 
@@ -418,9 +454,10 @@ def fi_payment_reference_validator(v: str):
 
 
 def iso_payment_reference_validator(v: str):
-    """
-    Validates ISO reference number checksum.
-    :param v: Reference number
+    """Validates ISO reference number checksum.
+
+    Args:
+        v: Reference number
     """
     num = ""
     v = STRIP_WHITESPACE.sub("", v)
@@ -444,10 +481,13 @@ def fi_iban_validator(v: str):
 
 
 def fi_iban_bank_info(v: str) -> Tuple[str, str]:
-    """
-    Returns BIC code and bank name from FI IBAN number.
-    :param v: IBAN account number
-    :return: (BIC code, bank name) or ('', '') if not found
+    """Returns BIC code and bank name from FI IBAN number.
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        (BIC code, bank name) or ('', '') if not found
     """
     v = iban_filter(v)
     bic = FI_BIC_BY_ACCOUNT_NUMBER.get(v[4:7], None)
@@ -612,10 +652,13 @@ SE_SSN_VALIDATOR = re.compile(r"^\d{6}[-]\d{3}[\d]$")
 
 
 def se_iban_bank_info(v: str) -> Tuple[str, str]:
-    """
-    Returns BIC code and bank name from SE IBAN number.
-    :param v: IBAN account number
-    :return: (BIC code, bank name) or ('', '') if not found
+    """Returns BIC code and bank name from SE IBAN number.
+
+    Args:
+        v: IBAN account number
+
+    Returns:
+        (BIC code, bank name) or ('', '') if not found
     """
     bank_name = se_clearing_code_bank_info(v)[0]
     return "", bank_name
@@ -655,10 +698,13 @@ def se_ssn_validator(v0: str):
 
 
 def se_clearing_code_bank_info(account_number: str) -> Tuple[str, Optional[int]]:
-    """
-    Returns Sweden bank info by clearing code.
-    :param account_number: Swedish account number with clearing code as prefix
-    :return: (Bank name, account digit count) or ("", None) if not found
+    """Returns Sweden bank info by clearing code.
+
+    Args:
+        account_number: Swedish account number with clearing code as prefix
+
+    Returns:
+        (Bank name, account digit count) or ("", None) if not found
     """
     v = iban_filter(account_number)
     if v.startswith("SE"):

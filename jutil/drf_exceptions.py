@@ -32,8 +32,7 @@ def transform_exception_to_drf(exception: Exception) -> Exception:
 
 
 def custom_exception_handler(exc, context):
-    """
-    Custom DRF exception handler which converts Django ValidationError to DRF ValidationError.
+    """Custom DRF exception handler which converts Django ValidationError to DRF ValidationError.
     Note that even if this approach is not technically recommended, this is still
     the most convenient way to handle shared validation between Django admin and API.
 

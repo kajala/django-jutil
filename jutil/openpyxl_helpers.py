@@ -43,9 +43,7 @@ class ExcelResponse(HttpResponse):
 
 
 def save_workbook_to_bytes(workbook: Workbook) -> bytes:
-    """
-    Return an in-memory workbook.
-    """
+    """Return an in-memory workbook."""
     with NamedTemporaryFile() as tmp:
         with ZipFile(tmp, "w", ZIP_DEFLATED, allowZip64=True) as archive:
             writer = ExcelWriter(workbook, archive)

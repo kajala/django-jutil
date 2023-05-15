@@ -2,8 +2,7 @@ from rest_framework import permissions
 
 
 class UserIsOwner(permissions.BasePermission):
-    """
-    Object-level permission to only allow authorized users of an object to edit it.
+    """Object-level permission to only allow authorized users of an object to edit it.
     Assumes the model instance has an `user` attribute (can be overriden with user_field).
     """
 
@@ -17,9 +16,7 @@ class UserIsOwner(permissions.BasePermission):
 
 
 class IsSameUser(permissions.BasePermission):
-    """
-    Allow access to use only to user himself.
-    """
+    """Allow access to use only to user himself."""
 
     def has_object_permission(self, request, view, obj):
         u = request.user

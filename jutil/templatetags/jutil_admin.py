@@ -26,8 +26,7 @@ def format_change_message_ex_values_dict(model: Any, values: dict) -> str:
 
 @register.filter
 def format_change_message_ex(action: LogEntry) -> str:  # noqa
-    """
-    Formats extended admin change message which contains new values as well.
+    """Formats extended admin change message which contains new values as well.
     See jutil.admin.ModelAdminBase.
     """
     if action.change_message and action.change_message[0] == "[":

@@ -26,9 +26,7 @@ from jutil.model import get_model_field_label
 
 
 def get_admin_log(instance: object) -> QuerySet:
-    """
-    Returns admin log (LogEntry QuerySet) of the object.
-    """
+    """Returns admin log (LogEntry QuerySet) of the object."""
     return LogEntry.objects.filter(
         content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
         object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
@@ -36,22 +34,23 @@ def get_admin_log(instance: object) -> QuerySet:
 
 
 def admin_log_system_user():
-    """
-    Returns admin log system user (username either settings.DJANGO_SYSTEM_USER, default value "system")
-    """
+    """Returns admin log system user (username either settings.DJANGO_SYSTEM_USER, default value "system")"""
     username = settings.DJANGO_SYSTEM_USER if hasattr(settings, "DJANGO_SYSTEM_USER") else "system"  # type: ignore
     return get_user_model().objects.get_or_create(username=username)[0]
 
 
 def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, AnonymousUser]] = None, action_flag: int = CHANGE, **kwargs):
-    """
-    Logs an entry to admin logs of model(s).
-    :param instances: Model instance or list of instances (None values are ignored)
-    :param msg: Message to log
-    :param who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
-    :param action_flag: ADDITION / CHANGE / DELETION action flag. Default CHANGED.
-    :param kwargs: Optional key-value attributes to append to message
-    :return: None
+    """Logs an entry to admin logs of model(s).
+
+    Args:
+        instances: Model instance or list of instances (None values are ignored)
+        msg: Message to log
+        who: Who did the change. If who is None then User with username of settings.DJANGO_SYSTEM_USER (default: 'system') will be used
+        action_flag: ADDITION / CHANGE / DELETION action flag. Default CHANGED.
+        **kwargs: Optional key-value attributes to append to message
+
+    Returns:
+        None
     """
     # use system user if 'who' is missing
     if who is None:
@@ -81,14 +80,17 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, A
 
 
 def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder, max_serialized_field_length: Optional[int] = None) -> str:
-    """
-    JSON serializes (changed) fields of a model instance for logging purposes.
+    """JSON serializes (changed) fields of a model instance for logging purposes.
     Referenced objects with primary key (pk) attribute are formatted using only that field as value.
-    :param obj: Model instance
-    :param field_names: List of field names to store
-    :param cls: Serialization class. Default DjangoJSONEncoder.
-    :param max_serialized_field_length: Optional maximum length for individual serialized str value. Longer fields are cut with terminating [...]
-    :return: str
+
+    Args:
+        obj: Model instance
+        field_names: List of field names to store
+        cls: Serialization class. Default DjangoJSONEncoder.
+        max_serialized_field_length: Optional maximum length for individual serialized str value. Longer fields are cut with terminating [...]
+
+    Returns:
+        str
     """
     out: Dict[str, Any] = {}
     for k in field_names:
@@ -105,8 +107,7 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
 
 
 def admin_log_has_field_values(instance) -> bool:  # pylint: disable=too-many-nested-blocks
-    """
-    Returns True if the instance has any field values stored as JSON in the admin log.
+    """Returns True if the instance has any field values stored as JSON in the admin log.
     See: admin_construct_change_message_ex, admin_log_field_values
     """
     content_type_id = get_content_type_for_model(instance).pk
@@ -131,14 +132,17 @@ def admin_log_has_field_values(instance) -> bool:  # pylint: disable=too-many-ne
 def admin_log_field_values(
     instance, changed_data: Optional[List[str]] = None, who: Optional[User] = None, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000
 ) -> LogEntry:  # noqa
-    """
-    Logs instance field values as JSON in the admin log.
-    :param instance: Model instance
-    :param changed_data: List of changed field names. If None then ADDITION is assumed as action.
-    :param who: User who did the change. Default is system user.
-    :param cls: JSON encoder. Default: Django implementation
-    :param max_serialized_field_length: Max length for long text fields.
-    :return: LogEntry
+    """Logs instance field values as JSON in the admin log.
+
+    Args:
+        instance: Model instance
+        changed_data: List of changed field names. If None then ADDITION is assumed as action.
+        who: User who did the change. Default is system user.
+        cls: JSON encoder. Default: Django implementation
+        max_serialized_field_length: Max length for long text fields.
+
+    Returns:
+        LogEntry
     """
     from jutil.model import get_model_field_names  # type: ignore  # noqa
 
@@ -231,13 +235,16 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
 
 
 def admin_obj_url(obj: Optional[object], route: str = "", base_url: str = "") -> str:
-    """
-    Returns admin URL to object. If object is standard model with default route name, the function
+    """Returns admin URL to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
-    :param obj: Object
-    :param route: Empty for default route
-    :param base_url: Base URL if you want absolute URLs, e.g. https://example.com
-    :return: URL to admin object change view
+
+    Args:
+        obj: Object
+        route: Empty for default route
+        base_url: Base URL if you want absolute URLs, e.g. https://example.com
+
+    Returns:
+        URL to admin object change view
     """
     if obj is None:
         return ""
@@ -248,14 +255,17 @@ def admin_obj_url(obj: Optional[object], route: str = "", base_url: str = "") ->
 
 
 def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base_url: str = "") -> str:
-    """
-    Returns safe-marked admin link to object. If object is standard model with default route name, the function
+    """Returns safe-marked admin link to object. If object is standard model with default route name, the function
     can deduct the route name as in "admin:<app>_<class-lowercase>_change".
-    :param obj: Object
-    :param label: Optional label. If empty uses str(obj)
-    :param route: Empty for default route
-    :param base_url: Base URL if you want absolute URLs, e.g. https://example.com
-    :return: HTML link marked safe
+
+    Args:
+        obj: Object
+        label: Optional label. If empty uses str(obj)
+        route: Empty for default route
+        base_url: Base URL if you want absolute URLs, e.g. https://example.com
+
+    Returns:
+        HTML link marked safe
     """
     if obj is None:
         return ""
@@ -264,8 +274,7 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
 
 
 class ModelAdminBase(admin.ModelAdmin):
-    """
-    ModelAdmin with some customizations:
+    """ModelAdmin with some customizations:
     * Customized change message which logs changed values and user IP as well (can be disabled by extended_log=False)
     * Length-limited latest-first history view (customizable by max_history_length)
     * Actions sorted alphabetically by localized description
@@ -286,8 +295,11 @@ class ModelAdminBase(admin.ModelAdmin):
 
     def sort_actions_by_description(self, actions: dict) -> OrderedDict:
         """
-        :param actions: dict of str: (callable, name, description)
-        :return: OrderedDict
+        Args:
+            actions: dict of str: (callable, name, description)
+
+        Returns:
+            OrderedDict
         """
         sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: x[1])
         sorted_actions = OrderedDict()
@@ -299,34 +311,32 @@ class ModelAdminBase(admin.ModelAdmin):
         return self.sort_actions_by_description(super().get_actions(request))
 
     def fill_extra_context(self, request: HttpRequest, extra_context: Optional[Dict[str, Any]]):  # pylint: disable=unused-argument
-        """
-        Function called by customized add_view(), change_view() and kw_changelist_view()
+        """Function called by customized add_view(), change_view() and kw_changelist_view()
         to supplement extra_context dictionary by custom variables.
         """
         return extra_context
 
     def add_view(self, request: HttpRequest, form_url="", extra_context=None):
-        """
-        Custom add_view() which calls fill_extra_context().
-        """
+        """Custom add_view() which calls fill_extra_context()."""
         return super().add_view(request, form_url, self.fill_extra_context(request, extra_context))
 
     def change_view(self, request: HttpRequest, object_id, form_url="", extra_context=None):
-        """
-        Custom change_view() which calls fill_extra_context().
-        """
+        """Custom change_view() which calls fill_extra_context()."""
         return super().change_view(request, object_id, form_url, self.fill_extra_context(request, extra_context))
 
     def changelist_view(self, request, extra_context=None):
         return super().changelist_view(request, self.fill_extra_context(request, extra_context))
 
     def kw_changelist_view(self, request: HttpRequest, extra_context=None, **kwargs):  # pylint: disable=unused-argument
-        """
-        Changelist view which allow key-value arguments and calls fill_extra_context().
-        :param request: HttpRequest
-        :param extra_context: Extra context dict
-        :param kwargs: Key-value dict
-        :return: See changelist_view()
+        """Changelist view which allow key-value arguments and calls fill_extra_context().
+
+        Args:
+            request: HttpRequest
+            extra_context: Extra context dict
+            **kwargs: Key-value dict
+
+        Returns:
+            See changelist_view()
         """
         extra_context = extra_context or {}
         extra_context.update(kwargs)
@@ -383,9 +393,7 @@ class ModelAdminBase(admin.ModelAdmin):
 
 
 class InlineModelAdminParentAccessMixin:
-    """
-    Admin mixin for accessing parent objects to be used in InlineModelAdmin derived classes.
-    """
+    """Admin mixin for accessing parent objects to be used in InlineModelAdmin derived classes."""
 
     OBJECT_PK_KWARGS = ["object_id", "pk", "id"]
 
