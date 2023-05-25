@@ -6,7 +6,6 @@ import socket
 from ipware import get_client_ip  # type: ignore
 
 logger = logging.getLogger(__name__)
-logger.warning("jutil.request deprecated, update to jutil.geoip. Contents is identical.")
 
 
 class GeoIP:
