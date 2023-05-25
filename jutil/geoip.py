@@ -6,7 +6,6 @@ import socket
 from ipware import get_client_ip  # type: ignore
 
 logger = logging.getLogger(__name__)
-logger.warning("jutil.request deprecated, update to jutil.geoip. Contents is identical.")
 
 
 class GeoIP:
@@ -71,6 +70,7 @@ def get_geo_ip_from_ipgeolocation(ip: str, timeout: int = 10, verbose: bool = Fa
     Args:
         ip: str
         timeout: timeout in seconds
+        verbose:
 
     Returns:
         IPGeoInfo
@@ -104,6 +104,7 @@ def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -
     Args:
         ip: str
         timeout: timeout in seconds
+        verbose:
 
     Returns:
         IPGeoInfo
@@ -155,6 +156,7 @@ def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
     Args:
         ip: str
         timeout: timeout in seconds
+        verbose:
 
     Returns:
         IPGeoInfo
