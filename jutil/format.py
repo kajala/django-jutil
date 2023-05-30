@@ -193,6 +193,20 @@ def format_xml_file(full_path: str, encoding: str = "UTF-8", exceptions: bool = 
     return b""
 
 
+def json_dumps(value: Any, indent: int = 4, cls: Any = DjangoJSONEncoder) -> str:
+    """
+    Returns json dump of value using DjangoJSONEncoder by default.
+    Args:
+        value: Any
+        indent: int
+        cls: DjangoJSONEncoder
+
+    Returns:
+        str
+    """
+    return json.dumps(value, indent=indent, cls=cls)
+
+
 def format_as_html_json(value: Any) -> str:
     """Returns value as JSON-formatted value in HTML.
 
@@ -202,7 +216,7 @@ def format_as_html_json(value: Any) -> str:
     Returns:
         str
     """
-    return mark_safe(html.escape(json.dumps(value, indent=4, cls=DjangoJSONEncoder)).replace("\n", "<br/>").replace(" ", "&nbsp;"))
+    return mark_safe(html.escape(json_dumps(value).replace("\n", "<br/>").replace(" ", "&nbsp;")))
 
 
 def format_dict_as_html(value: Dict[str, Any]) -> str:
