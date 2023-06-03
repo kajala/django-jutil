@@ -11,6 +11,7 @@ djangorestframework
 djangorestframework-stubs
 types-requests
 django-stubs
+openpyxl-stubs
 twine
 django-extensions
 python-dotenv
