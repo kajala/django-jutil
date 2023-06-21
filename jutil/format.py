@@ -193,12 +193,12 @@ def format_xml_file(full_path: str, encoding: str = "UTF-8", exceptions: bool = 
     return b""
 
 
-def json_dumps(value: Any, indent: int = 4, cls: Any = DjangoJSONEncoder) -> str:
+def json_dumps(value: Any, indent: Optional[int] = 4, cls: Any = DjangoJSONEncoder) -> str:
     """
     Returns json dump of value using DjangoJSONEncoder by default.
     Args:
         value: Any
-        indent: int
+        indent: int or None
         cls: DjangoJSONEncoder
 
     Returns:
