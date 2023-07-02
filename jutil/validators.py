@@ -164,7 +164,7 @@ def bic_validator(v0: str):
     """Validates bank BIC/SWIFT code (8-11 characters).
 
     Args:
-        v: str
+        v0: str
 
     Returns:
         None
@@ -179,7 +179,7 @@ def iban_validator(v0: str):
     """Validates IBAN format bank account number.
 
     Args:
-        v: str
+        v0: str
 
     Returns:
         None
@@ -206,6 +206,32 @@ def iban_validator(v0: str):
         x = Decimal(num) % Decimal(97)
         if x != Decimal(1):
             raise ValidationError(_("Invalid IBAN account number") + " ({})".format(v0), code="invalid_iban")
+
+
+def is_iban(v0: str) -> bool:
+    # validate prefix and length
+    v = iban_filter(v0)
+    if not v:
+        return False
+    country = v[:2].upper()
+    if country not in IBAN_LENGTH_BY_COUNTRY:
+        return False
+    iban_len = IBAN_LENGTH_BY_COUNTRY[country]
+    if iban_len != len(v):
+        return False
+
+    # validate IBAN numeric part
+    if iban_len <= 26:  # very long IBANs are unsupported by the numeric part validation
+        digits = "0123456789"
+        num = ""
+        for ch in v[4:] + v[0:4]:
+            if ch not in digits:
+                ch = str(ord(ch) - ord("A") + 10)
+            num += ch
+        x = Decimal(num) % Decimal(97)
+        if x != Decimal(1):
+            return False
+    return True
 
 
 def iban_generator(country_code: str = "") -> str:
@@ -319,22 +345,6 @@ def is_int(v: Any) -> bool:
     try:
         return str(int(v)) == str(v)
     except Exception:
-        return False
-
-
-def is_iban(v: str) -> bool:
-    """Returns True if account number is valid IBAN format.
-
-    Args:
-        v: str
-
-    Returns:
-        bool
-    """
-    try:
-        iban_validator(v)
-        return True
-    except ValidationError:
         return False
 
 

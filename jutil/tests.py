@@ -126,6 +126,7 @@ from jutil.validators import (
     bic_sanitizer,
     filter_country_company_org_id,
     variable_name_sanitizer,
+    is_iban,
 )
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET  # noqa
@@ -1314,6 +1315,14 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(wb2.active.cell(1, 1).value, "hello")
         self.assertEqual(wb2.active.cell(2, 2).value, 1.0)
         self.assertEqual(wb2.active.cell(2, 3).value, 2)
+
+    def test_is_iban(self):
+        valid_ibans = ["AL35202111090000000001234567", "AD1400080001001234567890", "AT483200000012345864"]
+        for valid_iban in valid_ibans:
+            self.assertTrue(is_iban(valid_iban))
+        invalid_ibans = ["GB96BARC202015300934591", "US64SVBKUS6S3300958879"]
+        for invalid_iban in invalid_ibans:
+            self.assertFalse(is_iban(invalid_iban))
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
