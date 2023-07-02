@@ -1,5 +1,4 @@
 import csv
-import html
 import json
 import logging
 import os
@@ -9,13 +8,12 @@ from datetime import timedelta
 from decimal import Decimal
 import subprocess
 from io import StringIO
-from typing import List, Any, Optional, Union, Sequence, Tuple, Dict, TypeVar
+from typing import List, Any, Optional, Union, Sequence, Tuple, TypeVar
 from django.conf import settings
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.functional import lazy
 import xml.dom.minidom  # type: ignore
-from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 
 logger = logging.getLogger(__name__)
@@ -205,24 +203,6 @@ def json_dumps(value: Any, indent: Optional[int] = 4, cls: Any = DjangoJSONEncod
         str
     """
     return json.dumps(value, indent=indent, cls=cls)
-
-
-def format_as_html_json(value: Any) -> str:
-    """Returns value as JSON-formatted value in HTML.
-
-    Args:
-        value: Any value which can be converted to JSON by json.dumps
-
-    Returns:
-        str
-    """
-    logging.warning("format_as_html_json() is deprecated, use f'<pre>json_dumps(data)</pre>'")
-    return mark_safe(html.escape(json_dumps(value).replace("\n", "<br/>").replace(" ", "&nbsp;")))
-
-
-def format_dict_as_html(value: Dict[str, Any]) -> str:
-    logging.warning("format_dict_as_html() is deprecated, use f'<pre>json_dumps(data)</pre>'")
-    return format_as_html_json(value)
 
 
 def format_csv(rows: List[List[Any]], dialect: str = "excel") -> str:
