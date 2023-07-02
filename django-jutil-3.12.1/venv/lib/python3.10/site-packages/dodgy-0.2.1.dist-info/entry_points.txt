@@ -1,0 +1,3 @@
+[console_scripts]
+dodgy = dodgy.run:main
+

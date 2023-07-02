@@ -1,0 +1,25 @@
+pip
+setuptools
+pytype
+prospector
+bandit
+dependency-check
+coverage
+codecov
+mypy
+djangorestframework
+djangorestframework-stubs
+types-requests
+django-stubs
+openpyxl-stubs
+twine
+django-extensions
+python-dotenv
+pre-commit
+black
+openpyxl==3.0.7
+redis
+psycopg2==2.9.3 --no-binary 2.9.3
+sendgrid==6.9.7
+ruff
+

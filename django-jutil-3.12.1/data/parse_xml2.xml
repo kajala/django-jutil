@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<soapenv:Envelope xmlns:request="http://www.soliditet.fi/frg/SoliditetHenkiloLuottoTiedot/Request" xmlns:response="http://www.soliditet.fi/frg/SoliditetHenkiloLuottoTiedot/Response" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://www.soliditet.fi/SoliditetHenkiloLuottoTiedot" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<soapenv:Body>
+		<response:Response>
+			<KayttajaTiedot xmlns="">
+				<KayttajaTunnus>1234</KayttajaTunnus>
+				<AsiakasTunnus>1234</AsiakasTunnus>
+				<LoppuAsiakas_Nimi>TestCo</LoppuAsiakas_Nimi>
+				<Versio>1</Versio>
+			</KayttajaTiedot>
+			<VastausLoki xmlns="">
+				<KysyttyHenkiloTunnus>020685-1234</KysyttyHenkiloTunnus>
+				<SyyKoodi>1</SyyKoodi>
+				<PaluuKoodi Koodi="1">Palveluvastaus onnistui</PaluuKoodi>
+			</VastausLoki>
+			<HenkiloTiedotResponse xmlns="">
+				<HenkiloTiedot>
+					<HenkiloTunnus>020685-1234</HenkiloTunnus>
+					<Hakutiedot>
+						<Sanomatunnus>BHEN</Sanomatunnus>
+						<OnnistuikoHaku Koodi="0001">Tietoja ei löydy</OnnistuikoHaku>
+					</Hakutiedot>
+				</HenkiloTiedot>
+			</HenkiloTiedotResponse>
+			<YritysYhteydetResponse xmlns="">
+				<YritysYhteysTiedot>
+					<HenkiloTunnus>020685-1234</HenkiloTunnus>
+					<OnVastuuHenkilo>E</OnVastuuHenkilo>
+				</YritysYhteysTiedot>
+			</YritysYhteydetResponse>
+			<ScoreJaLuottoSuositusResponse xmlns="">
+				<ScoreJaLuottoSuositus>
+					<Score>0</Score>
+					<LuottoSuositus>
+						<LuottoSuositusKoodi>-1</LuottoSuositusKoodi>
+						<LuottoSuositusSelite>Evätty</LuottoSuositusSelite>
+						<LuottoSuositusPeruste>Ei löydy VRK:sta</LuottoSuositusPeruste>
+					</LuottoSuositus>
+				</ScoreJaLuottoSuositus>
+			</ScoreJaLuottoSuositusResponse>
+		</response:Response>
+	</soapenv:Body>
+</soapenv:Envelope>
+

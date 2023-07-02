@@ -1,0 +1,5 @@
+Django>=2.1.7
+django-ipware>=3.0.0
+djangorestframework>=2.19.1
+pytz>=2019.1
+requests>=2.19.1

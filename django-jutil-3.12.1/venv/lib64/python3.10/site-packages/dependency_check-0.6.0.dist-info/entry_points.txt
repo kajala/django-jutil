@@ -1,0 +1,3 @@
+[console_scripts]
+dependency-check = dependency_check:run
+

@@ -79,7 +79,6 @@ from jutil.format import (
     get_media_full_path,
     camel_case_to_underscore,
     underscore_to_camel_case,
-    format_as_html_json,
     choices_label,
     is_media_full_path,
     capfirst_lazy,
@@ -1194,18 +1193,6 @@ class Tests(TestCase, TestSetupMixin):
         t1 = now()
         self.assertIsNone(obj)
         self.assertGreater(t1 - t0, timedelta(seconds=0.99))
-
-    def test_format_as_html_json(self):
-        pairs = [
-            (None, "null"),
-            ({"a": 1}, "{<br/>&nbsp;&nbsp;&nbsp;&nbsp;&quot;a&quot;:&nbsp;1<br/>}"),
-            (
-                {"script": "<script>window.alert()</script>"},
-                "{<br/>&nbsp;&nbsp;&nbsp;&nbsp;&quot;script&quot;:&nbsp;&quot;&lt;script&gt;window.alert()&lt;/script&gt;&quot;<br/>}",
-            ),
-        ]
-        for val, html in pairs:
-            self.assertEqual(format_as_html_json(val), html)
 
     def test_parse_bool(self):
         refs_true = [

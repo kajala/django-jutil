@@ -1,0 +1,3 @@
+[console_scripts]
+detect-requirements=requirements_detector.run:run
+
