@@ -1,2 +1,0 @@
-django-stubs
-mypy_django_plugin
