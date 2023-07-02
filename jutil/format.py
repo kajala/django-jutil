@@ -216,11 +216,12 @@ def format_as_html_json(value: Any) -> str:
     Returns:
         str
     """
+    logging.warning("format_as_html_json() is deprecated, use f'<pre>json_dumps(data)</pre>'")
     return mark_safe(html.escape(json_dumps(value).replace("\n", "<br/>").replace(" ", "&nbsp;")))
 
 
 def format_dict_as_html(value: Dict[str, Any]) -> str:
-    logging.warning("format_dict_as_html() is deprecated, use format_as_html_json()")
+    logging.warning("format_dict_as_html() is deprecated, use f'<pre>json_dumps(data)</pre>'")
     return format_as_html_json(value)
 
 
