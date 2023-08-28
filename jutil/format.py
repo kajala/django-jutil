@@ -362,88 +362,109 @@ capfirst_lazy = lazy(_capfirst_lazy, str)
 upper_lazy = lazy(_upper_lazy, str)
 
 
-def dec0(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec0(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 0 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 0 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1"))
+    return Decimal(a).quantize(Decimal("1"), rounding)
 
 
-def dec1(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec1(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 1 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 1 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.0"))
+    return Decimal(a).quantize(Decimal("1.0"), rounding)
 
 
-def dec2(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec2(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 2 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 2 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.00"))
+    return Decimal(a).quantize(Decimal("1.00"), rounding)
 
 
-def dec3(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec3(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 3 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 3 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.000"))
+    return Decimal(a).quantize(Decimal("1.000"), rounding)
 
 
-def dec4(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec4(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 4 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.0000"))
+    return Decimal(a).quantize(Decimal("1.0000"), rounding)
 
 
-def dec5(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec5(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 5 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.00000"))
+    return Decimal(a).quantize(Decimal("1.00000"), rounding)
 
 
-def dec6(a: Union[float, int, Decimal, str]) -> Decimal:
+def dec6(a: Union[float, int, Decimal, str], rounding: Optional[str] = None) -> Decimal:
     """Converts number to Decimal with 6 decimal digits.
 
     Args:
         a: Number
+        rounding: Rounding mode.
+            One of decimal.ROUND_CEILING, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP, ROUND_05UP.
+            Default is context dependent. See Python Decimal.quantize docs.
 
     Returns:
         Decimal with 4 decimal digits
     """
-    return Decimal(a).quantize(Decimal("1.000000"))
+    return Decimal(a).quantize(Decimal("1.000000"), rounding)
 
 
 def is_media_full_path(file_path: str) -> bool:
