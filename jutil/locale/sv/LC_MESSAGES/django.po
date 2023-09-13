@@ -1,18 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 01:05+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2023-09-13 01:06+0000\n"
+"PO-Revision-Date: 2023-09-12 20:05-0500\n"
+"Last-Translator: Google Translate API v3\n"
+"Language-Team: sv <jani>\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,88 +15,88 @@ msgstr ""
 #: jutil/admin.py:371
 #, python-format
 msgid "Change history: %s"
-msgstr ""
+msgstr "Ändringshistorik: %s"
 
 #: jutil/dates.py:10
 msgid "yesterday"
-msgstr ""
+msgstr "i går"
 
 #: jutil/dates.py:11
 msgid "today"
-msgstr ""
+msgstr "i dag"
 
 #: jutil/dates.py:12
 msgid "tomorrow"
-msgstr ""
+msgstr "i morgon"
 
 #: jutil/dates.py:13
 msgid "last week"
-msgstr ""
+msgstr "förra veckan"
 
 #: jutil/dates.py:14
 msgid "last month"
-msgstr ""
+msgstr "förra månaden"
 
 #: jutil/dates.py:15
 msgid "last year"
-msgstr ""
+msgstr "förra året"
 
 #: jutil/dates.py:16
 msgid "this week"
-msgstr ""
+msgstr "Denna vecka"
 
 #: jutil/dates.py:17
 msgid "this month"
-msgstr ""
+msgstr "den här månaden"
 
 #: jutil/dates.py:18
 msgid "this year"
-msgstr ""
+msgstr "det här året"
 
 #: jutil/dates.py:19
 msgid "next week"
-msgstr ""
+msgstr "nästa vecka"
 
 #: jutil/dates.py:20
 msgid "next month"
-msgstr ""
+msgstr "nästa månad"
 
 #: jutil/dates.py:21
 msgid "next year"
-msgstr ""
+msgstr "nästa år"
 
 #: jutil/dates.py:28 jutil/dates.py:29 jutil/dates.py:30
 msgid "number.of.days"
-msgstr "days"
+msgstr "dagar"
 
 #: jutil/dates.py:47
 msgid "daily"
-msgstr ""
+msgstr "dagligen"
 
 #: jutil/dates.py:48
 msgid "weekly"
-msgstr ""
+msgstr "varje vecka"
 
 #: jutil/dates.py:49
 msgid "monthly"
-msgstr ""
+msgstr "en gång i månaden"
 
 #: jutil/email.py:24 jutil/email.py:27
 msgid "Invalid email recipient: {}"
-msgstr ""
+msgstr "Ogiltig e-postmottagare: {}"
 
 #: jutil/files.py:22 jutil/files.py:62
 msgid "{} is not a directory"
-msgstr ""
+msgstr "{} är inte en katalog"
 
 #: jutil/files.py:25 jutil/files.py:65
 msgid "{} is not under MEDIA_ROOT"
-msgstr ""
+msgstr "{} är inte under MEDIA_ROOT"
 
 #: jutil/parse.py:42
 #, python-format
 msgid "%(value)s is not one of the available choices"
-msgstr ""
+msgstr "%(value)s är inte ett av de tillgängliga alternativen"
 
 #: jutil/parse.py:62 jutil/parse.py:68 jutil/tests.py:752
 #, python-format
@@ -109,131 +104,138 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"&quot;%(value)s&quot;-värdet har ett ogiltigt format. Det måste vara i "
+"formatet ÅÅÅÅ-MM-DD TT:MM[:ss[.uuuuuu]][TZ]."
 
 #: jutil/responses.py:20
 msgid "File {} not found"
-msgstr ""
+msgstr "Filen hittades inte"
 
 #: jutil/templates/jutil/admin/object_history.html:6
 msgid "Home"
-msgstr ""
+msgstr "Hem"
 
 #: jutil/templates/jutil/admin/object_history.html:10
 msgid "History"
-msgstr ""
+msgstr "Historia"
 
 #: jutil/templates/jutil/admin/object_history.html:22
 msgid "Date/time"
-msgstr ""
+msgstr "Datum Tid"
 
 #: jutil/templates/jutil/admin/object_history.html:23
 msgid "User"
-msgstr ""
+msgstr "Användare"
 
 #: jutil/templates/jutil/admin/object_history.html:24
 msgid "Action"
-msgstr ""
+msgstr "Handling"
 
 #: jutil/templates/jutil/admin/object_history.html:38
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
+"Det här objektet har ingen ändringshistorik. Det har förmodligen inte lagts "
+"till via denna adminwebbplats."
 
 #: jutil/templatetags/jutil_admin.py:45
-#, python-brace-format
+#, fuzzy, python-brace-format
+#| msgid "Added {name} “{object}”."
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "Lade till {name} &quot;{objekt}&quot;."
 
 #: jutil/templatetags/jutil_admin.py:47 jutil/templatetags/jutil_admin.py:54
 msgid "Added."
-msgstr ""
+msgstr "Lagt till."
 
 #: jutil/templatetags/jutil_admin.py:59
 msgid "and"
-msgstr ""
+msgstr "och"
 
 #: jutil/templatetags/jutil_admin.py:63
-#, python-brace-format
+#, fuzzy, python-brace-format
+#| msgid "Changed {fields} for {name} “{object}”."
 msgid "Changed {fields} for {name} “{object}”."
-msgstr ""
+msgstr "Ändrade {fields} för {name} &quot;{objekt}&quot;."
 
 #: jutil/templatetags/jutil_admin.py:65
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Ändrade {fields}."
 
 #: jutil/templatetags/jutil_admin.py:74
-#, python-brace-format
+#, fuzzy, python-brace-format
+#| msgid "Deleted {name} “{object}”."
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "Raderade {name} &quot;{objekt}&quot;."
 
 #: jutil/templatetags/jutil_admin.py:79
 msgid "No fields changed."
-msgstr ""
+msgstr "Inga fält har ändrats."
 
 #: jutil/tests.py:297 jutil/validators.py:40
 msgid "Invalid phone number"
-msgstr ""
+msgstr "Ogiltigt telefonnummer"
 
 #: jutil/tests.py:304 jutil/validators.py:75
 msgid "Invalid passport number"
-msgstr ""
+msgstr "Ogiltigt passnummer"
 
 #: jutil/tests.py:312 jutil/tests.py:355 jutil/tests.py:1019
 #: jutil/validators.py:105 jutil/validators.py:193 jutil/validators.py:250
 msgid "Invalid country code"
-msgstr ""
+msgstr "Ogiltig landskod"
 
 #: jutil/tests.py:326 jutil/validators.py:524 jutil/validators.py:527
 #: jutil/validators.py:534 jutil/validators.py:538
 msgid "Invalid company organization ID"
-msgstr ""
+msgstr "Ogiltigt företagsorganisations-ID"
 
 #: jutil/tests.py:330 jutil/tests.py:353 jutil/tests.py:357 jutil/tests.py:717
 #: jutil/tests.py:719 jutil/tests.py:721 jutil/validators.py:190
 #: jutil/validators.py:196 jutil/validators.py:208 jutil/validators.py:278
 #: jutil/validators.py:284
 msgid "Invalid IBAN account number"
-msgstr ""
+msgstr "Ogiltigt IBAN-kontonummer"
 
 #: jutil/tests.py:345 jutil/validators.py:558 jutil/validators.py:585
 #: jutil/validators.py:688 jutil/validators.py:707
 msgid "Invalid personal identification number"
-msgstr ""
+msgstr "Ogiltigt personnummer"
 
 #: jutil/tests.py:361 jutil/tests.py:363 jutil/tests.py:365
 #: jutil/validators.py:175
 msgid "Invalid bank BIC/SWIFT code"
-msgstr ""
+msgstr "Ogiltig bank BIC/SWIFT-kod"
 
 #: jutil/tests.py:853
 msgid "action time"
-msgstr ""
+msgstr "åtgärdstid"
 
 #: jutil/tests.py:940
 msgid "MISSING VALUE"
-msgstr ""
+msgstr "MISSING VALUE"
 
 #: jutil/tests.py:952 jutil/validators.py:39 jutil/validators.py:56
 #: jutil/validators.py:74 jutil/validators.py:104 jutil/validators.py:174
 #: jutil/validators.py:190
 msgid "Missing value"
-msgstr ""
+msgstr "Saknat värde"
 
 #: jutil/tests.py:1021 jutil/validators.py:253
 msgid "IBAN checksum generation does not support >26 character IBANs"
-msgstr ""
+msgstr "Generering av IBAN-kontrollsummor stöder inte &gt;26 tecken IBAN"
 
 #: jutil/validators.py:57
 msgid "Invalid email"
-msgstr ""
+msgstr "Ogiltig e-postadress"
 
 #: jutil/validators.py:448 jutil/validators.py:451 jutil/validators.py:463
 #: jutil/validators.py:482 jutil/validators.py:486
 msgid "Invalid payment reference: {}"
-msgstr ""
+msgstr "Ogiltig betalningsreferens: {}"
 
 #: jutil/validators.py:590 jutil/validators.py:592
 msgid "Unsupported year"
-msgstr ""
+msgstr "År som inte stöds"

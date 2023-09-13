@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-19 00:17+0000\n"
+"POT-Creation-Date: 2023-09-13 01:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: jutil/admin.py:361
+#: jutil/admin.py:371
 #, python-format
 msgid "Change history: %s"
 msgstr "Muutoshistoria: %s"
@@ -91,11 +91,11 @@ msgstr "kuukausittain"
 msgid "Invalid email recipient: {}"
 msgstr "Epäkelpo sähköposti: {}"
 
-#: jutil/files.py:19 jutil/files.py:56
+#: jutil/files.py:22 jutil/files.py:62
 msgid "{} is not a directory"
 msgstr "{} ei ole hakemisto"
 
-#: jutil/files.py:22 jutil/files.py:59
+#: jutil/files.py:25 jutil/files.py:65
 msgid "{} is not under MEDIA_ROOT"
 msgstr "{} ei ole MEDIA_ROOT hakemiston alla"
 
@@ -104,7 +104,7 @@ msgstr "{} ei ole MEDIA_ROOT hakemiston alla"
 msgid "%(value)s is not one of the available choices"
 msgstr "%(value)s ei ole yksi valittavissa olevista arvoista"
 
-#: jutil/parse.py:59 jutil/parse.py:65 jutil/tests.py:755
+#: jutil/parse.py:62 jutil/parse.py:68 jutil/tests.py:752
 #, python-format
 msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -112,7 +112,7 @@ msgid ""
 msgstr ""
 "%(value)s-arvon muoto ei kelpaa. Se tulee olla VVVV-KK-PP TT:MM[:ss[.uuuuuu]]"
 
-#: jutil/responses.py:19
+#: jutil/responses.py:20
 msgid "File {} not found"
 msgstr "Tiedostoa {} ei löydy"
 
@@ -144,88 +144,88 @@ msgid ""
 "admin site."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:38
+#: jutil/templatetags/jutil_admin.py:45
 #, python-brace-format
 msgid "Added {name} “{object}”."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:40 jutil/templatetags/jutil_admin.py:47
+#: jutil/templatetags/jutil_admin.py:47 jutil/templatetags/jutil_admin.py:54
 msgid "Added."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:52
+#: jutil/templatetags/jutil_admin.py:59
 msgid "and"
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:56
+#: jutil/templatetags/jutil_admin.py:63
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:58
+#: jutil/templatetags/jutil_admin.py:65
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:67
+#: jutil/templatetags/jutil_admin.py:74
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
 msgstr ""
 
-#: jutil/templatetags/jutil_admin.py:72
+#: jutil/templatetags/jutil_admin.py:79
 msgid "No fields changed."
 msgstr ""
 
-#: jutil/tests.py:299 jutil/validators.py:40
+#: jutil/tests.py:297 jutil/validators.py:40
 msgid "Invalid phone number"
 msgstr "Epäkelpo puhelinnumero"
 
-#: jutil/tests.py:306 jutil/validators.py:75
+#: jutil/tests.py:304 jutil/validators.py:75
 msgid "Invalid passport number"
 msgstr "Epäkelpo passin numero"
 
-#: jutil/tests.py:314 jutil/tests.py:357 jutil/tests.py:1022
-#: jutil/validators.py:102 jutil/validators.py:181 jutil/validators.py:209
+#: jutil/tests.py:312 jutil/tests.py:355 jutil/tests.py:1019
+#: jutil/validators.py:105 jutil/validators.py:193 jutil/validators.py:250
 msgid "Invalid country code"
 msgstr "Epäkelpo maakoodi"
 
-#: jutil/tests.py:328 jutil/validators.py:474 jutil/validators.py:477
-#: jutil/validators.py:484 jutil/validators.py:488
+#: jutil/tests.py:326 jutil/validators.py:524 jutil/validators.py:527
+#: jutil/validators.py:534 jutil/validators.py:538
 msgid "Invalid company organization ID"
 msgstr "Epäkelpo yrityksen tunnus"
 
-#: jutil/tests.py:332 jutil/tests.py:355 jutil/tests.py:359 jutil/tests.py:720
-#: jutil/tests.py:722 jutil/tests.py:724 jutil/validators.py:178
-#: jutil/validators.py:184 jutil/validators.py:196 jutil/validators.py:237
-#: jutil/validators.py:243
+#: jutil/tests.py:330 jutil/tests.py:353 jutil/tests.py:357 jutil/tests.py:717
+#: jutil/tests.py:719 jutil/tests.py:721 jutil/validators.py:190
+#: jutil/validators.py:196 jutil/validators.py:208 jutil/validators.py:278
+#: jutil/validators.py:284
 msgid "Invalid IBAN account number"
 msgstr "Epäkelpo IBAN-tilinumero"
 
-#: jutil/tests.py:347 jutil/validators.py:508 jutil/validators.py:535
-#: jutil/validators.py:635 jutil/validators.py:654
+#: jutil/tests.py:345 jutil/validators.py:558 jutil/validators.py:585
+#: jutil/validators.py:688 jutil/validators.py:707
 msgid "Invalid personal identification number"
 msgstr "Epäkelpo henkilötunnus"
 
-#: jutil/tests.py:363 jutil/tests.py:365 jutil/tests.py:367
-#: jutil/validators.py:166
+#: jutil/tests.py:361 jutil/tests.py:363 jutil/tests.py:365
+#: jutil/validators.py:175
 msgid "Invalid bank BIC/SWIFT code"
 msgstr "Epäkelpo pankin BIC/SWIFT koodi"
 
-#: jutil/tests.py:856
+#: jutil/tests.py:853
 msgid "action time"
 msgstr "tapahtuman aika"
 
-#: jutil/tests.py:943
+#: jutil/tests.py:940
 msgid "MISSING VALUE"
 msgstr "PUUTTUVA ARVO"
 
-#: jutil/tests.py:955 jutil/validators.py:39 jutil/validators.py:56
-#: jutil/validators.py:74 jutil/validators.py:101 jutil/validators.py:165
-#: jutil/validators.py:178
+#: jutil/tests.py:952 jutil/validators.py:39 jutil/validators.py:56
+#: jutil/validators.py:74 jutil/validators.py:104 jutil/validators.py:174
+#: jutil/validators.py:190
 msgid "Missing value"
 msgstr "Puuttuva arvo"
 
-#: jutil/tests.py:1024 jutil/validators.py:212
+#: jutil/tests.py:1021 jutil/validators.py:253
 msgid "IBAN checksum generation does not support >26 character IBANs"
 msgstr "IBAN tarkistussumman generointi ei tue yli 26 merkkisiä IBANeja"
 
@@ -233,12 +233,12 @@ msgstr "IBAN tarkistussumman generointi ei tue yli 26 merkkisiä IBANeja"
 msgid "Invalid email"
 msgstr "Epäkelpo sähköposti"
 
-#: jutil/validators.py:402 jutil/validators.py:405 jutil/validators.py:417
-#: jutil/validators.py:435 jutil/validators.py:439
+#: jutil/validators.py:448 jutil/validators.py:451 jutil/validators.py:463
+#: jutil/validators.py:482 jutil/validators.py:486
 msgid "Invalid payment reference: {}"
 msgstr "Epäkelpo maksuviite: {}"
 
-#: jutil/validators.py:540 jutil/validators.py:542
+#: jutil/validators.py:590 jutil/validators.py:592
 msgid "Unsupported year"
 msgstr "Epäkelpo vuosi"
 
