@@ -1229,11 +1229,11 @@ class Tests(TestCase, TestSetupMixin):
         cases = [
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": True},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".po", "ignore_case": False},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": False},
@@ -1269,7 +1269,7 @@ class Tests(TestCase, TestSetupMixin):
         cases = [
             [
                 {"recurse": True, "use_media_root": True, "filename": "django.po"},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": False, "use_media_root": True, "filename": "django.po"},
