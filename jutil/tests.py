@@ -127,6 +127,7 @@ from jutil.validators import (
     filter_country_company_org_id,
     variable_name_sanitizer,
     is_iban,
+    alnum_filter,
 )
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET  # noqa
@@ -1323,6 +1324,14 @@ class Tests(TestCase, TestSetupMixin):
         invalid_ibans = ["GB96BARC202015300934591", "US64SVBKUS6S3300958879"]
         for invalid_iban in invalid_ibans:
             self.assertFalse(is_iban(invalid_iban))
+
+    def test_alnum_filter(self):
+        results = [
+            ("!@3123a bcd222", "", "3123abcd222"),
+            ("hello world", " ", "hello world"),
+        ]
+        for input_value, extra, correct_result in results:
+            self.assertEqual(alnum_filter(input_value, extra=extra), correct_result)
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

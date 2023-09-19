@@ -361,6 +361,24 @@ def is_email(v: str) -> bool:
     return bool(v and EMAIL_VALIDATOR.fullmatch(v))
 
 
+def alnum_filter(v: str, extra: str = "") -> str:
+    """
+    Alphanumeric filter with optional extra allowed characters
+
+    Args:
+        v: str
+        extra: Extra allowed characters. Default is '-' and ' '
+
+    Returns:
+        str
+    """
+    out = ""
+    for ch in v:
+        if ch.isalnum() or ch in extra:
+            out += ch
+    return out
+
+
 # ============================================================================
 # Country specific functions (countries in alphabetical order)
 # ============================================================================
