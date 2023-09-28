@@ -42,6 +42,9 @@ class GeoIP:
         self.latitude = latitude
         self.longitude = longitude
 
+    def __str__(self):
+        return f"{self.ip} ({self.country_code})"
+
 
 def get_ip(request) -> str:
     """Returns best-guess IP for given request.
