@@ -160,7 +160,15 @@ def admin_log_field_values(
             changed_field_labels = [str(get_model_field_label(instance, k)) for k in changed_data]
         change_message = [{"changed": {"name": str(instance._meta.verbose_name), "object": str(instance), "fields": changed_field_labels, "values": values}}]
     else:
-        change_message = [{"added": {"values": values}}]
+        change_message = [
+            {
+                "added": {
+                    "name": str(instance._meta.verbose_name),
+                    "object": str(instance),
+                    "values": values,
+                }
+            }
+        ]
     # use system user if 'who' is missing
     if who is None:
         who = admin_log_system_user()
