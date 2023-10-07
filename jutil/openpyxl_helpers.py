@@ -73,6 +73,8 @@ def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any
         if isinstance(val, datetime):
             val = val.replace(tzinfo=None)
     else:
+        if str(val).startswith("https://"):
+            c.hyperlink = str(val)
         val = strip_tags(str(val if val else ""))
     c.value = val
     return c

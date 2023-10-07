@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 from typing import Tuple, Any, Optional, List
 import pytz
 from calendar import monthrange
@@ -50,6 +50,10 @@ TIME_STEP_CHOICES = [
 ]
 
 TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
+
+
+def utc_date_to_datetime(date_val: date) -> datetime:
+    return pytz.utc.localize(datetime.combine(date_val, time(0, 0)))
 
 
 def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple[datetime, datetime]:
