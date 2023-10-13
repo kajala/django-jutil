@@ -101,7 +101,7 @@ def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-loca
         data[tag].append(obj)
     else:
         if tag in data:
-            raise Exception("XML parsing failed, tag {} collision".format(tag))
+            raise Exception("XML parsing failed, tag {} collision".format(tag))  # noqa
         data[tag] = obj
 
 
@@ -159,7 +159,7 @@ def xml_to_dict(  # pylint: disable=too-many-arguments,too-many-locals
     root = etree.ElementTree.fromstring(xml_bytes)
     if tags:
         if document_tag:
-            raise Exception(
+            raise Exception(  # noqa
                 "xml_to_dict: document_tag=True does not make sense when using selective tag list "
                 "since selective tag list finds tags from the whole document, not only directly under root document tag"
             )
@@ -256,7 +256,7 @@ def dict_to_element(doc: dict, value_key: str = "@", attribute_prefix: str = "@"
     Returns: xml.etree.ElementTree.Element
     """
     if len(doc) != 1:
-        raise Exception("Invalid data dict for XML generation, document root must have single element")
+        raise Exception("Invalid data dict for XML generation, document root must have single element")  # noqa
 
     for tag, data in doc.items():
         el = Element(_xml_filter_tag_name(tag))

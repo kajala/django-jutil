@@ -1120,7 +1120,7 @@ class Tests(TestCase, TestSetupMixin):
         dummy_log = DummyLogHandler()
         jutil_middleware_logger.addHandler(dummy_log)
         try:
-            raise Exception("Dummy exception, ignore this")
+            raise Exception("Dummy exception, ignore this")  # noqa
         except Exception as e:
             mw = LogExceptionMiddleware(dummy_middleware_get_response)
             mw.process_exception(request, e)

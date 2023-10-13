@@ -209,7 +209,7 @@ def get_command_by_name(command_name: str) -> BaseCommand:
     all_commands = get_commands()
     app_name = all_commands.get(command_name)
     if app_name is None:
-        raise Exception(f"Django management command {command_name} not found")
+        raise Exception(f"Django management command {command_name} not found")  # noqa
     command = app_name if isinstance(app_name, BaseCommand) else load_command_class(app_name, command_name)
     assert isinstance(command, BaseCommand)
     return command
@@ -220,5 +220,5 @@ def get_command_name(command: BaseCommand) -> str:
     module_name = command.__class__.__module__
     res = module_name.rsplit(".", 1)
     if len(res) != 2:
-        raise Exception(f"Failed to parse Django command name from {module_name}")
+        raise Exception(f"Failed to parse Django command name from {module_name}")  # noqa
     return res[1]

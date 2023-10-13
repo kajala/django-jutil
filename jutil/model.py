@@ -81,7 +81,7 @@ def get_model_field(instance, field_name: str) -> Field:
     """
     f = get_model_field_or_none(instance, field_name)
     if f is None:
-        raise Exception(f"Field {field_name} not found from {instance}")
+        raise Exception(f"Field {field_name} not found from {instance}")  # noqa
     return f
 
 

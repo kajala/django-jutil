@@ -64,7 +64,7 @@ def format_full_name(first_name: str, last_name: str, max_length: int = 20) -> s
 
     full_name = first_name + " " + last_name
     if len(full_name) > max_length:
-        raise Exception("Failed to shorten name {}".format(original_full_name))
+        raise Exception("Failed to shorten name {}".format(original_full_name))  # noqa
     return full_name
 
 

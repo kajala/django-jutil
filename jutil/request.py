@@ -78,14 +78,14 @@ def get_geo_ip_from_ipgeolocation(ip: str, timeout: int = 10, verbose: bool = Fa
         IPGeoInfo
     """
     if not hasattr(settings, "IPGEOLOCATION_API_KEY") or not settings.IPGEOLOCATION_API_KEY:
-        raise Exception("get_geo_ip_ipstack() requires IPGEOLOCATION_API_KEY defined in Django settings")
+        raise Exception("get_geo_ip_ipstack() requires IPGEOLOCATION_API_KEY defined in Django settings")  # noqa
     url = f"https://api.ipgeolocation.io/ipgeo?apiKey={settings.IPGEOLOCATION_API_KEY}&ip={ip}"
     res = requests.get(url, timeout=timeout)
     if verbose:
         logger.info("GET %s HTTP %s: %s", url, res.status_code, res.text)
     if res.status_code != 200:
         logger.error("get_geo_ip_from_ipgeolocation(%s) failed: %s", ip, res.text)
-        raise Exception("api.ipgeolocation.io HTTP {}".format(res.status_code))
+        raise Exception("api.ipgeolocation.io HTTP {}".format(res.status_code))  # noqa
     data = res.json()
     return GeoIP(
         ip,
@@ -111,20 +111,20 @@ def get_geo_ip_from_ipstack(ip: str, timeout: int = 10, verbose: bool = False) -
         IPGeoInfo
     """
     if not hasattr(settings, "IPSTACK_TOKEN") or not settings.IPSTACK_TOKEN:
-        raise Exception("get_geo_ip_from_ipstack() requires IPSTACK_TOKEN defined in Django settings")
+        raise Exception("get_geo_ip_from_ipstack() requires IPSTACK_TOKEN defined in Django settings")  # noqa
     url = f"http://api.ipstack.com/{ip}?access_key={settings.IPSTACK_TOKEN}&format=1"
     res = requests.get(url, timeout=timeout)
     if verbose:
         logger.info("GET %s HTTP %s: %s", url, res.status_code, res.text)
     if res.status_code != 200:
         logger.error("get_geo_ip_from_ipstack(%s) failed: %s", ip, res.text)
-        raise Exception("api.ipstack.com HTTP {}".format(res.status_code))
+        raise Exception("api.ipstack.com HTTP {}".format(res.status_code))  # noqa
     data = res.json()
     res_success = data.get("success", True)
     if not res_success:
         res_info = data.get("info") or ""
         logger.error("get_geo_ip_from_ipstack(%s) failed: %s", ip, res_info)
-        raise Exception(res_info)
+        raise Exception(res_info)  # noqa
     return GeoIP(
         ip,
         country_name=data["country_name"],
@@ -165,7 +165,7 @@ def get_geo_ip(ip: str, timeout: int = 10, verbose: bool = False) -> GeoIP:
         return get_geo_ip_from_ipgeolocation(ip, timeout, verbose=verbose)
     if hasattr(settings, "IPSTACK_TOKEN") and settings.IPSTACK_TOKEN:
         return get_geo_ip_from_ipstack(ip, timeout, verbose=verbose)
-    raise Exception("get_geo_ip() requires either IPGEOLOCATION_TOKEN or IPSTACK_TOKEN defined in Django settings")
+    raise Exception("get_geo_ip() requires either IPGEOLOCATION_TOKEN or IPSTACK_TOKEN defined in Django settings")  # noqa
 
 
 def get_geo_ip_or_none(ip: str, timeout: int = 10) -> Optional[GeoIP]:

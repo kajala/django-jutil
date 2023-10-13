@@ -23,7 +23,7 @@ class RedisCachedSimpleListFilter(SimpleListFilter):
         Implement this method in derived class.
         :return: Same format return as lookups(), i.e. list of filter option (value, label) pairs.
         """
-        raise Exception("generate_lookups() must be implemented in RedisCachedSimpleListFilter derived class")
+        raise Exception("generate_lookups() must be implemented in RedisCachedSimpleListFilter derived class")  # noqa
 
     def get_redis_key_name(self) -> str:
         base_name = self.redis_key_name if self.redis_key_name else str(self.__class__.__name__)

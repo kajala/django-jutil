@@ -9,9 +9,9 @@ try:
     import redis  # type: ignore
 
     if int(redis.__version__.split(".", maxsplit=1)[0]) < 3:  # type: ignore
-        raise Exception("Invalid version")
+        raise Exception("Invalid version")  # noqa
 except Exception as err:
-    raise Exception("Using jutil.redis_helpers requires redis>=3.0.0 installed") from err
+    raise Exception("Using jutil.redis_helpers requires redis>=3.0.0 installed") from err  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +97,7 @@ def redis_get_bytes(name: str) -> bytes:
     """
     buf = redis_get_bytes_or_none(name)
     if buf is None:
-        raise Exception(f"{redis_prefix_key(name)} not in Redis")
+        raise Exception(f"{redis_prefix_key(name)} not in Redis")  # noqa
     return buf
 
 
@@ -158,7 +158,7 @@ def redis_get_json(name: str) -> Any:
     """
     buf = redis_instance().get(redis_prefix_key(name))
     if buf is None:
-        raise Exception(f"{redis_prefix_key(name)} not in Redis")
+        raise Exception(f"{redis_prefix_key(name)} not in Redis")  # noqa
     return json.loads(buf)
 
 

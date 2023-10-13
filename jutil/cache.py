@@ -38,8 +38,8 @@ class CachedFieldsMixin:
             for k in fields:
                 f = "get_" + k
                 if not hasattr(self, f):
-                    raise Exception("Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(k=k, obj=self))
-                v = self.__getattribute__(f)()
+                    raise Exception("Field {k} marked as cached in {obj} but function get_{k}() does not exist".format(k=k, obj=self))  # noqa
+                v = self.__getattribute__(f)()  # noqa
                 if force or getattr(self, k) != v:
                     setattr(self, k, v)
                     changed_fields.append(k)

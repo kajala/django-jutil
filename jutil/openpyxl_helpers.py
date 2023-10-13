@@ -11,9 +11,9 @@ try:
     import openpyxl  # type: ignore
 
     if int(openpyxl.__version__.split(".", maxsplit=1)[0]) < 3:
-        raise Exception("Invalid version")
+        raise Exception("Invalid version")  # noqa
 except Exception as err:
-    raise Exception("Using jutil.openpyxl_helpers requires openpyxl>3.0 installed") from err
+    raise Exception("Using jutil.openpyxl_helpers requires openpyxl>3.0 installed") from err  # noqa
 
 from openpyxl import Workbook  # type: ignore
 from openpyxl.styles import Alignment, NamedStyle  # type: ignore
@@ -74,7 +74,7 @@ def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any
             val = val.replace(tzinfo=None)
     else:
         if str(val).startswith("https://"):
-            c.hyperlink = str(val)
+            c.hyperlink = str(val)  # type: ignore
         val = strip_tags(str(val if val else ""))
     c.value = val
     return c

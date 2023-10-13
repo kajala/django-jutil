@@ -10,7 +10,7 @@ class UserIsOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if not hasattr(obj, self.user_field):
-            raise Exception("UserIsOwner: obj.{} does not exist: {}".format(self.user_field, obj))
+            raise Exception("UserIsOwner: obj.{} does not exist: {}".format(self.user_field, obj))  # noqa
         u = request.user
         return u and u.is_authenticated and getattr(obj, self.user_field) == u
 

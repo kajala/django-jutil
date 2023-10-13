@@ -69,7 +69,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, A
 
     for instance in instances:
         if instance:
-            LogEntry.objects.log_action(
+            LogEntry.objects.log_action(  # type: ignore
                 user_id=who.pk if who is not None else None,
                 content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
                 object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
@@ -173,7 +173,7 @@ def admin_log_field_values(
     if who is None:
         who = admin_log_system_user()
     content_type_id = get_content_type_for_model(instance).pk
-    return LogEntry.objects.log_action(
+    return LogEntry.objects.log_action(  # type: ignore
         user_id=who.pk,
         content_type_id=content_type_id,
         object_id=instance.pk,

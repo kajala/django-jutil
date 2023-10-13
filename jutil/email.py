@@ -124,12 +124,12 @@ def send_email_sendgrid(  # noqa
         from sendgrid import ClickTracking, FileType, FileName, TrackingSettings  # type: ignore  # pylint: disable=import-outside-toplevel
         from sendgrid import Personalization, FileContent, ContentId, Disposition  # type: ignore  # pylint: disable=import-outside-toplevel
     except Exception as err:
-        raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err
+        raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err  # noqa
 
     if not api_key and hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
         api_key = settings.EMAIL_SENDGRID_API_KEY
     if not api_key:
-        raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")
+        raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")  # noqa
 
     if files is None:
         files = []
