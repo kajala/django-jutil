@@ -70,7 +70,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, A
     for instance in instances:
         if instance:
             LogEntry.objects.log_action(  # type: ignore
-                user_id=who.pk if who is not None else None,
+                user_id=who.pk if who is not None else None,  # type: ignore
                 content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
                 object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
                 object_repr=force_str(instance),
