@@ -1,6 +1,6 @@
 import logging
 from typing import List, Tuple
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 from jutil.redis_helpers import redis_get_json, redis_set_json
 
@@ -17,6 +17,8 @@ class RedisCachedSimpleListFilter(SimpleListFilter):
     redis_key_name = ""  # Redis key to store data. Default is class name.
     redis_key_expires = 3600  # Redis data expiration in seconds
     parameter_value_refresh_trigger = "_refresh"  # special querystring parameter name which causes cache to be refreshed by force
+    refresh_link_in_lookups = False  # if refresh link should be included in list of lookups
+    refresh_link_label = _("Refresh")
 
     def generate_lookups(self, request, model_admin):
         """
@@ -44,8 +46,12 @@ class RedisCachedSimpleListFilter(SimpleListFilter):
         try:
             parameter_value = request.GET.get(self.parameter_name)
             if parameter_value and str(parameter_value) == self.parameter_value_refresh_trigger:
-                return self.refresh_lookups(request, model_admin)
-            return redis_get_json(self.get_redis_key_name())
+                results = self.refresh_lookups(request, model_admin)
+            else:
+                results = redis_get_json(self.get_redis_key_name())
+            if self.refresh_link_in_lookups:
+                results.append((self.parameter_value_refresh_trigger, str(self.refresh_link_label)))
+            return results
         except Exception as exc:
             logger.error(exc)
         return self.refresh_lookups(request, model_admin)
