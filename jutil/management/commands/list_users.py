@@ -11,7 +11,7 @@ class Command(SafeCommand):
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument("--staff-only", action="store_true")
-        parser.add_argument("--user-fields", type=str, default="id,username,first_name,last_name,is_staff,is_superuser")
+        parser.add_argument("--user-fields", type=str, default="id,username,first_name,last_name,email,is_active,is_staff,is_superuser,date_joined,last_login")
         parser.add_argument("--order-by", type=str, default="username")
         parser.add_argument("--bool-as-int", action="store_true")
         parser.add_argument("--false-as-empty", action="store_true")
