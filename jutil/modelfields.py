@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 from django.db import models
 from django.utils.html import strip_tags
 
@@ -6,7 +6,7 @@ from django.utils.html import strip_tags
 class SafeCharField(models.CharField):
     """CharField which strips HTML tags from form data on save."""
 
-    _pyi_private_set_type: str | int | models.expressions.Combinable
+    _pyi_private_set_type: Union[str, int, models.expressions.Combinable]
     _pyi_private_get_type: str
     _pyi_lookup_exact_type: Any
 
@@ -17,7 +17,7 @@ class SafeCharField(models.CharField):
 class SafeTextField(models.TextField):
     """TextField which strips HTML tags from form data on save."""
 
-    _pyi_private_set_type: str | models.expressions.Combinable
+    _pyi_private_set_type: Union[str, models.expressions.Combinable]
     _pyi_private_get_type: str
     _pyi_lookup_exact_type: Any
 
