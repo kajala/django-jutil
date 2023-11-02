@@ -1291,7 +1291,7 @@ class Tests(TestCase, TestSetupMixin):
             self.assertTrue(isinstance(cls, BaseCommand))
             self.assertEqual(get_command_name(cls), cmd_name)
 
-    def test_redis_helpers(self):
+    def test_redis_helpers1(self):
         for k in ["jani", "jani2", "jani3", "jani4"]:
             redis_delete(k)
         self.assertEqual(redis_get_json_or_none("jani2"), None)
@@ -1304,6 +1304,21 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(redis_get_bytes("jani"), b'{"a": 1}')
         self.assertEqual(redis_get_bytes("jani2"), b'"testing"')
         self.assertDictEqual(redis_get_json("jani3"), {"a": 2})
+
+    def test_redis_helpers2(self):
+        from jutil.redis_helpers import redis_set_bytes, redis_delete, redis_get_bytes_or_none, redis_set_json  # noqa
+
+        redis_delete("a")
+        self.assertEqual(redis_get_bytes_or_none("a"), None)
+        self.assertEqual(redis_set_json("a", 1), True)
+        self.assertEqual(redis_get_json("a"), 1)
+        self.assertEqual(redis_delete("a"), 1)
+        self.assertEqual(redis_delete("a"), 0)
+        self.assertEqual(redis_set_json("a", 1), True)
+        self.assertEqual(redis_set_json("a", 1, nx=True), None)
+        self.assertEqual(redis_delete("a"), 1)
+        self.assertEqual(redis_set_json("a", 1, nx=True), True)
+        self.assertEqual(redis_delete("a"), 1)
 
     def test_openpyxl_helpers(self):
         from jutil.openpyxl_helpers import rows_to_workbook, save_workbook_to_bytes  # type: ignore  # noqa
