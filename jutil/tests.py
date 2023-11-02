@@ -1306,8 +1306,6 @@ class Tests(TestCase, TestSetupMixin):
         self.assertDictEqual(redis_get_json("jani3"), {"a": 2})
 
     def test_redis_helpers2(self):
-        from jutil.redis_helpers import redis_set_bytes, redis_delete, redis_get_bytes_or_none, redis_set_json  # noqa
-
         redis_delete("a")
         self.assertEqual(redis_get_bytes_or_none("a"), None)
         self.assertEqual(redis_set_json("a", 1), True)
