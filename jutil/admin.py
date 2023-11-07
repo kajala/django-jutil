@@ -293,6 +293,7 @@ class ModelAdminBase(admin.ModelAdmin):
     save_on_top = True
     extended_log = True
     max_history_length = 1000
+    history_ordering = ["-action_time", "-id"]
     serialization_cls = DjangoJSONEncoder
     max_serialized_field_length = 1000
 
@@ -352,6 +353,7 @@ class ModelAdminBase(admin.ModelAdmin):
 
     def history_view(self, request, object_id, extra_context=None):
         from django.contrib.admin.models import LogEntry  # noqa
+        from django.contrib.admin.views.main import PAGE_VAR  # noqa
 
         # First check if the user can see this history.
         model = self.model
@@ -371,14 +373,23 @@ class ModelAdminBase(admin.ModelAdmin):
                 content_type=get_content_type_for_model(model),
             )
             .select_related()
-            .order_by("-action_time")
-        )[: self.max_history_length]
+            .order_by(*self.history_ordering)
+        )
+
+        max_per_page = self.max_history_length
+        paginator = self.get_paginator(request, action_list, max_per_page)
+        page_number = request.GET.get(PAGE_VAR, 1)  # type: ignore
+        page_obj = paginator.get_page(page_number)
+        page_range = paginator.get_elided_page_range(page_obj.number)
 
         context = {
             **self.admin_site.each_context(request),
             "title": _("Change history: %s") % obj,
             "subtitle": None,
-            "action_list": action_list,
+            "action_list": page_obj,
+            "page_range": page_range,
+            "page_var": PAGE_VAR,
+            "pagination_required": paginator.count > max_per_page,
             "module_name": str(capfirst(opts.verbose_name_plural)),
             "object": obj,
             "opts": opts,
