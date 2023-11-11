@@ -1,7 +1,8 @@
 import json
 import logging
+from datetime import timedelta
 from functools import lru_cache
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -54,7 +55,7 @@ def redis_prefix_key(name: str) -> str:
     return str(settings.DATABASES["default"]["NAME"]) + "." + name
 
 
-def redis_set_bytes(name: str, value: bytes, ex: Optional[int] = None, nx: Optional[bool] = None):
+def redis_set_bytes(name: str, value: bytes, ex: Optional[Union[int, timedelta]] = None, nx: bool = False):
     """Sets value of the key as bytes to Redis.
 
     Uses default DB name as a key prefix. For example, if default DB name is "my_db"
@@ -63,7 +64,7 @@ def redis_set_bytes(name: str, value: bytes, ex: Optional[int] = None, nx: Optio
     Args:
         name: Key name without DB name prefix
         value: bytes
-        ex: Optional expire time in seconds
+        ex: Optional expire time either in seconds or timedelta
         nx: Set only if value does not exist in Redis. See Redis docs for details.
     """
     return redis_instance().set(redis_prefix_key(name), value, ex=ex, nx=nx)
@@ -102,7 +103,7 @@ def redis_get_bytes(name: str) -> bytes:
     return buf
 
 
-def redis_set_json(name: str, value: Any, ex: Optional[int] = None, nx: Optional[bool] = None, cls=DjangoJSONEncoder):
+def redis_set_json(name: str, value: Any, ex: Optional[Union[int, timedelta]] = None, nx: bool = False, cls=DjangoJSONEncoder):
     """Sets value of the key as JSON to Redis.
 
     Uses default DB name as a key prefix. For example, if default DB name is "my_db"
@@ -113,7 +114,7 @@ def redis_set_json(name: str, value: Any, ex: Optional[int] = None, nx: Optional
     Args:
         name: Key name without DB name prefix
         value: Any value that will be serialized as JSON
-        ex: Optional expire time in seconds
+        ex: Optional expire time either in seconds or timedelta
         nx: Set only if value does not exist in Redis. See Redis docs for details.
         cls: JSON encoder class (default is DjangoJSONEncoder from Django)
     """

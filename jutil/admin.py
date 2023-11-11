@@ -351,7 +351,7 @@ class ModelAdminBase(admin.ModelAdmin):
         extra_context.update(kwargs)
         return self.changelist_view(request, self.fill_extra_context(request, extra_context))
 
-    def history_view(self, request, object_id, extra_context=None):
+    def history_view(self, request, object_id, extra_context=None):  # pylint: disable=too-many-locals
         from django.contrib.admin.models import LogEntry  # noqa
         from django.contrib.admin.views.main import PAGE_VAR  # noqa
 
