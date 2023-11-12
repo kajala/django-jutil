@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import OrderedDict
 from decimal import Decimal
 from typing import Optional, Sequence, List, Dict, Any, Union
@@ -23,6 +24,8 @@ from django.utils.text import capfirst
 from django.utils.encoding import force_str
 from django.contrib.admin.models import LogEntry
 from jutil.model import get_model_field_label
+
+logger = logging.getLogger(__name__)
 
 
 def get_admin_log(instance: object) -> QuerySet:
@@ -79,6 +82,19 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, A
             )
 
 
+def admin_obj_is_related_manager(val: object) -> bool:
+    """
+    Checks if django model instance field value is RelatedManager type (e.g. ManyToMany field).
+    Note that we have to check this indirectly like this since RelatedManager class is created dynamically by create_forward_many_to_many_manager.
+
+    Args:
+        val: object
+
+    Returns: True if object is Django model RelatedManger type
+    """
+    return hasattr(val, "__class__") and hasattr(val, "all") and callable(getattr(val, "all")) and val.__class__.__name__ == "ManyRelatedManager"  # type: ignore  # noqa
+
+
 def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder, max_serialized_field_length: Optional[int] = None) -> str:
     """JSON serializes (changed) fields of a model instance for logging purposes.
     Referenced objects with primary key (pk) attribute are formatted using only that field as value.
@@ -95,13 +111,22 @@ def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=Djan
     out: Dict[str, Any] = {}
     for k in field_names:
         val = getattr(obj, k) if hasattr(obj, k) else None
-        if val is not None:
-            if hasattr(val, "pk"):
-                val = {"pk": val.pk, "str": str(val)}
-            elif not isinstance(val, (Decimal, float, int, bool)):
-                val = str(val)
-            if max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
-                val = val[:max_serialized_field_length] + " [...]"
+        try:
+            if val is not None:
+                if admin_obj_is_related_manager(val):
+                    val_list = []
+                    for sub_val in val.all():
+                        val_list.append({"pk": sub_val.pk, "str": str(sub_val)})
+                    val = val_list
+                elif hasattr(val, "pk"):
+                    val = {"pk": val.pk, "str": str(val)}
+                elif not isinstance(val, (Decimal, float, int, bool)):
+                    val = str(val)
+                elif max_serialized_field_length is not None and isinstance(val, str) and len(val) > max_serialized_field_length:
+                    val = val[:max_serialized_field_length] + " [...]"
+        except Exception as exc:
+            logger.warning("Failed to serialize object %s field %s value %s: %s", obj, k, val, exc)
+            val = str(val)[:max_serialized_field_length]
         out[k] = val
     return json.dumps(out, cls=cls)
 
