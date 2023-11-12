@@ -55,6 +55,7 @@ def send_email(  # noqa
     html: str = "",
     sender: Union[str, Tuple[str, str]] = "",
     files: Optional[Sequence[str]] = None,
+    files_content: Optional[Sequence[Union[Tuple[str, bytes], Tuple[str, bytes, str]]]] = None,
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
@@ -69,6 +70,7 @@ def send_email(  # noqa
         html: Body (html), optional
         sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
         files: Paths to files to attach
+        files_content: List of (filename, bytes, mimetype="") file contents to attach.
         cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
@@ -80,8 +82,8 @@ def send_email(  # noqa
         Status code 202 if emails were sent successfully
     """
     if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:
-        return send_email_sendgrid(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
-    return send_email_smtp(recipients, subject, text, html, sender, files, cc_recipients, bcc_recipients, exceptions)
+        return send_email_sendgrid(recipients, subject, text, html, sender, files, files_content, cc_recipients, bcc_recipients, exceptions)
+    return send_email_smtp(recipients, subject, text, html, sender, files, files_content, cc_recipients, bcc_recipients, exceptions)
 
 
 def send_email_sendgrid(  # noqa
@@ -91,6 +93,7 @@ def send_email_sendgrid(  # noqa
     html: str = "",
     sender: Union[str, Tuple[str, str]] = "",
     files: Optional[Sequence[str]] = None,
+    files_content: Optional[Sequence[Union[Tuple[str, bytes], Tuple[str, bytes, str]]]] = None,
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
@@ -107,6 +110,7 @@ def send_email_sendgrid(  # noqa
         html: Body (html), optional
         sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
         files: Paths to files to attach
+        files_content: List of (filename, bytes, mimetype="") file contents to attach.
         cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
@@ -133,6 +137,8 @@ def send_email_sendgrid(  # noqa
 
     if files is None:
         files = []
+    if files_content is None:
+        files_content = []
     from_clean = make_email_recipient(sender or settings.DEFAULT_FROM_EMAIL)
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
@@ -173,6 +179,19 @@ def send_email_sendgrid(  # noqa
                     attachment.content_id = ContentId(basename(filename))
                     attachment.disposition = Disposition("attachment")
                     mail.add_attachment(attachment)
+        for content in files_content:
+            if len(content) < 2:
+                raise Exception("Invalid file content: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
+            filename = content[0]
+            file_bytes = content[1]
+            mimetype = "application/octet-stream" if len(content) < 3 else content[2]
+            attachment = Attachment()
+            attachment.file_type = FileType(mimetype)
+            attachment.file_name = FileName(basename(filename))
+            attachment.file_content = FileContent(b64encode(file_bytes).decode())
+            attachment.content_id = ContentId(basename(filename))
+            attachment.disposition = Disposition("attachment")
+            mail.add_attachment(attachment)
 
         mail_body = mail.get()
         res = sg.client.mail.send.post(request_body=mail_body)
@@ -201,6 +220,7 @@ def send_email_smtp(  # noqa
     html: str = "",
     sender: Union[str, Tuple[str, str]] = "",
     files: Optional[Sequence[str]] = None,
+    files_content: Optional[Sequence[Union[Tuple[str, bytes], Tuple[str, bytes, str]]]] = None,
     cc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     bcc_recipients: Optional[Sequence[Union[str, Tuple[str, str]]]] = None,
     exceptions: bool = False,
@@ -223,6 +243,7 @@ def send_email_smtp(  # noqa
         html: Body (html), optional
         sender: Sender email, or settings.DEFAULT_FROM_EMAIL if missing
         files: Paths to files to attach
+        files_content: List of (filename, bytes, mimetype="") file contents to attach.
         cc_recipients: List of "Cc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         bcc_recipients: List of "Bcc" recipients (if any). Single email (str); or comma-separated email list (str); or list of name-email pairs
         exceptions: Raise exception if email sending fails. List of recipients; or single email (str); or comma-separated email list (str);
@@ -235,6 +256,8 @@ def send_email_smtp(  # noqa
     """
     if files is None:
         files = []
+    if files_content is None:
+        files_content = []
     from_clean = make_email_recipient(sender or settings.DEFAULT_FROM_EMAIL)
     recipients_clean = make_email_recipient_list(recipients)
     cc_recipients_clean = make_email_recipient_list(cc_recipients)
@@ -253,6 +276,13 @@ def send_email_smtp(  # noqa
         for filename in files:
             if filename:
                 mail.attach_file(filename)
+        for content in files_content:
+            if len(content) < 2:
+                raise Exception("Invalid file content: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
+            filename = content[0]
+            file_bytes = content[1]
+            mimetype = "application/octet-stream" if len(content) < 3 else content[2]
+            mail.attach(filename=filename, content=file_bytes, mimetype=mimetype)
         if html:
             mail.attach_alternative(content=html, mimetype="text/html")
 

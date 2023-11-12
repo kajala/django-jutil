@@ -1,8 +1,13 @@
 from typing import List, Any, Optional
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import CommandParser
+from django.utils.timezone import now
+
 from jutil.command import SafeCommand
+from jutil.email import send_email
 from jutil.format import format_csv
 
 
@@ -16,6 +21,7 @@ class Command(SafeCommand):
         parser.add_argument("--bool-as-int", action="store_true")
         parser.add_argument("--false-as-empty", action="store_true")
         parser.add_argument("--totals", action="store_true")
+        parser.add_argument("--email", type=str, help="Comma separated list of email addresses")
 
     @staticmethod
     def format_output(value: Any, bool_as_int: bool, false_as_empty: bool) -> Any:
@@ -64,4 +70,11 @@ class Command(SafeCommand):
         if kwargs["totals"]:
             rows.append(totals)
 
-        print(format_csv(rows))
+        output = format_csv(rows)
+        print(output)
+        if kwargs["email"]:
+            recipients = kwargs["email"].split(",")
+            db_name = (settings.DATABASES.get("default") or {}).get("NAME") or ""  # type: ignore  # noqa
+            base_name = f"{db_name}-users-{now().date()}"
+            send_email(recipients, f"{db_name} users {now().date()}", "(CSV-file attached)", files_content=[(f"{base_name}.csv", output.encode())])
+            print("Emailed user list to", recipients)
