@@ -131,7 +131,7 @@ def send_email_sendgrid(  # noqa
         raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err  # noqa
 
     if not api_key and hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
-        api_key = settings.EMAIL_SENDGRID_API_KEY
+        api_key = settings.EMAIL_SENDGRID_API_KEY or ""
     if not api_key:
         raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")  # noqa
 
@@ -181,10 +181,10 @@ def send_email_sendgrid(  # noqa
                     mail.add_attachment(attachment)
         for content in files_content:
             if len(content) < 2:
-                raise Exception("Invalid file content: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
+                raise ValueError("Invalid file_contents parameter: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
             filename = content[0]
             file_bytes = content[1]
-            mimetype = "application/octet-stream" if len(content) < 3 else content[2]
+            mimetype = "application/octet-stream" if len(content) < 3 else content[2]  # type: ignore
             attachment = Attachment()
             attachment.file_type = FileType(mimetype)
             attachment.file_name = FileName(basename(filename))
@@ -278,10 +278,10 @@ def send_email_smtp(  # noqa
                 mail.attach_file(filename)
         for content in files_content:
             if len(content) < 2:
-                raise Exception("Invalid file content: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
+                raise ValueError("Invalid file content: Needs to be <str> filename, <bytes> file content, and optional <str> mime type")
             filename = content[0]
             file_bytes = content[1]
-            mimetype = "application/octet-stream" if len(content) < 3 else content[2]
+            mimetype = "application/octet-stream" if len(content) < 3 else content[2]  # type: ignore
             mail.attach(filename=filename, content=file_bytes, mimetype=mimetype)
         if html:
             mail.attach_alternative(content=html, mimetype="text/html")
