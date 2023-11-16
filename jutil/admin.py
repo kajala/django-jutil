@@ -343,6 +343,9 @@ def admin_update_model_instance(
     if field_names:
         old_values_str = admin_obj_serialize_fields(instance, field_names, cls=cls)
         old_values = json.loads(old_values_str) if old_values_str else {}
+        for k in field_names:
+            setattr(instance, k, changes[k])  # type: ignore
+        instance.save(update_fields=field_names)  # type: ignore
         values_str = admin_obj_serialize_fields(instance, field_names, cls=cls)
         values = json.loads(values_str) if values_str else {}
         with translation.override(None):
@@ -358,9 +361,6 @@ def admin_update_model_instance(
                     }
                 }
             )
-        for k in field_names:
-            setattr(instance, k, changes[k])  # type: ignore
-        instance.save(update_fields=field_names)  # type: ignore
     if note:
         change_message.append(note)
     if not change_message:
