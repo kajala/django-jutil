@@ -311,7 +311,11 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
 
 
 def admin_update_model_instance(
-    instance: object, changes: Dict[str, Any], note: str = "", who: Optional[Union[User, AnonymousUser]] = None, cls: Any = DjangoJSONEncoder
+    instance: object,
+    changes: Dict[str, Any],
+    note: str = "",
+    who: Optional[Union[User, AnonymousUser]] = None,
+    cls: Any = DjangoJSONEncoder,
 ) -> LogEntry:
     """
     Changes object field values and writes a structured message about the change with optional free-form text about the change to object's admin history log.
@@ -331,6 +335,8 @@ def admin_update_model_instance(
     action_flag = CHANGE
     field_names: List[str] = []
     for k, v in changes.items():
+        if not hasattr(instance, k):
+            raise ValueError(f"{instance}: Model has no field name {k}")
         if v != getattr(instance, k):
             field_names.append(k)
     change_message: List[Union[dict, str]] = []
@@ -352,6 +358,9 @@ def admin_update_model_instance(
                     }
                 }
             )
+        for k in field_names:
+            setattr(instance, k, changes[k])  # type: ignore
+        instance.save(update_fields=field_names)  # type: ignore
     if note:
         change_message.append(note)
     if not change_message:
@@ -359,6 +368,8 @@ def admin_update_model_instance(
     if who is None:
         who = admin_log_system_user()
     content_type_id = get_content_type_for_model(instance).pk
+    for k, v in changes.items():
+        setattr(instance, k, v)
     return LogEntry.objects.log_action(  # type: ignore
         user_id=who.pk,
         content_type_id=content_type_id,
