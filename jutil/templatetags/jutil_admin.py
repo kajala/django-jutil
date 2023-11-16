@@ -38,6 +38,9 @@ def format_change_message_ex(action: LogEntry) -> str:  # noqa
         model = obj._meta.model  # type: ignore  # noqa
         messages = []
         for sub_message in change_message:
+            if isinstance(sub_message, str):
+                messages.append(sub_message)
+                continue
             if "added" in sub_message:
                 if sub_message["added"]:
                     if "name" in sub_message["added"]:

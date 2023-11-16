@@ -95,7 +95,9 @@ def admin_obj_is_related_manager(val: object) -> bool:
     return hasattr(val, "__class__") and hasattr(val, "all") and callable(getattr(val, "all")) and val.__class__.__name__ == "ManyRelatedManager"  # type: ignore  # noqa
 
 
-def admin_obj_serialize_fields(obj: object, field_names: Sequence[str], cls=DjangoJSONEncoder, max_serialized_field_length: Optional[int] = None) -> str:
+def admin_obj_serialize_fields(
+    obj: object, field_names: Sequence[str], cls: Any = DjangoJSONEncoder, max_serialized_field_length: Optional[int] = None
+) -> str:
     """JSON serializes (changed) fields of a model instance for logging purposes.
     Referenced objects with primary key (pk) attribute are formatted using only that field as value.
 
@@ -180,20 +182,22 @@ def admin_log_field_values(
 
     values_str = admin_obj_serialize_fields(instance, field_names, cls, max_serialized_field_length)
     values = json.loads(values_str) if values_str else {}
-    if changed_data:
-        with translation.override(None):
+    with translation.override(None):
+        if changed_data:
             changed_field_labels = [str(get_model_field_label(instance, k)) for k in changed_data]
-        change_message = [{"changed": {"name": str(instance._meta.verbose_name), "object": str(instance), "fields": changed_field_labels, "values": values}}]
-    else:
-        change_message = [
-            {
-                "added": {
-                    "name": str(instance._meta.verbose_name),
-                    "object": str(instance),
-                    "values": values,
+            change_message = [
+                {"changed": {"name": str(instance._meta.verbose_name), "object": str(instance), "fields": changed_field_labels, "values": values}}
+            ]
+        else:
+            change_message = [
+                {
+                    "added": {
+                        "name": str(instance._meta.verbose_name),
+                        "object": str(instance),
+                        "values": values,
+                    }
                 }
-            }
-        ]
+            ]
     # use system user if 'who' is missing
     if who is None:
         who = admin_log_system_user()
@@ -304,6 +308,65 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
         return ""
     url = mark_safe(admin_obj_url(obj, route, base_url))  # nosec
     return format_html("<a href='{}'>{}</a>", url, str(obj) if not label else label)
+
+
+def admin_update_model_instance(
+    instance: object, changes: Dict[str, Any], note: str = "", who: Optional[Union[User, AnonymousUser]] = None, cls: Any = DjangoJSONEncoder
+) -> LogEntry:
+    """
+    Changes object field values and writes a structured message about the change with optional free-form text about the change to object's admin history log.
+
+    Args:
+        instance: Model instance
+        changes: Key-value pairs of fields to change.
+        note: Free text note what the change is about (optional)
+        who: Who made the change (optional)
+        cls: Serialization class. Default DjangoJSONEncoder.
+
+    Returns:
+        LogEntry
+    """
+    from jutil.model import get_model_field_names  # type: ignore  # noqa
+
+    action_flag = CHANGE
+    field_names: List[str] = []
+    for k, v in changes.items():
+        if v != getattr(instance, k):
+            field_names.append(k)
+    change_message: List[Union[dict, str]] = []
+    if field_names:
+        old_values_str = admin_obj_serialize_fields(instance, field_names, cls=cls)
+        old_values = json.loads(old_values_str) if old_values_str else {}
+        values_str = admin_obj_serialize_fields(instance, field_names, cls=cls)
+        values = json.loads(values_str) if values_str else {}
+        with translation.override(None):
+            changed_field_labels = [str(get_model_field_label(instance, k)) for k in field_names]
+            change_message.append(
+                {
+                    "changed": {
+                        "name": str(instance._meta.verbose_name),
+                        "object": str(instance),
+                        "fields": changed_field_labels,
+                        "values": values,
+                        "old_values": old_values,
+                    }
+                }
+            )
+    if note:
+        change_message.append(note)
+    if not change_message:
+        change_message.append(str(_("No fields changed.")))
+    if who is None:
+        who = admin_log_system_user()
+    content_type_id = get_content_type_for_model(instance).pk
+    return LogEntry.objects.log_action(  # type: ignore
+        user_id=who.pk,
+        content_type_id=content_type_id,
+        object_id=instance.pk,
+        object_repr=str(instance),
+        action_flag=action_flag,
+        change_message=change_message,
+    )
 
 
 class ModelAdminBase(admin.ModelAdmin):
