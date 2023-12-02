@@ -1,3 +1,4 @@
+import math
 import random
 import re
 import unicodedata
@@ -379,6 +380,29 @@ def alnum_filter(v: str, extra: str = "") -> str:
     return out
 
 
+def iso_payment_reference_validator(v: str):
+    """Validates ISO reference number checksum.
+
+    Args:
+        v: Reference number
+    """
+    num = ""
+    v = STRIP_WHITESPACE.sub("", v)
+    v = STRIP_PREFIX_ZEROS.sub("", v)
+    for ch in v[4:] + v[0:4]:
+        x = ord(ch)
+        if ord("0") <= x <= ord("9"):
+            num += ch
+        else:
+            x -= 55
+            if x < 10 or x > 35:
+                raise ValidationError(_("Invalid payment reference: {}").format(v))
+            num += str(x)
+    res = Decimal(num) % Decimal("97")
+    if res != Decimal("1"):
+        raise ValidationError(_("Invalid payment reference: {}").format(v))
+
+
 # ============================================================================
 # Country specific functions (countries in alphabetical order)
 # ============================================================================
@@ -457,8 +481,12 @@ FI_COMPANY_ORG_ID_FILTER = re.compile(r"[^0-9]")
 def fi_payment_reference_number(num: str):
     """
     Appends Finland reference number checksum to existing number.
-    :param num: At least 3 digits
-    :return: Number plus checksum
+
+    Args:
+        num: At least 3 digits
+
+    Returns:
+        Number plus checksum
     """
     assert isinstance(num, str)
     v = STRIP_WHITESPACE.sub("", num)
@@ -478,29 +506,6 @@ def fi_payment_reference_number(num: str):
 def fi_payment_reference_validator(v: str):
     v = STRIP_WHITESPACE.sub("", v)
     if fi_payment_reference_number(v[:-1]) != v:
-        raise ValidationError(_("Invalid payment reference: {}").format(v))
-
-
-def iso_payment_reference_validator(v: str):
-    """Validates ISO reference number checksum.
-
-    Args:
-        v: Reference number
-    """
-    num = ""
-    v = STRIP_WHITESPACE.sub("", v)
-    v = STRIP_PREFIX_ZEROS.sub("", v)
-    for ch in v[4:] + v[0:4]:
-        x = ord(ch)
-        if ord("0") <= x <= ord("9"):
-            num += ch
-        else:
-            x -= 55
-            if x < 10 or x > 35:
-                raise ValidationError(_("Invalid payment reference: {}").format(v))
-            num += str(x)
-    res = Decimal(num) % Decimal("97")
-    if res != Decimal("1"):
         raise ValidationError(_("Invalid payment reference: {}").format(v))
 
 
@@ -677,6 +682,39 @@ def fi_ssn_age(ssn: str, today: Optional[date] = None) -> int:
 
 SE_SSN_FILTER = re.compile(r"[^-0-9]")
 SE_SSN_VALIDATOR = re.compile(r"^\d{6}[-]\d{3}[\d]$")
+
+
+def se_payment_reference_number(num: str):
+    """
+    Appends Sweden length number and reference number checksum to existing number sequence.
+
+    Args:
+        num: At least 3 digits
+
+    Returns:
+        Number plus checksum
+    """
+    assert isinstance(num, str)
+    v = STRIP_WHITESPACE.sub("", num)
+    if digit_filter(v) != v:
+        raise ValidationError(_("Invalid payment reference: {}").format(num))
+    if len(v) < 3:
+        raise ValidationError(_("Invalid payment reference: {}").format(num))
+    num_with_len = num + str((len(num) + 2) % 10)
+    checksum = 0
+    for ix, x in enumerate(reversed(num_with_len), start=1):
+        result = int(x) * int((ix & 1) + 1)
+        if result > 9:
+            result = result - 9
+        checksum += result
+    check_digit = str(int(math.ceil(checksum / 10.0)) * 10 - checksum)
+    return num_with_len + check_digit
+
+
+def se_payment_reference_validator(v: str):
+    v = STRIP_WHITESPACE.sub("", v)
+    if se_payment_reference_number(v[:-2]) != v:
+        raise ValidationError(_("Invalid payment reference: {}").format(v))
 
 
 def se_iban_bank_info(v: str) -> Tuple[str, str]:

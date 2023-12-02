@@ -128,6 +128,8 @@ from jutil.validators import (
     variable_name_sanitizer,
     is_iban,
     alnum_filter,
+    se_payment_reference_number,
+    se_payment_reference_validator,
 )
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET  # noqa
@@ -1345,6 +1347,12 @@ class Tests(TestCase, TestSetupMixin):
         ]
         for input_value, extra, correct_result in results:
             self.assertEqual(alnum_filter(input_value, extra=extra), correct_result)
+
+    def test_se_ref_num(self):
+        self.assertEqual(se_payment_reference_number("123"), "12351")
+        with self.assertRaises(ValidationError):
+            se_payment_reference_validator("12352")
+        se_payment_reference_validator("12351")
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
