@@ -130,6 +130,10 @@ from jutil.validators import (
     alnum_filter,
     se_payment_reference_number,
     se_payment_reference_validator,
+    validate_dict_key_values_not_empty,
+    validate_dict_key_values_not_none,
+    validate_object_key_values_not_empty,
+    validate_object_key_values_not_none,
 )
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET  # noqa
@@ -1353,6 +1357,36 @@ class Tests(TestCase, TestSetupMixin):
         with self.assertRaises(ValidationError):
             se_payment_reference_validator("12352")
         se_payment_reference_validator("12351")
+
+    def test_dict_key_value_validators(self):
+        a = {"a": 1, "b": 1}
+        validate_dict_key_values_not_empty(a, ["a", "b"])
+        with self.assertRaises(ValidationError):
+            validate_dict_key_values_not_empty(a, ["a", "b", "c"])
+        validate_dict_key_values_not_none(a, ["a", "b"])
+        with self.assertRaises(ValidationError):
+            validate_dict_key_values_not_none(a, ["a", "b", "c"])
+        a["b"] = None
+        with self.assertRaises(ValidationError):
+            validate_dict_key_values_not_none(a, ["a", "b"])
+
+    def test_obj_key_value_validators(self):
+        class TestClass:
+            a: int
+            b: int
+
+        a = TestClass()
+        a.a = 1  # type: ignore
+        a.b = 2  # type: ignore
+        validate_object_key_values_not_empty(a, ["a", "b"])
+        with self.assertRaises(ValidationError):
+            validate_object_key_values_not_empty(a, ["a", "b", "c"])
+        validate_object_key_values_not_none(a, ["a", "b"])
+        with self.assertRaises(ValidationError):
+            validate_object_key_values_not_none(a, ["a", "b", "c"])
+        a.b = None
+        with self.assertRaises(ValidationError):
+            validate_object_key_values_not_none(a, ["a", "b"])
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

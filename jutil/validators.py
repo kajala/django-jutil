@@ -5,7 +5,7 @@ import unicodedata
 from datetime import date
 from decimal import Decimal
 from random import randint
-from typing import Tuple, Optional, Any
+from typing import Tuple, Optional, Any, List, Dict
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -401,6 +401,42 @@ def iso_payment_reference_validator(v: str):
     res = Decimal(num) % Decimal("97")
     if res != Decimal("1"):
         raise ValidationError(_("Invalid payment reference: {}").format(v))
+
+
+def validate_object_key_values_not_empty(obj: object, keys: List[str]):
+    err_dict: Dict[str, str] = {}
+    for k in keys:
+        if not hasattr(obj, k) or not getattr(obj, k):
+            err_dict[k] = str(_("This field is required."))
+    if err_dict:
+        raise ValidationError(err_dict)
+
+
+def validate_object_key_values_not_none(obj: object, keys: List[str]):
+    err_dict: Dict[str, str] = {}
+    for k in keys:
+        if not hasattr(obj, k) or getattr(obj, k) is None:
+            err_dict[k] = str(_("This field is required."))
+    if err_dict:
+        raise ValidationError(err_dict)
+
+
+def validate_dict_key_values_not_empty(data: Dict[str, Any], keys: List[str]):
+    err_dict: Dict[str, str] = {}
+    for k in keys:
+        if not data.get(k):
+            err_dict[k] = str(_("This field is required."))
+    if err_dict:
+        raise ValidationError(err_dict)
+
+
+def validate_dict_key_values_not_none(data: Dict[str, Any], keys: List[str]):
+    err_dict: Dict[str, str] = {}
+    for k in keys:
+        if data.get(k) is None:
+            err_dict[k] = str(_("This field is required."))
+    if err_dict:
+        raise ValidationError(err_dict)
 
 
 # ============================================================================
