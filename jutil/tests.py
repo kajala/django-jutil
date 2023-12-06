@@ -2,13 +2,14 @@
 import json
 import logging
 import os
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from decimal import Decimal
 from io import BytesIO, StringIO
 from os.path import join
 from urllib.parse import urlparse
+
+import django
 from django.core.management import call_command
-from django.utils import timezone
 from typing import List
 from django.utils.timezone import now
 from rest_framework.test import APIClient
@@ -168,7 +169,7 @@ class DummyLogHandler(logging.Handler):
 
 
 def dummy_time_zone_response(obj) -> HttpResponse:
-    tz = timezone.get_current_timezone()
+    tz = django.utils.timezone.get_current_timezone()
     return HttpResponse(str(tz).encode())
 
 
@@ -1160,7 +1161,7 @@ class Tests(TestCase, TestSetupMixin):
         user = self.user
         self.assertTrue(user.is_authenticated)
         user.profile.timezone = "Europe/Helsinki"
-        with timezone.override(ZoneInfo("America/Chicago")):
+        with django.utils.timezone.override(ZoneInfo("America/Chicago")):
             request = self.create_dummy_request("/admin/login/")
             mw = ActivateUserProfileTimezoneMiddleware(dummy_time_zone_response)
             res = mw(request)
