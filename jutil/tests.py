@@ -16,7 +16,6 @@ from jutil.drf_exceptions import transform_exception_to_drf
 from jutil.files import find_file
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
-import pytz
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
@@ -62,6 +61,7 @@ from jutil.dates import (
     this_year,
     get_time_steps,
     TIME_STEP_DAILY,
+    utc_date_to_datetime,
 )
 from jutil.format import (
     format_full_name,
@@ -139,6 +139,11 @@ from xml.etree.ElementTree import Element
 from xml.etree import ElementTree as ET  # noqa
 from django.contrib import admin
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo  # type: ignore  # noqa
+from zoneinfo import ZoneInfo
 
 MY_CHOICE_1 = "1"
 MY_CHOICE_2 = "2"
@@ -560,18 +565,18 @@ class Tests(TestCase, TestSetupMixin):
     def test_dates(self):
         t = datetime(2018, 1, 30)
         b, e = this_week(t)
-        self.assertEqual(b, pytz.utc.localize(datetime(2018, 1, 29)))
-        self.assertEqual(e, pytz.utc.localize(datetime(2018, 2, 5)))
+        self.assertEqual(b, datetime(2018, 1, 29).replace(tzinfo=timezone.utc))
+        self.assertEqual(e, datetime(2018, 2, 5).replace(tzinfo=timezone.utc))
         b, e = this_month(t)
-        self.assertEqual(b, pytz.utc.localize(datetime(2018, 1, 1)))
-        self.assertEqual(e, pytz.utc.localize(datetime(2018, 2, 1)))
+        self.assertEqual(b, datetime(2018, 1, 1).replace(tzinfo=timezone.utc))
+        self.assertEqual(e, datetime(2018, 2, 1).replace(tzinfo=timezone.utc))
         b, e = next_week(t)
-        self.assertEqual(b, pytz.utc.localize(datetime(2018, 2, 5)))
-        self.assertEqual(e, pytz.utc.localize(datetime(2018, 2, 12)))
+        self.assertEqual(b, datetime(2018, 2, 5).replace(tzinfo=timezone.utc))
+        self.assertEqual(e, datetime(2018, 2, 12).replace(tzinfo=timezone.utc))
 
     def test_named_date_ranges(self):
         t = datetime(2018, 5, 31)
-        t_tz = pytz.utc.localize(t)
+        t_tz = t.replace(tzinfo=timezone.utc)
         named_ranges = [
             ("last_year", last_year(t)),
             ("last_month", last_month(t)),
@@ -820,8 +825,8 @@ class Tests(TestCase, TestSetupMixin):
         argv = parser.parse_args(["--begin", "2019-06-25", "--end", "2020-02-01"])
         options = argv.__dict__
         begin, end, steps = parse_date_range_arguments(options)
-        self.assertEqual(begin, pytz.utc.localize(datetime(2019, 6, 25)))
-        self.assertEqual(end, pytz.utc.localize(datetime(2020, 2, 1)))
+        self.assertEqual(begin, datetime(2019, 6, 25).replace(tzinfo=timezone.utc))
+        self.assertEqual(end, datetime(2020, 2, 1).replace(tzinfo=timezone.utc))
 
     def test_format_timedelta(self):
         self.assertEqual(format_timedelta(timedelta(seconds=90)), "1min30s")
@@ -982,26 +987,26 @@ class Tests(TestCase, TestSetupMixin):
                 self.assertEqual(get_media_full_path(dst), get_media_full_path(get_media_full_path(dst)))
 
     def test_end_of_month(self):
-        helsinki = pytz.timezone("Europe/Helsinki")
+        helsinki = ZoneInfo("Europe/Helsinki")
         # 1
         time_now = datetime(2020, 6, 5, 15, 47, 23, 818646)
         eom = end_of_month(time_now, tz=helsinki)
-        eom_ref = helsinki.localize(datetime(2020, 6, 30, 23, 59, 59, 999999))
+        eom_ref = datetime(2020, 6, 30, 23, 59, 59, 999999, tzinfo=helsinki)
         self.assertEqual(eom, eom_ref)
         # 2
         time_now = datetime(2020, 7, 5, 15, 47, 23, 818646)
         eom = end_of_month(time_now, tz=helsinki)
-        eom_ref = helsinki.localize(datetime(2020, 7, 31, 23, 59, 59, 999999))
+        eom_ref = datetime(2020, 7, 31, 23, 59, 59, 999999, tzinfo=helsinki)
         self.assertEqual(eom, eom_ref)
         # 3
         time_now = datetime(2020, 6, 5, 15, 47, 23, 818646)
         eom = end_of_month(time_now, n=1, tz=helsinki)
-        eom_ref = helsinki.localize(datetime(2020, 7, 31, 23, 59, 59, 999999))
+        eom_ref = datetime(2020, 7, 31, 23, 59, 59, 999999, tzinfo=helsinki)
         self.assertEqual(eom, eom_ref)
         # 4
         time_now = datetime(2020, 7, 5, 15, 47, 23, 818646)
         eom = end_of_month(time_now, n=-2, tz=helsinki)
-        eom_ref = helsinki.localize(datetime(2020, 5, 31, 23, 59, 59, 999999))
+        eom_ref = datetime(2020, 5, 31, 23, 59, 59, 999999, tzinfo=helsinki)
         self.assertEqual(eom, eom_ref)
 
     def test_iban_generator_and_validator(self):
@@ -1155,7 +1160,7 @@ class Tests(TestCase, TestSetupMixin):
         user = self.user
         self.assertTrue(user.is_authenticated)
         user.profile.timezone = "Europe/Helsinki"
-        with timezone.override(pytz.timezone("America/Chicago")):
+        with timezone.override(ZoneInfo("America/Chicago")):
             request = self.create_dummy_request("/admin/login/")
             mw = ActivateUserProfileTimezoneMiddleware(dummy_time_zone_response)
             res = mw(request)
@@ -1387,6 +1392,9 @@ class Tests(TestCase, TestSetupMixin):
         a.b = None
         with self.assertRaises(ValidationError):
             validate_object_key_values_not_none(a, ["a", "b"])
+
+    def test_zoneinfo(self):
+        self.assertEqual(utc_date_to_datetime(date(2023, 12, 5)), datetime(2023, 12, 5, 0, 0, tzinfo=timezone.utc))
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

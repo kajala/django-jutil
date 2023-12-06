@@ -15,7 +15,7 @@ from jutil.dates import (
     this_month,
     last_year,
     last_week,
-    localize_time_range,
+    replace_range_tzinfo,
     this_year,
     this_week,
     get_time_steps,
@@ -115,14 +115,14 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
 
     Args:
         name: Name of the date range. See add_date_range_arguments().
-        today: Optional current datetime. Default is datetime.utcnow().
+        today: Optional current datetime. Default is datetime.now().
         tz: Optional timezone. Default is UTC.
 
     Returns:
         datetime (begin, end)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
 
     if name == "last_week":
@@ -146,24 +146,24 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
     if name == "yesterday":
         return yesterday(today, tz)
     if name == "today":
-        return localize_time_range(begin, begin + timedelta(hours=24), tz)
+        return replace_range_tzinfo(begin, begin + timedelta(hours=24), tz)
     if name == "tomorrow":
-        return localize_time_range(begin + timedelta(hours=24), begin + timedelta(hours=48), tz)
+        return replace_range_tzinfo(begin + timedelta(hours=24), begin + timedelta(hours=48), tz)
 
     m = re.match(r"^plus_minus_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(begin - timedelta(days=days), today + timedelta(days=days), tz)
+        return replace_range_tzinfo(begin - timedelta(days=days), today + timedelta(days=days), tz)
 
     m = re.match(r"^prev_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(begin - timedelta(days=days), today, tz)
+        return replace_range_tzinfo(begin - timedelta(days=days), today, tz)
 
     m = re.match(r"^next_(\d+)d$", name)
     if m:
         days = int(m.group(1))
-        return localize_time_range(begin, today + timedelta(days=days), tz)
+        return replace_range_tzinfo(begin, today + timedelta(days=days), tz)
 
     raise ValueError("Invalid date range name: {}".format(name))
 

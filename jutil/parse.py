@@ -1,9 +1,8 @@
 import logging
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone
 from typing import Optional, Any
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
-import pytz
 from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.dateparse import parse_date as django_parse_date
 
@@ -62,8 +61,8 @@ def parse_datetime(v: str, tz: Any = None) -> datetime:
                 raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v})
             t = datetime.combine(t_date, time())
         if tz is None:
-            tz = pytz.utc
-        return t if t.tzinfo else tz.localize(t)
+            tz = timezone.utc
+        return t if t.tzinfo is not None else t.replace(tzinfo=tz)
     except Exception as err:
         raise ValidationError(_("“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.") % {"value": v}) from err
 
@@ -105,7 +104,7 @@ def parse_datetime_or_none(v: str, tz: Any = None) -> Optional[datetime]:
                 return None
             t = datetime.combine(t_date, time())
         if tz is None:
-            tz = pytz.utc
-        return t if t.tzinfo else tz.localize(t)
+            tz = timezone.utc
+        return t if t.tzinfo is not None else t.replace(tzinfo=tz)
     except Exception:
         return None

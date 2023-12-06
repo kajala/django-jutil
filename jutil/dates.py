@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta, time, date
+from datetime import datetime, timedelta, time, date, timezone
 from typing import Tuple, Any, Optional, List
-import pytz
 from calendar import monthrange
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
@@ -53,20 +52,20 @@ TIME_STEP_NAMES = list(zip(*TIME_STEP_CHOICES))[0]
 
 
 def utc_date_to_datetime(date_val: date) -> datetime:
-    return pytz.utc.localize(datetime.combine(date_val, time(0, 0)))
+    return datetime.combine(date_val, time(0, 0)).replace(tzinfo=timezone.utc)
 
 
-def localize_time_range(begin: datetime, end: datetime, tz: Any = None) -> Tuple[datetime, datetime]:
+def replace_range_tzinfo(begin: datetime, end: datetime, tzinfo: Any = None) -> Tuple[datetime, datetime]:
     """
-    Localizes time range. Uses pytz.utc if None provided.
+    Replaces time range tzinfo. Uses timezone.utc if None provided.
     :param begin: Begin datetime
     :param end: End datetime
-    :param tz: pytz timezone or None (default UTC)
+    :param tzinfo: ZoneInfo or None (default timezone.utc)
     :return: begin, end
     """
-    if tz is None:
-        tz = pytz.utc
-    return tz.localize(begin), tz.localize(end)
+    if tzinfo is None:
+        tzinfo = timezone.utc
+    return begin.replace(tzinfo=tzinfo), end.replace(tzinfo=tzinfo)
 
 
 def get_last_day_of_month(today: Optional[datetime] = None) -> int:
@@ -79,7 +78,7 @@ def get_last_day_of_month(today: Optional[datetime] = None) -> int:
         int
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     return monthrange(today.year, today.month)[1]
 
 
@@ -95,7 +94,7 @@ def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -
         datetime
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     last_day = monthrange(today.year, today.month)[1]
     end = today.replace(day=last_day, hour=0, minute=0, second=0, microsecond=0) + timedelta(hours=24)
     while n > 0:
@@ -108,8 +107,8 @@ def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -
         n += 1
     end_incl = end - timedelta(microseconds=1)
     if tz is None:
-        tz = pytz.utc
-    return tz.localize(end_incl)
+        tz = timezone.utc
+    return end_incl.replace(tzinfo=tz)
 
 
 def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -124,10 +123,10 @@ def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = today - timedelta(days=today.weekday())
     begin = datetime(year=begin.year, month=begin.month, day=begin.day)
-    return localize_time_range(begin, begin + timedelta(days=7), tz)
+    return replace_range_tzinfo(begin, begin + timedelta(days=7), tz)
 
 
 def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -141,11 +140,11 @@ def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = datetime(day=1, month=today.month, year=today.year)
     end = begin + timedelta(days=32)
     end = datetime(day=1, month=end.month, year=end.year)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -159,18 +158,18 @@ def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = datetime(day=1, month=1, year=today.year)
     end = datetime(day=1, month=1, year=begin.year + 1)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def next_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = datetime(day=1, month=1, year=today.year + 1)
     end = datetime(day=1, month=1, year=begin.year + 2)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -184,10 +183,10 @@ def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = today + timedelta(days=7 - today.weekday())
     begin = datetime(year=begin.year, month=begin.month, day=begin.day)
-    return localize_time_range(begin, begin + timedelta(days=7), tz)
+    return replace_range_tzinfo(begin, begin + timedelta(days=7), tz)
 
 
 def next_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -201,13 +200,13 @@ def next_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = datetime(day=1, month=today.month, year=today.year)
     next_mo = begin + timedelta(days=32)
     begin = datetime(day=1, month=next_mo.month, year=next_mo.year)
     following_mo = begin + timedelta(days=32)
     end = datetime(day=1, month=following_mo.month, year=following_mo.year)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def last_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -221,10 +220,10 @@ def last_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     begin = today - timedelta(weeks=1, days=today.weekday())
     begin = datetime(year=begin.year, month=begin.month, day=begin.day)
-    return localize_time_range(begin, begin + timedelta(days=7), tz)
+    return replace_range_tzinfo(begin, begin + timedelta(days=7), tz)
 
 
 def last_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -238,11 +237,11 @@ def last_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     end = datetime(day=1, month=today.month, year=today.year)
     end_incl = end - timedelta(seconds=1)
     begin = datetime(day=1, month=end_incl.month, year=end_incl.year)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def last_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -256,11 +255,11 @@ def last_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     end = datetime(day=1, month=1, year=today.year)
     end_incl = end - timedelta(seconds=1)
     begin = datetime(day=1, month=1, year=end_incl.year)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:
@@ -274,11 +273,11 @@ def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
         begin (inclusive), end (exclusive)
     """
     if today is None:
-        today = datetime.utcnow()
+        today = datetime.now()
     end = datetime(day=today.day, month=today.month, year=today.year)
     end_incl = end - timedelta(seconds=1)
     begin = datetime(day=end_incl.day, month=end_incl.month, year=end_incl.year)
-    return localize_time_range(begin, end, tz)
+    return replace_range_tzinfo(begin, end, tz)
 
 
 def add_month(t: datetime, n: int = 1) -> datetime:
