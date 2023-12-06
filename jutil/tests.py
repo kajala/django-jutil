@@ -141,7 +141,7 @@ from xml.etree import ElementTree as ET  # noqa
 from django.contrib import admin
 
 try:
-    import zoneinfo
+    import zoneinfo  # noqa
 except ImportError:
     from backports import zoneinfo  # type: ignore  # noqa
 from zoneinfo import ZoneInfo
@@ -1378,8 +1378,8 @@ class Tests(TestCase, TestSetupMixin):
 
     def test_obj_key_value_validators(self):
         class TestClass:
-            a: int
-            b: int
+            a: int  # type: ignore
+            b: int  # type: ignore
 
         a = TestClass()
         a.a = 1  # type: ignore

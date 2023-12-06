@@ -310,7 +310,7 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
     return format_html("<a href='{}'>{}</a>", url, str(obj) if not label else label)
 
 
-def admin_update_model_instance(
+def admin_update_model_instance(  # pylint: disable=too-many-locals
     instance: object,
     changes: Dict[str, Any],
     note: str = "",
@@ -353,7 +353,7 @@ def admin_update_model_instance(
             change_message.append(
                 {
                     "changed": {
-                        "name": str(instance._meta.verbose_name),
+                        "name": str(instance._meta.verbose_name),  # type: ignore
                         "object": str(instance),
                         "fields": changed_field_labels,
                         "values": values,
@@ -367,13 +367,13 @@ def admin_update_model_instance(
         change_message.append(str(_("No fields changed.")))
     if who is None:
         who = admin_log_system_user()
-    content_type_id = get_content_type_for_model(instance).pk
+    content_type_id = get_content_type_for_model(instance).pk  # type: ignore
     for k, v in changes.items():
         setattr(instance, k, v)
     return LogEntry.objects.log_action(  # type: ignore
-        user_id=who.pk,
+        user_id=who.pk,  # type: ignore
         content_type_id=content_type_id,
-        object_id=instance.pk,
+        object_id=instance.pk,  # type: ignore
         object_repr=str(instance),
         action_flag=action_flag,
         change_message=change_message,
