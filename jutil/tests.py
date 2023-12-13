@@ -31,7 +31,7 @@ from django.utils.translation import override, gettext as _, gettext_lazy
 from rest_framework.exceptions import NotAuthenticated
 from jutil.admin import admin_log, admin_obj_url, admin_obj_link, ModelAdminBase, get_admin_log
 from jutil.auth import AuthUserMixin, get_auth_user, get_auth_user_or_none
-from jutil.command import get_date_range_by_name, add_date_range_arguments, parse_date_range_arguments, get_command_by_name, get_command_name
+from jutil.command import add_date_range_arguments, parse_date_range_arguments, get_command_by_name, get_command_name
 from jutil.email import make_email_recipient_list
 from jutil.middleware import EnsureOriginMiddleware, LogExceptionMiddleware, EnsureLanguageCookieMiddleware
 from jutil.model import (
@@ -63,6 +63,7 @@ from jutil.dates import (
     get_time_steps,
     TIME_STEP_DAILY,
     utc_date_to_datetime,
+    get_date_range_by_name,
 )
 from jutil.format import (
     format_full_name,

@@ -106,6 +106,9 @@ EMAIL_HOST_PASSWORD = (sendgrid api key)
 Changes
 =======
 
+4.1.1:
+* Refactoring: get_date_range_by_name moved from jutil.command to jutil.dates (since usage not tied to cli as is)
+
 4.0.1:
 * ZoneInfo support with backports fallback
 * Dropped pytz from dependencies (following Django 5.0 example)

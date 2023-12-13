@@ -1,27 +1,16 @@
 import logging
-import re
 import traceback
-from datetime import datetime, timedelta
-from typing import Tuple, List, Any, Optional
+from datetime import datetime
+from typing import Tuple, List, Any
 from django.core.management import get_commands, load_command_class
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.timezone import now
 from django.conf import settings
 from jutil.dates import (
-    last_month,
-    yesterday,
     TIME_RANGE_NAMES,
     TIME_STEP_NAMES,
-    this_month,
-    last_year,
-    last_week,
-    replace_range_tzinfo,
-    this_year,
-    this_week,
     get_time_steps,
-    next_year,
-    next_month,
-    next_week,
+    get_date_range_by_name,
 )
 from jutil.email import send_email
 import getpass
@@ -108,64 +97,6 @@ def add_date_range_arguments(parser: CommandParser):
         parser.add_argument("--" + v.replace("_", "-"), action="store_true")
     for v in TIME_RANGE_NAMES:
         parser.add_argument("--" + v.replace("_", "-"), action="store_true")
-
-
-def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:  # noqa
-    """Returns a timezone-aware date range by symbolic name.
-
-    Args:
-        name: Name of the date range. See add_date_range_arguments().
-        today: Optional current datetime. Default is datetime.now().
-        tz: Optional timezone. Default is UTC.
-
-    Returns:
-        datetime (begin, end)
-    """
-    if today is None:
-        today = datetime.now()
-    begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    if name == "last_week":
-        return last_week(today, tz)
-    if name == "last_month":
-        return last_month(today, tz)
-    if name == "last_year":
-        return last_year(today, tz)
-    if name == "this_week":
-        return this_week(today, tz)
-    if name == "this_month":
-        return this_month(today, tz)
-    if name == "this_year":
-        return this_year(today, tz)
-    if name == "next_week":
-        return next_week(today, tz)
-    if name == "next_month":
-        return next_month(today, tz)
-    if name == "next_year":
-        return next_year(today, tz)
-    if name == "yesterday":
-        return yesterday(today, tz)
-    if name == "today":
-        return replace_range_tzinfo(begin, begin + timedelta(hours=24), tz)
-    if name == "tomorrow":
-        return replace_range_tzinfo(begin + timedelta(hours=24), begin + timedelta(hours=48), tz)
-
-    m = re.match(r"^plus_minus_(\d+)d$", name)
-    if m:
-        days = int(m.group(1))
-        return replace_range_tzinfo(begin - timedelta(days=days), today + timedelta(days=days), tz)
-
-    m = re.match(r"^prev_(\d+)d$", name)
-    if m:
-        days = int(m.group(1))
-        return replace_range_tzinfo(begin - timedelta(days=days), today, tz)
-
-    m = re.match(r"^next_(\d+)d$", name)
-    if m:
-        days = int(m.group(1))
-        return replace_range_tzinfo(begin, today + timedelta(days=days), tz)
-
-    raise ValueError("Invalid date range name: {}".format(name))
 
 
 def parse_date_range_arguments(options: dict, default_range: str = "last_month", tz: Any = None) -> Tuple[datetime, datetime, List[Tuple[datetime, datetime]]]:

@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta, time, date, timezone
 from typing import Tuple, Any, Optional, List
 from calendar import monthrange
@@ -377,3 +378,61 @@ def get_time_steps(step_type: str, begin: datetime, end: datetime) -> List[Tuple
             t = add_month(t0, n)
         n += 1
     return [(begins[i], begins[i + 1]) for i in range(len(begins) - 1)]
+
+
+def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetime, datetime]:  # noqa
+    """Returns a timezone-aware date range by symbolic name.
+
+    Args:
+        name: Name of the date range. See TIME_RANGE_CHOICES.
+        today: Optional current datetime. Default is datetime.now().
+        tz: Optional timezone. Default is UTC.
+
+    Returns:
+        datetime (begin, end)
+    """
+    if today is None:
+        today = datetime.now()
+    begin = today.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    if name == "last_week":
+        return last_week(today, tz)
+    if name == "last_month":
+        return last_month(today, tz)
+    if name == "last_year":
+        return last_year(today, tz)
+    if name == "this_week":
+        return this_week(today, tz)
+    if name == "this_month":
+        return this_month(today, tz)
+    if name == "this_year":
+        return this_year(today, tz)
+    if name == "next_week":
+        return next_week(today, tz)
+    if name == "next_month":
+        return next_month(today, tz)
+    if name == "next_year":
+        return next_year(today, tz)
+    if name == "yesterday":
+        return yesterday(today, tz)
+    if name == "today":
+        return replace_range_tzinfo(begin, begin + timedelta(hours=24), tz)
+    if name == "tomorrow":
+        return replace_range_tzinfo(begin + timedelta(hours=24), begin + timedelta(hours=48), tz)
+
+    m = re.match(r"^plus_minus_(\d+)d$", name)
+    if m:
+        days = int(m.group(1))
+        return replace_range_tzinfo(begin - timedelta(days=days), today + timedelta(days=days), tz)
+
+    m = re.match(r"^prev_(\d+)d$", name)
+    if m:
+        days = int(m.group(1))
+        return replace_range_tzinfo(begin - timedelta(days=days), today, tz)
+
+    m = re.match(r"^next_(\d+)d$", name)
+    if m:
+        days = int(m.group(1))
+        return replace_range_tzinfo(begin, today + timedelta(days=days), tz)
+
+    raise ValueError("Invalid date range name: {}".format(name))
