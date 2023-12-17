@@ -1398,6 +1398,11 @@ class Tests(TestCase, TestSetupMixin):
     def test_zoneinfo(self):
         self.assertEqual(utc_date_to_datetime(date(2023, 12, 5)), datetime(2023, 12, 5, 0, 0, tzinfo=timezone.utc))
 
+    def test_cmd_name(self):
+        from jutil.management.commands.geo_ip import Command  # noqa  # type: ignore
+
+        self.assertEqual(Command().name, "geo_ip")
+
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
 dummy_admin_func_b.short_description = "B"  # type: ignore

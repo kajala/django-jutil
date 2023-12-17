@@ -43,6 +43,16 @@ class SafeCommand(BaseCommand):
     def do(self, *args, **kwargs):
         pass
 
+    @property
+    def name(self) -> str:
+        """
+        Returns name of the CLI management command.
+        For example, customers/management/commands/list_customers.py Command would return "list_customers".
+        Returns:
+            str
+        """
+        return self.__class__.__module__.rsplit(".", 1)[1]
+
 
 def add_date_range_arguments(parser: CommandParser):
     """Adds following arguments to the CommandParser:
