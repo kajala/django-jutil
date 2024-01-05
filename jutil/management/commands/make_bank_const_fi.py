@@ -4,6 +4,7 @@ from django.core.management.base import CommandParser
 from jutil.command import SafeCommand
 from jutil.dict import sorted_dict
 from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
+from jutil.validators import ascii_filter
 
 
 def fi_iban_load_map(filename: str) -> dict:
@@ -23,10 +24,10 @@ def fi_iban_load_map(filename: str) -> dict:
         if head != ["National ID", "BIC Code", "Financial Institution Name"]:
             raise ValidationError("Incompatible file content in {}".format(filename))
         for line in lines:
-            if len(line) == 3 and line[0]:
+            if len(line) >= 3 and line[0]:
                 nat_id = str(line[0]).strip()
                 bic_code = line[1].strip()
-                name = line[2].strip()
+                name = ascii_filter(line[2].strip())
                 out[nat_id] = (bic_code, name)
     return out
 
