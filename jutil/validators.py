@@ -301,6 +301,16 @@ def iban_bank_info(v: str) -> Tuple[str, str]:
     func = globals().get(func_name)
     if func is not None:
         return func(v)
+    try:
+        # optional: use schwifty for extended support if installed
+        import schwifty  # noqa
+
+        obj = schwifty.IBAN(v)
+        bic = str(obj.bic)
+        bank_name = str(obj.bank_name)
+        return bic, bank_name
+    except Exception:  # noqa
+        pass
     return "", ""
 
 
