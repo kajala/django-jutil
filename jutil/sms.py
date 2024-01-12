@@ -3,13 +3,14 @@ from django.conf import settings
 from jutil.validators import phone_filter
 
 
-def send_sms(phone: str, message: str, sender: str = "", **kw):
+def send_sms(phone: str, message: str, sender: str = "", channel: str = "", **kw):
     """Sends SMS via Kajala Group SMS API. Contact info@kajala.com for access.
 
     Args:
         phone: Phone number
         message: Message to be esnd
         sender: Sender (max 11 characters)
+        channel: Set delivery channel explicitly
         **kw: Variable key-value pairs to be sent to SMS API
 
     Returns:
@@ -30,6 +31,8 @@ def send_sms(phone: str, message: str, sender: str = "", **kw):
         "msg": message,
         "src": sender,
     }
+    if channel:
+        data["channel"] = channel
     for k, v in kw.items():
         data[k] = v
     return requests.post("https://sms.kajala.com/api/sms/", json=data, headers=headers, timeout=15)
