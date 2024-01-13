@@ -48,7 +48,7 @@ def parse_datetime(v: str, tz: Any = None) -> datetime:
 
     Args:
         v: Input string to parse
-        tz: Default pytz timezone or if None then use UTC as default
+        tz: Default timezone or if None then use UTC as default
 
     Returns:
         datetime with timezone
@@ -91,7 +91,7 @@ def parse_datetime_or_none(v: str, tz: Any = None) -> Optional[datetime]:
 
     Args:
         v: Input string to parse
-        tz: Default pytz timezone or if None then use UTC as default
+        tz: Default timezone or if None then use UTC as default
 
     Returns:
         datetime with timezone or None

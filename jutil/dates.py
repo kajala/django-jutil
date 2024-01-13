@@ -89,7 +89,7 @@ def end_of_month(today: Optional[datetime] = None, n: int = 0, tz: Any = None) -
     Args:
         today: Some date in the month (defaults current datetime)
         n: +- number of months to offset from current month. Default 0.
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         datetime
@@ -118,7 +118,7 @@ def this_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -135,7 +135,7 @@ def this_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
     Args:
         today: Some date in the month (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -153,7 +153,7 @@ def this_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -178,7 +178,7 @@ def next_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -195,7 +195,7 @@ def next_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
     Args:
         today: Some date in the month (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -215,7 +215,7 @@ def last_week(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -232,7 +232,7 @@ def last_month(today: Optional[datetime] = None, tz: Any = None) -> Tuple[dateti
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -250,7 +250,7 @@ def last_year(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
@@ -268,7 +268,7 @@ def yesterday(today: Optional[datetime] = None, tz: Any = None) -> Tuple[datetim
 
     Args:
         today: Some date (defaults current datetime)
-        tz: Timezone (defaults pytz UTC)
+        tz: Timezone (defaults timezone.utc)
 
     Returns:
         begin (inclusive), end (exclusive)
