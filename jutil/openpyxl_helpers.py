@@ -80,6 +80,11 @@ def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any
     return c
 
 
+def get_column_letters(sheet: Worksheet) -> List[str]:
+    column_letters = list(openpyxl.utils.get_column_letter(col_number + 1) for col_number in range(sheet.max_column))
+    return column_letters
+
+
 def rows_to_sheet(sheet: Worksheet, rows: List[List[Any]], config: Optional[CellConfig]):
     if config is None:
         config = CellConfig()
