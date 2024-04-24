@@ -205,18 +205,22 @@ def json_dumps(value: Any, indent: Optional[int] = 4, cls: Any = DjangoJSONEncod
     return json.dumps(value, indent=indent, cls=cls)
 
 
-def format_csv(rows: List[List[Any]], dialect: str = "excel") -> str:
-    """Formats rows to CSV string content.
+def format_csv(rows: List[List[Any]], dialect: str = "excel", delimiter: str = ",", doublequote: bool = True, lineterminator: str = "\r\n") -> str:
+    """Formats rows to CSV string content. Thin wrapper around csv.writer() for convenience.
 
     Args:
         rows: List[List[Any]]
         dialect: See csv.writer dialect
+        delimiter: A one-character string used to separate fields. It defaults to ','.
+        doublequote: Controls how instances of quote character appearing inside a field should themselves be quoted. When True, the character is doubled.
+                     When False, the escape character is used as a prefix to the quotechar. It defaults to True.
+        lineterminator: The string used to terminate lines
 
     Returns:
         str
     """
     f = StringIO()
-    writer = csv.writer(f, dialect=dialect)
+    writer = csv.writer(f, dialect=dialect, delimiter=delimiter, doublequote=doublequote, lineterminator=lineterminator)
     for row in rows:
         writer.writerow(row)
     return f.getvalue()
