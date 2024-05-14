@@ -316,6 +316,7 @@ def admin_update_model_instance(  # pylint: disable=too-many-locals
     note: str = "",
     who: Optional[Union[User, AnonymousUser]] = None,
     cls: Any = DjangoJSONEncoder,
+    commit: bool = True,
 ) -> LogEntry:
     """
     Changes object field values and writes a structured message about the change with optional free-form text about the change to object's admin history log.
@@ -326,6 +327,7 @@ def admin_update_model_instance(  # pylint: disable=too-many-locals
         note: Free text note what the change is about (optional)
         who: Who made the change (optional)
         cls: Serialization class. Default DjangoJSONEncoder.
+        commit: Save instance to database at the end of change
 
     Returns:
         LogEntry
@@ -370,6 +372,8 @@ def admin_update_model_instance(  # pylint: disable=too-many-locals
     content_type_id = get_content_type_for_model(instance).pk  # type: ignore
     for k, v in changes.items():
         setattr(instance, k, v)
+    if commit:
+        instance.save()  # type: ignore
     return LogEntry.objects.log_action(  # type: ignore
         user_id=who.pk,  # type: ignore
         content_type_id=content_type_id,
