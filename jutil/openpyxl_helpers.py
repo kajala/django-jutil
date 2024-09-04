@@ -4,8 +4,10 @@ from tempfile import NamedTemporaryFile
 from zipfile import ZipFile, ZIP_DEFLATED
 from django.http import HttpResponse
 from django.utils.html import strip_tags
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict
 import os
+
+from openpyxl.utils import column_index_from_string
 
 try:
     import openpyxl  # type: ignore
@@ -101,3 +103,42 @@ def rows_to_workbook(rows: List[List[Any]], config: Optional[CellConfig] = None)
     assert isinstance(sheet, Worksheet)
     rows_to_sheet(sheet, rows, config)
     return book
+
+
+def set_sheet_column_widths(sheet: Worksheet, column_letter_width_pairs: Dict[str, int]):
+    """
+    Sets worksheet column widths.
+
+    For example:
+    set_sheet_column_widths(wb.active, {"A": 20, "B": 20, "C": 20})
+
+    Args:
+        sheet: Worksheet
+        column_letter_width_pairs: Column letter - width (int) dict
+
+    Returns:
+
+    """
+    for column_letter, column_width in column_letter_width_pairs.items():
+        sheet.column_dimensions[column_letter].width = column_width
+
+
+def set_sheet_column_alignments(sheet: Worksheet, column_letter_alignment_pairs: Dict[str, str]):
+    """
+    Sets worksheet column alignments.
+    Alignment value must be one of ‘fill’, ‘left’, ‘distributed’, ‘justify’, ‘center’, ‘general’, ‘centerContinuous’, ‘right’.
+
+    For example:
+    set_sheet_column_alignments(wb.active, {"A": "left", "B": "right", "C": "right"})
+
+    Args:
+        sheet: Worksheet
+        column_letter_alignment_pairs: Column letter - alignment dict.
+
+    Returns:
+
+    """
+    for row in sheet:
+        for column_letter, alignment in column_letter_alignment_pairs.items():
+            column_ix = column_index_from_string(column_letter)
+            row[column_ix - 1].alignment = Alignment(horizontal=alignment)
