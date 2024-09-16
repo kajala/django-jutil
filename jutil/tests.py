@@ -41,6 +41,7 @@ from jutil.model import (
     get_object_or_none,
     wait_object_or_none,
 )
+from jutil.openpyxl_helpers import find_sheet_column_index_by_label, get_sheet_column_letters
 from jutil.redis_helpers import redis_set_json, redis_get_json, redis_get_bytes, redis_set_bytes, redis_get_json_or_none, redis_get_bytes_or_none, redis_delete
 from jutil.request import get_ip_info
 from jutil.responses import CsvResponse
@@ -1342,6 +1343,13 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(wb2.active.cell(1, 1).value, "hello")
         self.assertEqual(wb2.active.cell(2, 2).value, 1.0)
         self.assertEqual(wb2.active.cell(2, 3).value, 2)
+        wb3 = load_workbook(filename=os.path.join(settings.BASE_DIR, "data/test-excel.xlsx"))
+        sheet = wb3.active
+        self.assertEqual(find_sheet_column_index_by_label(sheet, "test1"), 0)
+        self.assertEqual(find_sheet_column_index_by_label(sheet, "test2"), 1)
+        self.assertEqual(find_sheet_column_index_by_label(sheet, "test3"), 2)
+        self.assertEqual(find_sheet_column_index_by_label(sheet, "test4"), None)
+        self.assertEqual(get_sheet_column_letters(sheet), ["A", "B", "C", "D"])
 
     def test_is_iban(self):
         valid_ibans = ["AL35202111090000000001234567", "AD1400080001001234567890", "AT483200000012345864"]

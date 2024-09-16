@@ -82,7 +82,7 @@ def set_cell_value(sheet: Worksheet, row_index: int, column_index: int, val: Any
     return c
 
 
-def get_column_letters(sheet: Worksheet) -> List[str]:
+def get_sheet_column_letters(sheet: Worksheet) -> List[str]:
     column_letters = list(openpyxl.utils.get_column_letter(col_number + 1) for col_number in range(sheet.max_column))
     return column_letters
 
@@ -142,3 +142,14 @@ def set_sheet_column_alignments(sheet: Worksheet, column_letter_alignment_pairs:
         for column_letter, alignment in column_letter_alignment_pairs.items():
             column_ix = column_index_from_string(column_letter)
             row[column_ix - 1].alignment = Alignment(horizontal=alignment)
+
+
+def find_sheet_column_index_by_label(sheet: Worksheet, label: str, label_row_index: int = 0) -> Optional[int]:
+    row_num = label_row_index + 1
+    for col_num in range(1, 100):
+        cell = sheet.cell(row_num, col_num)
+        if cell.value is None:
+            break
+        if str(cell.value) == label:
+            return col_num - 1
+    return None
