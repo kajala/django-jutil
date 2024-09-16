@@ -146,7 +146,7 @@ def set_sheet_column_alignments(sheet: Worksheet, column_letter_alignment_pairs:
 
 def find_sheet_column_index_by_label(sheet: Worksheet, label: str, label_row_index: int = 0) -> Optional[int]:
     row_num = label_row_index + 1
-    for col_num in range(1, 100):
+    for col_num in range(1, sheet.max_column + 1):
         cell = sheet.cell(row_num, col_num)
         if cell.value is None:
             break

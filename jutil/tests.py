@@ -1349,7 +1349,7 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(find_sheet_column_index_by_label(sheet, "test2"), 1)
         self.assertEqual(find_sheet_column_index_by_label(sheet, "test3"), 2)
         self.assertEqual(find_sheet_column_index_by_label(sheet, "test4"), None)
-        self.assertEqual(get_sheet_column_letters(sheet), ["A", "B", "C", "D"])
+        self.assertEqual(get_sheet_column_letters(sheet), ["A", "B", "C"])
 
     def test_is_iban(self):
         valid_ibans = ["AL35202111090000000001234567", "AD1400080001001234567890", "AT483200000012345864"]
