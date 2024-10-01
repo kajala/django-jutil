@@ -31,6 +31,9 @@ DIGIT_FILTER = re.compile(r"[^0-9]")
 
 
 def phone_filter(v: str) -> str:
+    """
+    Filters unwanted characters from phone number.
+    """
     return PHONE_FILTER.sub("", str(v)) if v else ""
 
 
