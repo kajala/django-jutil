@@ -14,12 +14,10 @@ cd dist
 FILE="$PROJECT-$REL"
 echo $FILE
 tar xvf "$FILE.tar.gz"
-cd $FILE
 for DIR_TO_BE_DELETED in venv uploads downloads certs .idea coverage.xml project logs .mypy_cache linecalc.conf; do
     rm -rf "$FILE/$DIR_TO_BE_DELETED"
 done
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
-cd ..
 rm "$FILE.tar.gz"
 tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
