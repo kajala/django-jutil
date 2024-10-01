@@ -14,7 +14,7 @@ cd dist
 FILE="$PROJECT-$REL"
 echo $FILE
 tar xvf "$FILE.tar.gz"
-for DIR_TO_BE_DELETED in venv uploads downloads certs .idea coverage.xml project logs .mypy_cache linecalc.conf; do
+for DIR_TO_BE_DELETED in venv uploads downloads certs .idea coverage.xml project logs .mypy_cache linecalc.conf mypy.ini pyproject.toml requirements-dev.txt; do
     rm -rf "$FILE/$DIR_TO_BE_DELETED"
 done
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
@@ -23,4 +23,7 @@ tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
 cd ..
 
-twine upload dist/$FILE.tar.gz
+if [ "$1" != "--no-upload" ]; then
+    twine upload dist/$FILE.tar.gz
+fi
+
