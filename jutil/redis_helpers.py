@@ -82,7 +82,7 @@ def redis_get_bytes_or_none(name: str) -> Optional[bytes]:
     Returns:
         bytes or None if value missing
     """
-    return redis_instance().get(redis_prefix_key(name))
+    return redis_instance().get(redis_prefix_key(name))  # type: ignore
 
 
 def redis_get_bytes(name: str) -> bytes:
@@ -139,7 +139,7 @@ def redis_get_json_or_none(name: str) -> Any:
     try:
         buf = redis_instance().get(redis_prefix_key(name))
         if buf is not None:
-            return json.loads(buf)
+            return json.loads(buf)  # type: ignore
     except Exception as exc:
         logger.error("redis_get_json(%s) failed: %s", name, exc)
     return None
@@ -162,7 +162,7 @@ def redis_get_json(name: str) -> Any:
     buf = redis_instance().get(redis_prefix_key(name))
     if buf is None:
         raise Exception(f"{redis_prefix_key(name)} not in Redis")  # noqa
-    return json.loads(buf)
+    return json.loads(buf)  # type: ignore
 
 
 def redis_delete(name: str):
