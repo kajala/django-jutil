@@ -102,6 +102,14 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = (sendgrid api key)
 
+# Amazon SES (2024)
+DEFAULT_FROM_EMAIL = "no-reply@example.com"
+EMAIL_HOST = "email-smtp.us-east-2.amazonaws.com"  # or whatever your zone is
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "(SES email user)"  # remember domain verification etc.
+EMAIL_HOST_PASSWORD = "(SES email password)"
+
 
 Changes
 =======
