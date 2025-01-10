@@ -15,8 +15,8 @@ def format_change_message_ex_values_dict(model: Any, values: dict) -> str:
             out.append(f'"{obj_str}" [id={obj_pk}]')
         else:
             field = getattr(model, k).field if hasattr(model, k) and hasattr(getattr(model, k), "field") else None  # type: ignore  # noqa
-            if hasattr(field, "choices") and field.choices:
-                choice_label = dict(field.choices).get(v) or ""
+            if hasattr(field, "choices") and field.choices:  # type: ignore
+                choice_label = dict(field.choices).get(v) or ""  # type: ignore
                 if choice_label:
                     out.append(f'"{v}" ({choice_label})')
                     continue

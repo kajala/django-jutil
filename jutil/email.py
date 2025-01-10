@@ -81,7 +81,7 @@ def send_email(  # noqa
     Returns:
         Status code 202 if emails were sent successfully
     """
-    if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:
+    if hasattr(settings, "EMAIL_SENDGRID_API_KEY") and settings.EMAIL_SENDGRID_API_KEY:  # type: ignore
         return send_email_sendgrid(recipients, subject, text, html, sender, files, files_content, cc_recipients, bcc_recipients, exceptions)
     return send_email_smtp(recipients, subject, text, html, sender, files, files_content, cc_recipients, bcc_recipients, exceptions)
 
@@ -131,7 +131,7 @@ def send_email_sendgrid(  # noqa
         raise Exception("Using send_email_sendgrid() requires sendgrid pip install sendgrid>=6.3.1,<7.0.0") from err  # noqa
 
     if not api_key and hasattr(settings, "EMAIL_SENDGRID_API_KEY"):
-        api_key = settings.EMAIL_SENDGRID_API_KEY or ""
+        api_key = settings.EMAIL_SENDGRID_API_KEY or ""  # type: ignore
     if not api_key:
         raise Exception("EMAIL_SENDGRID_API_KEY not defined in Django settings and API key not passed in to send_email_sendgrid() either")  # noqa
 

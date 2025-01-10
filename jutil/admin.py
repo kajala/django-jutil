@@ -310,7 +310,7 @@ def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base
     return format_html("<a href='{}'>{}</a>", url, str(obj) if not label else label)
 
 
-def admin_update_model_instance(  # pylint: disable=too-many-locals
+def admin_update_model_instance(  # pylint: disable=too-many-locals,too-many-arguments,too-many-positional-arguments
     instance: object,
     changes: Dict[str, Any],
     note: str = "",

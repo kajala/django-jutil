@@ -49,7 +49,7 @@ def _xml_tag_filter(s: str, strip_namespaces: bool) -> str:
     return s
 
 
-def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-locals
+def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-locals,too-many-positional-arguments
     data: dict,
     el: Element,
     array_tags: Iterable[str],
@@ -105,7 +105,7 @@ def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-loca
         data[tag] = obj
 
 
-def xml_to_dict(  # pylint: disable=too-many-arguments,too-many-locals
+def xml_to_dict(  # pylint: disable=too-many-arguments,too-many-locals,too-many-positional-arguments
     xml_bytes: bytes,
     tags: Optional[Iterable[str]] = None,
     array_tags: Optional[Iterable[str]] = None,

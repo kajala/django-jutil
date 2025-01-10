@@ -22,7 +22,7 @@ class GeoIP:
     latitude: float
     longitude: float
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         ip: str,
         country_name: str,
