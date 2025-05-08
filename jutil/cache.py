@@ -18,9 +18,6 @@ class CachedFieldsMixin:
     if TYPE_CHECKING:
         pk: Any = None
 
-        def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-            pass
-
     def update_cached_fields(
         self, commit: bool = True, exceptions: bool = True, updated_fields: Optional[Sequence[str]] = None, force: bool = False
     ) -> List[str]:
@@ -44,7 +41,7 @@ class CachedFieldsMixin:
                     setattr(self, k, v)
                     changed_fields.append(k)
             if commit and changed_fields:
-                self.save(update_fields=changed_fields)  # pytype: disable=attribute-error
+                self.save(update_fields=changed_fields)  # type: ignore  # noqa
             return changed_fields
         except Exception as err:
             logger.warning("%s update_cached_fields failed for %s: %s", self.__class__.__name__, self, err)

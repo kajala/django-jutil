@@ -619,7 +619,7 @@ class Tests(TestCase, TestSetupMixin):
         ac = "FI8847304720017517"
         inf = iban_bank_info(ac)
         self.assertEqual(inf[0], "POPFFI22")
-        self.assertEqual(inf[1], "POP-Pankki")
+        self.assertEqual(inf[1], "POP and Bonum Bank")
 
         ac = ""
         inf = iban_bank_info(ac)
