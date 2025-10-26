@@ -1,3 +1,37 @@
+[build-system]
+requires = ["setuptools>=80.9.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-jutil"
+version = "4.2.0"
+description = "Collection of small utilities for Django and Django REST framework projects."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "License :: OSI Approved :: MIT License"
+authors = [
+  { name = "Jani Kajala", email = "kajala@gmail.com" }
+]
+dependencies = [
+    "Django>=2.1.7",
+    "django-ipware>=3.0.0",
+    "djangorestframework>=2.19.1",
+    "requests>=2.19.1",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+packages = ["jutil"]
+include-package-data = true
+
+[project.urls]
+"Homepage" = "https://github.com/kajala/django-jutil"
+"Issues" = "https://github.com/kajala/django-jutil/issues"
+
 [tool.black]
 line-length = 159
 
