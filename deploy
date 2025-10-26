@@ -29,6 +29,7 @@ for DIR_TO_BE_DELETED in venv uploads downloads certs .idea coverage.xml project
 done
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
 rm "$FILE.tar.gz"
+rm "*.whl"
 tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
 cd ..
