@@ -2,7 +2,7 @@ DIR=`pwd`
 PROJECT_DIR=`basename $DIR`
 PROJECT="`echo $PROJECT_DIR | tr '-' '_'`"
 
-REL="`parse-pyproject-version.py`"
+REL="`parse-pyproject-version.py --patch`"
 if [ "$?" != "0" ]; then
     REL=""
 fi
