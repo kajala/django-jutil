@@ -18,6 +18,10 @@ echo "Making release $REL of $PROJECT"
 
 rm -rf dist htmlcov buyild MANIFEST *.egg-info
 ./venv/bin/python -m build
+if [ "$?" != "0" ]; then
+    echo "ERROR: ./venv/bin/python -m build failed, exiting"
+    exit
+fi
 
 # clean venv/ and htmlcov/ directories from the dist
 cd dist
