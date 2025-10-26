@@ -114,6 +114,9 @@ EMAIL_HOST_PASSWORD =
 Changes
 =======
 
+4.2.1:
+* New pyproject.toml based build system
+
 4.1.1:
 * Refactoring: get_date_range_by_name moved from jutil.command to jutil.dates (since usage not tied to cli as is)
 
