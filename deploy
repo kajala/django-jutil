@@ -2,16 +2,21 @@ DIR=`pwd`
 PROJECT_DIR=`basename $DIR`
 PROJECT="`echo $PROJECT_DIR | tr '-' '_'`"
 
-if [ -z "$1" ]; then
-    echo "Usage: <ver>"
+REL="`parse-pyproject-version.py`"
+if [ "$?" != "0" ]; then
+    REL=""
+fi
+if [ -z "$1" ] && [ "$REL" == "" ]; then
+    echo "Usage: <release version>"
     exit 1
 fi
-REL="$1"
+if [ -z "$REL" ]; then
+    REL="$1"
+fi
 
 echo "Making release $REL of $PROJECT"
 
-rm -rf dist
-rm -rf htmlcov
+rm -rf dist htmlcov buyild MANIFEST *.egg-info
 ./venv/bin/python -m build
 
 # clean venv/ and htmlcov/ directories from the dist
