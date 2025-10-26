@@ -1,15 +1,20 @@
 DIR=`pwd`
 PROJECT_DIR=`basename $DIR`
 PROJECT="`echo $PROJECT_DIR | tr '-' '_'`"
-REL=`parse-setup-version.py`
+
+if [ -z "$1" ]; then
+    echo "Usage: <ver>"
+    exit 1
+fi
+REL="$1"
+
 echo "Making release $REL of $PROJECT"
 
 rm -rf dist
 rm -rf htmlcov
-python3 setup.py sdist
+./venv/bin/python -m build
 
-# clean venv/ directory from the dist
-# TODO: cleaner way to do this
+# clean venv/ and htmlcov/ directories from the dist
 cd dist
 FILE="$PROJECT-$REL"
 echo $FILE
@@ -26,4 +31,3 @@ cd ..
 if [ "$1" != "--no-upload" ]; then
     twine upload dist/$FILE.tar.gz
 fi
-

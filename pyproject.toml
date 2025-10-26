@@ -8,7 +8,8 @@ version = "4.2.0"
 description = "Collection of small utilities for Django and Django REST framework projects."
 readme = "README.md"
 requires-python = ">=3.8"
-license = "License :: OSI Approved :: MIT License"
+license = "MIT"
+license-files = ["LICENSE.txt"]
 authors = [
   { name = "Jani Kajala", email = "kajala@gmail.com" }
 ]
@@ -20,7 +21,6 @@ dependencies = [
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
 
