@@ -1244,11 +1244,11 @@ class Tests(TestCase, TestSetupMixin):
         cases = [
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": True},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/en/LC_MESSAGES/django.po", "jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".po", "ignore_case": False},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/en/LC_MESSAGES/django.po", "jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": True, "use_media_root": True, "suffix": ".PO", "ignore_case": False},
@@ -1263,6 +1263,8 @@ class Tests(TestCase, TestSetupMixin):
             out = StringIO()
             call_command("list_files", dir_name, json=True, stdout=out, **call_kw)
             data = json.loads(out.getvalue())
+            # print("data_ref =", json.dumps(sorted(data_ref)))
+            # print("    data =", json.dumps(sorted(data)))
             self.assertListEqual(data_ref, data)
 
     def test_filters(self):
@@ -1284,7 +1286,7 @@ class Tests(TestCase, TestSetupMixin):
         cases = [
             [
                 {"recurse": True, "use_media_root": True, "filename": "django.po"},
-                ["jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po", "jutil/locale/en/LC_MESSAGES/django.po"],
+                ["jutil/locale/en/LC_MESSAGES/django.po", "jutil/locale/fi/LC_MESSAGES/django.po", "jutil/locale/sv/LC_MESSAGES/django.po"],
             ],
             [
                 {"recurse": False, "use_media_root": True, "filename": "django.po"},

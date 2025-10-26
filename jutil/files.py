@@ -42,7 +42,7 @@ def list_files(dir_name: str, suffix: str = "", ignore_case: bool = True, use_me
                 out.append(file_path)
         elif recurse and ent.is_dir() and ent.name != "." and ent.name != "..":
             out.extend(list_files(ent.path, suffix=suffix, ignore_case=ignore_case, use_media_root=use_media_root, recurse=recurse))
-    return out
+    return list(sorted(out))
 
 
 def find_file(filename: str, dir_name: str = ".", use_media_root: bool = False, recurse: bool = False) -> List[str]:
@@ -75,4 +75,4 @@ def find_file(filename: str, dir_name: str = ".", use_media_root: bool = False, 
                 out.append(file_path)
         elif recurse and ent.is_dir() and ent.name != "." and ent.name != "..":
             out.extend(find_file(filename, dir_name=ent.path, use_media_root=use_media_root, recurse=recurse))
-    return out
+    return list(sorted(out))
