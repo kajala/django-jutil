@@ -27,4 +27,4 @@ class Command(SafeCommand):
             json_str = json.dumps(out, indent=4)
             self.stdout.writelines([json_str])
         else:
-            self.stdout.writelines(out)
+            self.stdout.writelines("\n".join(out) + "\n")
