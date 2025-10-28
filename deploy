@@ -34,6 +34,7 @@ done
 find . -name "__pycache__" -type d -exec rm -r "{}" \;
 rm "$FILE.tar.gz"
 rm "*.whl"
+cp ../pyproject.toml $FILE/
 tar zcvf "$FILE.tar.gz" $FILE
 rm -rf $FILE
 cd ..
