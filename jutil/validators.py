@@ -127,8 +127,10 @@ def variable_name_sanitizer(v: str) -> str:
 
 
 def ascii_filter(v: str) -> str:
-    """Replaces Unicode accent characters with plain ASCII.
+    """
+    Replaces Unicode accent characters with plain ASCII.
     For example remove_accents('HELÉN') == 'HELEN'.
+    Uses NFKD (Unicode Normalization Form Compatibility Decomposition) normalization.
 
     Args:
         v: str
