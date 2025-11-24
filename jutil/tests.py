@@ -87,6 +87,7 @@ from jutil.format import (
     capfirst_lazy,
     dec0,
     upper_lazy,
+    format_validation_error,
 )
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
@@ -1412,6 +1413,19 @@ class Tests(TestCase, TestSetupMixin):
         from jutil.management.commands.geo_ip import Command  # noqa  # type: ignore
 
         self.assertEqual(Command().name, "geo_ip")
+
+    def test_format_validation_error(self):
+        try:
+            raise ValidationError({"a": "1", "b": "2"})
+        except ValidationError as exc:
+            out = format_validation_error(exc)
+            self.assertEqual(out, "a: 1\nb: 2")
+        try:
+            raise ValidationError("hello world")
+        except ValidationError as exc:
+            out = format_validation_error(exc)
+            print(out)
+            self.assertEqual(out, "hello world")
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
