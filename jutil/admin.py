@@ -212,9 +212,9 @@ def admin_log_field_values(
     )
 
 
-def admin_construct_change_message_ex(
+def admin_construct_change_message_ex(  # noqa
     request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000, log_formsets: bool = False
-) -> List[Any]:  # noqa
+) -> List[Any]:
     """
     Creates extended audit log ("History" in admin) message. Optionally supports logging the message to formset/inline items as well.
 
