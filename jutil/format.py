@@ -571,7 +571,7 @@ def choices_label(choices: Sequence[Tuple[T, Any]], value: T) -> Union[Any, str]
     return ""
 
 
-def format_validation_error(exc: ValidationError) -> str:
+def format_validation_error(exc: Union[ValidationError, str, dict, list]) -> str:
     """
     Convert a Django ValidationError into a readable multiline text.
     Handles nested dict errors, list errors, and messages.
@@ -584,7 +584,7 @@ def format_validation_error(exc: ValidationError) -> str:
                     msg = format_validation_error(msg)
                 lines.append(str(field) + ": " + str(msg))
         return "\n".join(lines)
-    elif isinstance(exc.messages, list):
+    elif hasattr(exc, "messages") and isinstance(exc.messages, list):
         lines = []
         for msg in exc.messages:
             if isinstance(msg, ValidationError):
