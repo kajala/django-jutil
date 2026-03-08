@@ -15,7 +15,7 @@ from django.utils import translation
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.contrib.admin.models import CHANGE, ADDITION
+from django.contrib.admin.models import CHANGE, ADDITION, DELETION
 from django.template.response import TemplateResponse
 from django.contrib.admin.options import get_content_type_for_model
 from django.contrib.admin.utils import unquote
@@ -212,7 +212,24 @@ def admin_log_field_values(
     )
 
 
-def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000) -> List[Any]:  # noqa
+def admin_construct_change_message_ex(
+    request, form, formsets, add, cls=DjangoJSONEncoder, max_serialized_field_length: int = 1000, log_formsets: bool = False
+) -> List[Any]:  # noqa
+    """
+    Creates extended audit log ("History" in admin) message. Optionally supports logging the message to formset/inline items as well.
+
+    Args:
+        request: HttpRequest
+        form: Admin form
+        formsets: Admin formsets/inlines
+        add: True for additions
+        cls: Encoding manager, default DjangoJSONEncoder
+        max_serialized_field_length: Maximum log length for very large fields
+        log_formsets: If true log additions/changes/deletions of formset items/inlines are added to formset/inline objects too
+
+    Returns:
+        List of change messages for LogEntry creation.
+    """
     from ipware import get_client_ip  # type: ignore  # noqa
     from django.contrib.admin.utils import _get_changed_field_labels_from_form  # type: ignore  # noqa
     from jutil.model import get_model_field_names  # noqa
@@ -245,6 +262,15 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
                             }
                         }
                     )
+                    if log_formsets:
+                        LogEntry.objects.log_actions(
+                            user_id=request.user.pk,
+                            queryset=[added_object],
+                            action_flag=ADDITION,
+                            change_message=[{"added": {"values": values, "ip": ip}}],
+                            single_object=True,
+                        )
+
                 for changed_object, changed_fields in formset.changed_objects:
                     values = json.loads(admin_obj_serialize_fields(changed_object, changed_fields, cls, max_serialized_field_length))
                     change_message.append(
@@ -258,6 +284,17 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
                             }
                         }
                     )
+                    if log_formsets:
+                        LogEntry.objects.log_actions(
+                            user_id=request.user.pk,
+                            queryset=[changed_object],
+                            action_flag=CHANGE,
+                            change_message=[
+                                {"changed": {"fields": _get_changed_field_labels_from_form(formset.forms[0], changed_fields), "values": values, "ip": ip}}
+                            ],
+                            single_object=True,
+                        )
+
                 for deleted_object in formset.deleted_objects:
                     change_message.append(
                         {
@@ -268,6 +305,13 @@ def admin_construct_change_message_ex(request, form, formsets, add, cls=DjangoJS
                             }
                         }
                     )
+                    if log_formsets:
+                        LogEntry.objects.log_actions(
+                            user_id=request.user.pk,
+                            queryset=[deleted_object],
+                            action_flag=DELETION,
+                        )
+
     return change_message
 
 
@@ -395,6 +439,7 @@ class ModelAdminBase(admin.ModelAdmin):
 
     save_on_top = True
     extended_log = True
+    extended_log_formsets = False
     max_history_length = 1000
     history_ordering = ["-action_time", "-id"]
     serialization_cls = DjangoJSONEncoder
@@ -402,7 +447,9 @@ class ModelAdminBase(admin.ModelAdmin):
 
     def construct_change_message(self, request, form, formsets, add=False):
         if self.extended_log:
-            return admin_construct_change_message_ex(request, form, formsets, add, self.serialization_cls, self.max_serialized_field_length)
+            return admin_construct_change_message_ex(
+                request, form, formsets, add, self.serialization_cls, self.max_serialized_field_length, log_formsets=self.extended_log_formsets
+            )
         return super().construct_change_message(request, form, formsets, add)
 
     def sort_actions_by_description(self, actions: dict) -> OrderedDict:
