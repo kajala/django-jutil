@@ -584,7 +584,7 @@ def format_validation_error(exc: Union[ValidationError, str, dict, list]) -> str
                     msg = format_validation_error(msg)
                 lines.append(str(field) + ": " + str(msg))
         return "\n".join(lines)
-    elif hasattr(exc, "messages") and isinstance(exc.messages, list):
+    if hasattr(exc, "messages") and isinstance(exc.messages, list):
         lines = []
         for msg in exc.messages:
             if isinstance(msg, ValidationError):
