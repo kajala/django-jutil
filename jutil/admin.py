@@ -1,6 +1,7 @@
 import json
 import logging
 from collections import OrderedDict
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Sequence, List, Dict, Any, Union
 from django.conf import settings
@@ -426,6 +427,72 @@ def admin_update_model_instance(  # pylint: disable=too-many-locals,too-many-arg
         action_flag=action_flag,
         change_message=change_message,
     )
+
+
+class ModelFieldValueChange:
+    timestamp: datetime
+    instance: Any
+    field_name: str
+    value: Any
+    log_entry: LogEntry
+
+    def __str__(self) -> str:
+        return f"[{self.timestamp}] {self.instance._meta.model_name}[pk={self.instance.pk}].{self.field_name} = {self.value}"  # noqa
+
+
+def get_model_instance_admin_log_changes(
+    instance: object,
+    field_name: str = "",
+    timestamp: Optional[datetime] = None,
+    ordering: str = "-pk",
+    max_entries: Optional[int] = None,
+    verbose: bool = False,
+) -> List[ModelFieldValueChange]:
+    """
+    Lists (extended) admin log changes related to specific model instance.
+    Supports optional filtering by time range.
+    For example, get_model_instance_admin_log_changes(obj, "state", datetime(2026, 1, 1)) returns list of "state" values before 2026.
+
+    Args:
+        instance: Model instance
+        field_name: Optional field name for filtering changes. Only this field is returned.
+        timestamp: Optional time stamp for filtering changes. Only events before this timestamp are reported.
+        ordering: Ordering of LogEntry fields to report. Default is newest first ("-pk").
+        max_entries: Maximum number of changes to return. Default is all.
+        verbose: Extended debug info to logging
+
+    Returns:
+        List of model field value changes as listed in the audit log
+    """
+    out: List[ModelFieldValueChange] = []
+    log_qs = get_admin_log(instance)
+    if timestamp is not None:
+        log_qs = log_qs.filter(action_time__lte=timestamp)
+    entry_count = 0
+    for entry in log_qs.order_by(ordering).distinct():
+        assert isinstance(entry, LogEntry)
+        if verbose:
+            logger.debug("[LogEntry.pk=%s] change_message: %s", entry.pk, entry.change_message)
+        try:
+            change_message = json.loads(entry.change_message)
+            for data in change_message:
+                for key, value in (data.get("changed") or data.get("added"))["values"].items():
+                    if field_name and field_name != key:
+                        continue
+                    chg = ModelFieldValueChange()
+                    chg.timestamp = entry.action_time
+                    chg.instance = instance
+                    chg.log_entry = entry
+                    chg.field_name = key
+                    chg.value = value
+                    out.append(chg)
+                    entry_count += 1
+        except Exception as exc:
+            if verbose:
+                logger.debug("[LogEntry.pk=%s] Parsing failed (%s). change_message=%s", entry.pk, exc, entry.change_message)
+        if max_entries is not None and entry_count >= max_entries:
+            break
+    return out
 
 
 class ModelAdminBase(admin.ModelAdmin):
