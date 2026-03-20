@@ -73,7 +73,7 @@ def admin_log(instances: Sequence[object], msg: str, who: Optional[Union[User, A
 
     for instance in instances:
         if instance:
-            LogEntry.objects.log_action(  # type: ignore
+            LogEntry.objects.create(  # type: ignore
                 user_id=who.pk if who is not None else None,  # type: ignore
                 content_type_id=get_content_type_for_model(instance).pk,  # type: ignore
                 object_id=instance.pk,  # type: ignore  # pytype: disable=attribute-error
@@ -203,7 +203,7 @@ def admin_log_field_values(
     if who is None:
         who = admin_log_system_user()
     content_type_id = get_content_type_for_model(instance).pk
-    return LogEntry.objects.log_action(  # type: ignore
+    return LogEntry.objects.create(  # type: ignore
         user_id=who.pk,
         content_type_id=content_type_id,
         object_id=instance.pk,
@@ -264,12 +264,14 @@ def admin_construct_change_message_ex(  # noqa
                         }
                     )
                     if log_formsets:
-                        LogEntry.objects.log_actions(
+                        msg = [{"added": {"values": values, "ip": ip}}]
+                        LogEntry.objects.create(
                             user_id=request.user.pk,
-                            queryset=[added_object],
+                            content_type_id=get_content_type_for_model(added_object).pk,
+                            object_id=added_object.pk,
+                            object_repr=str(added_object)[:200],
                             action_flag=ADDITION,
-                            change_message=[{"added": {"values": values, "ip": ip}}],
-                            single_object=True,
+                            change_message=json.dumps(msg, cls=DjangoJSONEncoder),
                         )
 
                 for changed_object, changed_fields in formset.changed_objects:
@@ -286,14 +288,14 @@ def admin_construct_change_message_ex(  # noqa
                         }
                     )
                     if log_formsets:
-                        LogEntry.objects.log_actions(
+                        msg = [{"changed": {"fields": _get_changed_field_labels_from_form(formset.forms[0], changed_fields), "values": values, "ip": ip}}]
+                        LogEntry.objects.create(
                             user_id=request.user.pk,
-                            queryset=[changed_object],
+                            content_type_id=get_content_type_for_model(changed_object).pk,
+                            object_id=changed_object.pk,
+                            object_repr=str(changed_object)[:200],
                             action_flag=CHANGE,
-                            change_message=[
-                                {"changed": {"fields": _get_changed_field_labels_from_form(formset.forms[0], changed_fields), "values": values, "ip": ip}}
-                            ],
-                            single_object=True,
+                            change_message=json.dumps(msg, cls=DjangoJSONEncoder),
                         )
 
                 for deleted_object in formset.deleted_objects:
@@ -307,10 +309,13 @@ def admin_construct_change_message_ex(  # noqa
                         }
                     )
                     if log_formsets:
-                        LogEntry.objects.log_actions(
+                        LogEntry.objects.create(
                             user_id=request.user.pk,
-                            queryset=[deleted_object],
+                            content_type_id=get_content_type_for_model(deleted_object).pk,
+                            object_id=deleted_object.pk,
+                            object_repr=str(deleted_object)[:200],
                             action_flag=DELETION,
+                            change_message="",
                         )
 
     return change_message
@@ -440,7 +445,7 @@ class ModelFieldValueChange:
         return f"[{self.timestamp}] {self.instance._meta.model_name}[pk={self.instance.pk}].{self.field_name} = {self.value}"  # noqa
 
 
-def get_model_instance_admin_log_changes(
+def get_model_instance_admin_log_changes(  # noqa
     instance: object,
     field_name: str = "",
     timestamp: Optional[datetime] = None,
