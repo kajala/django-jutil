@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from dataclasses import asdict
 from datetime import datetime, timedelta, date, timezone
 from decimal import Decimal
 from io import BytesIO, StringIO
@@ -15,6 +16,7 @@ from django.utils.timezone import now
 from rest_framework.test import APIClient
 from jutil.drf_exceptions import transform_exception_to_drf
 from jutil.files import find_file
+from jutil.loantools import calc_fully_amortized_loan_monthly_payment_schedule, calc_fully_amortized_loan_payment, PaymentScheduleData
 from jutil.modelfields import SafeCharField, SafeTextField
 from jutil.middleware import logger as jutil_middleware_logger, ActivateUserProfileTimezoneMiddleware
 from django.conf import settings
@@ -1426,6 +1428,267 @@ class Tests(TestCase, TestSetupMixin):
             out = format_validation_error(exc)
             print(out)
             self.assertEqual(out, "hello world")
+
+    def test_calc_fully_amortized_loan_monthly_payment(self):
+        pmt = calc_fully_amortized_loan_payment(Decimal("110000"), 24, Decimal("12.50") / Decimal(12))
+        self.assertEqual(dec2(pmt), Decimal("5203.80"))
+
+    def test_pmt_schedule(self):
+        ref_data = [
+            PaymentScheduleData(
+                due_date=date(2026, 4, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("1167.81"),
+                due_principal=Decimal("4035.99"),
+                interest_days=31,
+                total_paid_principal=Decimal("4035.99"),
+                total_paid_interest=Decimal("1167.81"),
+                balance=Decimal("105964.01"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 5, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("1088.67"),
+                due_principal=Decimal("4115.13"),
+                interest_days=30,
+                total_paid_principal=Decimal("8151.12"),
+                total_paid_interest=Decimal("2256.48"),
+                balance=Decimal("101848.88"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 6, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("1081.27"),
+                due_principal=Decimal("4122.53"),
+                interest_days=31,
+                total_paid_principal=Decimal("12273.65"),
+                total_paid_interest=Decimal("3337.75"),
+                balance=Decimal("97726.35"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 7, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("1004.04"),
+                due_principal=Decimal("4199.76"),
+                interest_days=30,
+                total_paid_principal=Decimal("16473.41"),
+                total_paid_interest=Decimal("4341.79"),
+                balance=Decimal("93526.59"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 8, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("992.92"),
+                due_principal=Decimal("4210.88"),
+                interest_days=31,
+                total_paid_principal=Decimal("20684.29"),
+                total_paid_interest=Decimal("5334.71"),
+                balance=Decimal("89315.71"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 9, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("948.21"),
+                due_principal=Decimal("4255.59"),
+                interest_days=31,
+                total_paid_principal=Decimal("24939.88"),
+                total_paid_interest=Decimal("6282.92"),
+                balance=Decimal("85060.12"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 10, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("873.91"),
+                due_principal=Decimal("4329.89"),
+                interest_days=30,
+                total_paid_principal=Decimal("29269.77"),
+                total_paid_interest=Decimal("7156.83"),
+                balance=Decimal("80730.23"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 11, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("857.07"),
+                due_principal=Decimal("4346.73"),
+                interest_days=31,
+                total_paid_principal=Decimal("33616.50"),
+                total_paid_interest=Decimal("8013.90"),
+                balance=Decimal("76383.50"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2026, 12, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("784.76"),
+                due_principal=Decimal("4419.04"),
+                interest_days=30,
+                total_paid_principal=Decimal("38035.54"),
+                total_paid_interest=Decimal("8798.66"),
+                balance=Decimal("71964.46"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 1, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("764.01"),
+                due_principal=Decimal("4439.79"),
+                interest_days=31,
+                total_paid_principal=Decimal("42475.33"),
+                total_paid_interest=Decimal("9562.67"),
+                balance=Decimal("67524.67"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 2, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("716.87"),
+                due_principal=Decimal("4486.93"),
+                interest_days=31,
+                total_paid_principal=Decimal("46962.26"),
+                total_paid_interest=Decimal("10279.54"),
+                balance=Decimal("63037.74"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 3, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("604.47"),
+                due_principal=Decimal("4599.33"),
+                interest_days=28,
+                total_paid_principal=Decimal("51561.59"),
+                total_paid_interest=Decimal("10884.01"),
+                balance=Decimal("58438.41"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 4, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("620.41"),
+                due_principal=Decimal("4583.39"),
+                interest_days=31,
+                total_paid_principal=Decimal("56144.98"),
+                total_paid_interest=Decimal("11504.42"),
+                balance=Decimal("53855.02"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 5, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("553.30"),
+                due_principal=Decimal("4650.50"),
+                interest_days=30,
+                total_paid_principal=Decimal("60795.48"),
+                total_paid_interest=Decimal("12057.72"),
+                balance=Decimal("49204.52"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 6, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("522.38"),
+                due_principal=Decimal("4681.42"),
+                interest_days=31,
+                total_paid_principal=Decimal("65476.90"),
+                total_paid_interest=Decimal("12580.10"),
+                balance=Decimal("44523.10"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 7, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("457.43"),
+                due_principal=Decimal("4746.37"),
+                interest_days=30,
+                total_paid_principal=Decimal("70223.27"),
+                total_paid_interest=Decimal("13037.53"),
+                balance=Decimal("39776.73"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 8, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("422.29"),
+                due_principal=Decimal("4781.51"),
+                interest_days=31,
+                total_paid_principal=Decimal("75004.78"),
+                total_paid_interest=Decimal("13459.82"),
+                balance=Decimal("34995.22"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 9, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("371.52"),
+                due_principal=Decimal("4832.28"),
+                interest_days=31,
+                total_paid_principal=Decimal("79837.06"),
+                total_paid_interest=Decimal("13831.34"),
+                balance=Decimal("30162.94"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 10, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("309.89"),
+                due_principal=Decimal("4893.91"),
+                interest_days=30,
+                total_paid_principal=Decimal("84730.97"),
+                total_paid_interest=Decimal("14141.23"),
+                balance=Decimal("25269.03"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 11, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("268.27"),
+                due_principal=Decimal("4935.53"),
+                interest_days=31,
+                total_paid_principal=Decimal("89666.50"),
+                total_paid_interest=Decimal("14409.50"),
+                balance=Decimal("20333.50"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2027, 12, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("208.91"),
+                due_principal=Decimal("4994.89"),
+                interest_days=30,
+                total_paid_principal=Decimal("94661.39"),
+                total_paid_interest=Decimal("14618.41"),
+                balance=Decimal("15338.61"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2028, 1, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("162.84"),
+                due_principal=Decimal("5040.96"),
+                interest_days=31,
+                total_paid_principal=Decimal("99702.35"),
+                total_paid_interest=Decimal("14781.25"),
+                balance=Decimal("10297.65"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2028, 2, 12),
+                due_amount=Decimal("5203.80"),
+                due_interest=Decimal("109.32"),
+                due_principal=Decimal("5094.48"),
+                interest_days=31,
+                total_paid_principal=Decimal("104796.83"),
+                total_paid_interest=Decimal("14890.57"),
+                balance=Decimal("5203.17"),
+            ),
+            PaymentScheduleData(
+                due_date=date(2028, 3, 12),
+                due_amount=Decimal("5254.85"),
+                due_interest=Decimal("51.68"),
+                due_principal=Decimal("5203.17"),
+                interest_days=29,
+                total_paid_principal=Decimal("110000.00"),
+                total_paid_interest=Decimal("14942.25"),
+                balance=Decimal("0.00"),
+            ),
+        ]
+
+        principal_amount = dec2(110000)
+        term_months = 24
+        interest_rate = dec2("12.5")
+        pmt = dec2(calc_fully_amortized_loan_payment(principal_amount, term_months, interest_rate / Decimal(12)))
+        loan_drawn_date = date(2026, 3, 12)
+        repayments_begin_date = date(2026, 4, 12)
+        days_in_year = 365
+        schedule = calc_fully_amortized_loan_monthly_payment_schedule(
+            principal_amount, term_months, interest_rate, pmt, loan_drawn_date, repayments_begin_date, days_in_year
+        )
+        for ix, entry in enumerate(schedule):
+            self.assertDictEqual(asdict(entry), asdict(ref_data[ix]))
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

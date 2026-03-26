@@ -2,6 +2,8 @@ import re
 from datetime import datetime, timedelta, time, date, timezone
 from typing import Tuple, Any, Optional, List
 from calendar import monthrange
+from zoneinfo import ZoneInfo
+
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -436,3 +438,19 @@ def get_date_range_by_name(name: str, today: Optional[datetime] = None, tz: Any 
         return replace_range_tzinfo(begin, today + timedelta(days=days), tz)
 
     raise ValueError("Invalid date range name: {}".format(name))
+
+
+def as_datetime(date_value: date, tzinfo: Optional[ZoneInfo] = None) -> datetime:
+    """
+    Converts date value to datetime 00:00 in selected timezone, default UTC.
+
+    Args:
+        date_value: Date value
+        tzinfo: Optional ZoneInfo, default is UTC
+
+    Returns:
+        datetime with timezone
+    """
+    if tzinfo is None:
+        tzinfo = timezone.utc
+    return datetime.combine(date_value, time()).replace(tzinfo=tzinfo)

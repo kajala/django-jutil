@@ -4,7 +4,7 @@ from django.db.models import Q
 
 
 class Command(BaseCommand):
-    help = "Non-interactive user password reset"
+    help = "Non-interactive user password reset. Note that passing password on command line is not a good practice so use this only for development."
 
     def add_arguments(self, parser: CommandParser):
         parser.add_argument("name", type=str)
