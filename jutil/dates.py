@@ -452,5 +452,5 @@ def as_datetime(date_value: date, tzinfo: Optional[ZoneInfo] = None) -> datetime
         datetime with timezone
     """
     if tzinfo is None:
-        tzinfo = timezone.utc
+        tzinfo = ZoneInfo("UTC")
     return datetime.combine(date_value, time()).replace(tzinfo=tzinfo)

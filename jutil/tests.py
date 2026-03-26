@@ -67,6 +67,7 @@ from jutil.dates import (
     TIME_STEP_DAILY,
     utc_date_to_datetime,
     get_date_range_by_name,
+    as_datetime,
 )
 from jutil.format import (
     format_full_name,
@@ -1685,10 +1686,21 @@ class Tests(TestCase, TestSetupMixin):
         repayments_begin_date = date(2026, 4, 12)
         days_in_year = 365
         schedule = calc_fully_amortized_loan_monthly_payment_schedule(
-            principal_amount, term_months, interest_rate, pmt, loan_drawn_date, repayments_begin_date, days_in_year
+            principal_amount=principal_amount,
+            term_months=term_months,
+            interest_rate=interest_rate,
+            monthly_payment=pmt,
+            loan_drawn_date=loan_drawn_date,
+            repayments_begin_date=repayments_begin_date,
+            days_in_year=days_in_year,
         )
         for ix, entry in enumerate(schedule):
             self.assertDictEqual(asdict(entry), asdict(ref_data[ix]))
+
+    def test_as_datetime(self):
+        self.assertEqual(as_datetime(date(2026, 3, 26)), as_datetime(date(2026, 3, 26), ZoneInfo("UTC")))
+        t = as_datetime(date(2026, 3, 26))
+        self.assertEqual(t, datetime(2026, 3, 26, 0, 0, tzinfo=ZoneInfo(key="UTC")))
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
