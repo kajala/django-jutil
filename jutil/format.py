@@ -592,3 +592,29 @@ def format_validation_error(exc: Union[ValidationError, str, dict, list]) -> str
             lines.append(str(msg))
         return "\n".join(lines)
     return str(exc)
+
+
+def format_http_response(content: Union[bytes, str], encoding: str = "UTF-8") -> str:
+    """
+    Tries to pretty format text based HTTP response whether it's XML or JSON.
+
+    Args:
+        content: Either XML or JSON or plain text response to be formatted.
+        encoding: Encoding if XML content and encoding known
+
+    Returns:
+        str
+    """
+    try:
+        data = json.loads(str(content.decode(encoding) if isinstance(content, bytes) else content))
+        return json_dumps(data)
+    except Exception:
+        pass
+    try:
+        if isinstance(content, bytes):
+            return format_xml_bytes(content, encoding, exceptions=True)
+        else:
+            return format_xml(content, encoding=encoding, exceptions=True)
+    except Exception:
+        pass
+    return str(content.decode(encoding) if isinstance(content, bytes) else content)

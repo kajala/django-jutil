@@ -91,6 +91,7 @@ from jutil.format import (
     dec0,
     upper_lazy,
     format_validation_error,
+    format_http_response,
 )
 from jutil.parse import parse_datetime, parse_bool, parse_datetime_or_none
 from jutil.validators import (
@@ -1701,6 +1702,12 @@ class Tests(TestCase, TestSetupMixin):
         self.assertEqual(as_datetime(date(2026, 3, 26)), as_datetime(date(2026, 3, 26), ZoneInfo("UTC")))
         t = as_datetime(date(2026, 3, 26))
         self.assertEqual(t, datetime(2026, 3, 26, 0, 0, tzinfo=ZoneInfo(key="UTC")))
+
+    def test_format_http_response(self):
+        json_ref = '{\n    "a": 1,\n    "b": {\n        "c": 2,\n        "d": 3\n    }\n}'
+        self.assertEqual(format_http_response('{"a":1,"b":{"c":2,"d":3}}'), json_ref)
+        xml_ref = '<?xml version="1.0"?>\n<a>\n  <b>hello</b>\n  <c>\n    <d>world</d>\n    <e>1234</e>\n  </c>\n</a>\n'
+        self.assertEqual(format_http_response("<a><b>hello</b><c><d>world</d><e>1234</e></c></a>"), xml_ref)
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
