@@ -526,7 +526,6 @@ def ee_iban_validator(v: str):
 
 FI_SSN_FILTER = re.compile(r"[^0-9A-Z+-]")
 FI_SSN_VALIDATOR = re.compile(r"^\d{6}[+-A]\d{3}[\d\w]$")
-FI_COMPANY_ORG_ID_FILTER = re.compile(r"[^0-9]")
 
 
 def fi_payment_reference_number(num: str):
@@ -584,21 +583,40 @@ def fi_ssn_filter(v: str) -> str:
 
 
 def fi_company_org_id_filter(v: str) -> str:
-    v = FI_COMPANY_ORG_ID_FILTER.sub("", v)
+    """
+    Filters Finland company org id and returns it in standard form.
+    Removes possible prefixes e.g. FI or 00000.
+    Note: This function does not perform any validatiopn.
+
+    Args:
+        v: Org id
+
+    Returns:
+        Org id in standard form
+    """
+    v = digit_filter(v)
+    while len(v) > 8 and v[0] == "0":
+        v = v[1:]
     return v[:-1] + "-" + v[-1:] if len(v) >= 2 else ""
 
 
 def fi_company_org_id_validator(v0: str):
     v = re.sub(r"\s+", "", v0)
-    prefix = v[:2]  # retain prefix: either numeric or FI is ok
+
+    # retain prefix: allow either missing or 'FI'
+    prefix = v[:2]
     v = fi_company_org_id_filter(v)
-    if v[:2] == prefix:
-        prefix = "FI"
-    if v[-2:-1] != "-" or prefix != "FI":
+    if v[:2] != prefix and prefix.upper() != "FI":
+        raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
+
+    # standard format has the checksum separated by '-'
+    if v[-2:-1] != "-":
         raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
     v = v.replace("-", "", 1)
     if len(v) != 8:
         raise ValidationError(_("Invalid company organization ID") + " ({})".format(v0), code="invalid_company_org_id")
+
+    # ensure checksum matches
     multipliers = (7, 9, 10, 5, 8, 4, 2)
     x = 0
     for i, m in enumerate(multipliers):

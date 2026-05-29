@@ -1709,6 +1709,10 @@ class Tests(TestCase, TestSetupMixin):
         xml_ref = '<?xml version="1.0"?>\n<a>\n  <b>hello</b>\n  <c>\n    <d>world</d>\n    <e>1234</e>\n  </c>\n</a>\n'
         self.assertEqual(format_http_response("<a><b>hello</b><c><d>world</d><e>1234</e></c></a>"), xml_ref)
 
+    def test_zero_prefix_org_id(self):
+        org_id = "FI00028470434"
+        fi_company_org_id_validator(org_id)
+
 
 dummy_admin_func_a.short_description = "A"  # type: ignore
 dummy_admin_func_b.short_description = "B"  # type: ignore
