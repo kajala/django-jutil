@@ -21,6 +21,9 @@
         <tr>
             <th scope="col">{% translate 'Date/time' %}</th>
             <th scope="col">{% translate 'User' %}</th>
+            {% if show_content_type %}
+            <th scope="col">{% translate 'Content type' %}</th>
+            {% endif %}
             <th scope="col">{% translate 'Action' %}</th>
         </tr>
         </thead>
@@ -29,6 +32,9 @@
         <tr>
             <th scope="row">{{ action.action_time|date:"SHORT_DATETIME_FORMAT" }}</th>
             <td>{{ action.user.get_username }}</td>
+            {% if show_content_type %}
+            <td>{{ action.content_type.name }}</td>
+            {% endif %}
             <td>{{ action|format_change_message_ex }}</td>
         </tr>
         {% endfor %}
