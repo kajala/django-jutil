@@ -5,6 +5,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Sequence, List, Dict, Any, Union
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User, AnonymousUser
@@ -573,6 +575,16 @@ class ModelAdminBase(admin.ModelAdmin):
         extra_context.update(kwargs)
         return self.changelist_view(request, self.fill_extra_context(request, extra_context))
 
+    def get_related_content_types(self, model):
+        concrete_model = model._meta.concrete_model
+
+        # Find all models registered in Django that share the exact same concrete parent
+        related_models = [
+            m for m in apps.get_models()
+            if m._meta.concrete_model == concrete_model
+        ]
+        return ContentType.objects.get_for_models(*related_models, for_concrete_models=False).values()
+
     def history_view(self, request, object_id, extra_context=None):  # pylint: disable=too-many-locals
         from django.contrib.admin.models import LogEntry  # noqa
         from django.contrib.admin.views.main import PAGE_VAR  # noqa
@@ -589,10 +601,12 @@ class ModelAdminBase(admin.ModelAdmin):
         # Then get the history for this object.
         opts = model._meta  # noqa
         app_label = opts.app_label
+        # show_content_type
+        related_content_types = self.get_related_content_types(model)
         action_list = (
             LogEntry.objects.filter(
                 object_id=unquote(object_id),
-                content_type=get_content_type_for_model(model),
+                content_type__in=related_content_types,
             )
             .select_related()
             .order_by(*self.history_ordering)
@@ -616,6 +630,7 @@ class ModelAdminBase(admin.ModelAdmin):
             "object": obj,
             "opts": opts,
             "preserved_filters": self.get_preserved_filters(request),
+            "show_content_type": len(related_content_types) > 1, # There are proxy models so need to display the content type
             **(extra_context or {}),
         }
 

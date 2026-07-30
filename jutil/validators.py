@@ -17,7 +17,7 @@ from jutil.bank_const_dk import DK_BANK_CLEARING_MAP
 from jutil.bank_const_fi import FI_BIC_BY_ACCOUNT_NUMBER, FI_BANK_NAME_BY_BIC
 from jutil.bank_const_se import SE_BANK_CLEARING_LIST
 
-EMAIL_VALIDATOR = re.compile(r"[a-zA-Z0-9\._-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+")
+EMAIL_VALIDATOR = re.compile(r"[a-zA-Z0-9\._+-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]+")
 PHONE_FILTER = re.compile(r"[^+0-9]")
 PHONE_VALIDATOR = re.compile(r"\+?\d{6,}")
 PASSPORT_FILTER = re.compile(r"[^-A-Z0-9]")
