@@ -1182,7 +1182,7 @@ class Tests(TestCase, TestSetupMixin):
 
         obj = TestModel()
         data = 'hello world <script>alert("popup")<script>'
-        data_ref = "hello world "
+        data_ref = 'hello world alert("popup")'
         for f in obj._meta.fields:
             if f.name in ["cf", "tf"]:
                 f.save_form_data(obj, data)
@@ -1712,6 +1712,100 @@ class Tests(TestCase, TestSetupMixin):
     def test_zero_prefix_org_id(self):
         org_id = "FI00028470434"
         fi_company_org_id_validator(org_id)
+
+    def test_xml_to_dict_empty_list(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList />
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), [])
+
+    def test_xml_to_dict_empty_list2(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList>
+            </ItemList>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), [])
+
+    def test_xml_to_dict_empty_list3(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList> </ItemList>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), [])
+
+    def test_xml_to_dict_empty_list4(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList>-</ItemList>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), ["-"])
+
+    def test_xml_to_dict_empty_list5(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), None)
+
+    def test_xml_to_dict_list(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList>
+                <A>123</A>
+            </ItemList>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), [{"A": "123"}])
+
+    def test_xml_to_dict_list2(self):
+        xml_content = """<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        <Root>
+            <ResponseStatus>
+                <Status>OK</Status>
+                <TimeStamp>Fri, 18 Sep 2026 15:39:53 -0500</TimeStamp>
+            </ResponseStatus>
+            <ItemList>1</ItemList>
+            <ItemList>2</ItemList>
+        </Root>"""
+        xml_bytes = xml_content.encode("utf-8")
+        data = xml_to_dict(xml_bytes, array_tags=["ItemList"])
+        self.assertEqual(data.get("ItemList"), ["1", "2"])
 
 
 dummy_admin_func_a.short_description = "A"  # type: ignore

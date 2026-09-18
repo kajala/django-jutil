@@ -98,7 +98,8 @@ def _xml_set_element_data_r(  # pylint: disable=too-many-arguments,too-many-loca
         data.setdefault(tag, [])
         if not isinstance(data[tag], list):
             data[tag] = [data[tag]]
-        data[tag].append(obj)
+        if obj is not None:  # exclude empty elements (None) in the lists
+            data[tag].append(obj)
     else:
         if tag in data:
             raise Exception("XML parsing failed, tag {} collision".format(tag))  # noqa
