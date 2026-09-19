@@ -612,9 +612,8 @@ def format_http_response(content: Union[bytes, str], encoding: str = "UTF-8") ->
         pass
     try:
         if isinstance(content, bytes):
-            return format_xml_bytes(content, encoding, exceptions=True)
-        else:
-            return format_xml(content, encoding=encoding, exceptions=True)
+            return format_xml_bytes(content, encoding, exceptions=True).decode(encoding)
+        return format_xml(content, encoding=encoding, exceptions=True)
     except Exception:
         pass
     return str(content.decode(encoding) if isinstance(content, bytes) else content)

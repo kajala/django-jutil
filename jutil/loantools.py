@@ -101,8 +101,8 @@ class PaymentScheduleData:
         return out
 
 
-def calc_fully_amortized_loan_monthly_payment_schedule(
-    *,  # noqa
+def calc_fully_amortized_loan_monthly_payment_schedule(  # noqa
+    *,
     principal_amount: Decimal,
     term_months: int,
     interest_rate: Decimal,
