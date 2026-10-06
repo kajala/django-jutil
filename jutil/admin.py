@@ -534,7 +534,7 @@ class ModelAdminBase(admin.ModelAdmin):
         Returns:
             OrderedDict
         """
-        sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: x[1])
+        sorted_descriptions = sorted([(k, data[2]) for k, data in actions.items()], key=lambda x: str(x[1]))
         sorted_actions = OrderedDict()
         for k, description in sorted_descriptions:  # pylint: disable=unused-variable
             sorted_actions[k] = actions[k]
@@ -579,10 +579,7 @@ class ModelAdminBase(admin.ModelAdmin):
         concrete_model = model._meta.concrete_model
 
         # Find all models registered in Django that share the exact same concrete parent
-        related_models = [
-            m for m in apps.get_models()
-            if m._meta.concrete_model == concrete_model
-        ]
+        related_models = [m for m in apps.get_models() if m._meta.concrete_model == concrete_model]
         return ContentType.objects.get_for_models(*related_models, for_concrete_models=False).values()
 
     def history_view(self, request, object_id, extra_context=None):  # pylint: disable=too-many-locals
@@ -630,7 +627,7 @@ class ModelAdminBase(admin.ModelAdmin):
             "object": obj,
             "opts": opts,
             "preserved_filters": self.get_preserved_filters(request),
-            "show_content_type": len(related_content_types) > 1, # There are proxy models so need to display the content type
+            "show_content_type": len(related_content_types) > 1,  # There are proxy models so need to display the content type
             **(extra_context or {}),
         }
 

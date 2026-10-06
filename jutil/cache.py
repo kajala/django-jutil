@@ -1,5 +1,7 @@
 import logging
 from typing import Optional, TYPE_CHECKING, Any, Sequence, List
+import time
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 
@@ -78,3 +80,31 @@ def update_cached_fields(*args):
                         e.update_cached_fields()
             else:
                 a.update_cached_fields()
+
+
+def cache_for_seconds(seconds: int):
+    def decorator(func):
+        # Maps function arguments key -> (result, expiration_time)
+        cache = {}
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Create a unique key from positional and keyword arguments
+            key = (args, frozenset(kwargs.items()))
+            now = time.time()
+
+            # Check if key exists and hasn't expired yet
+            cache_item = cache.get(key)
+            if cache_item is not None:
+                result, expires_at = cache_item[0], cache_item[1]
+                if now < expires_at:
+                    return result
+
+            # Otherwise, calculate new result and update cache
+            result = func(*args, **kwargs)
+            cache[key] = (result, now + seconds)
+            return result
+
+        return wrapper
+
+    return decorator
