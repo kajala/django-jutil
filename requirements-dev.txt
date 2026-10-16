@@ -1,5 +1,6 @@
 pip
 uv
+pyright
 pytype
 prospector
 coverage

@@ -815,17 +815,17 @@ class Tests(TestCase, TestSetupMixin):
         admin_log([obj], "Hello, world", user=self.user, ip="127.0.0.1")
         admin_log(obj, "Hello, world", user=self.user, ip="127.0.0.1")
         self.assertGreaterEqual(get_admin_log(obj).filter(change_message__contains="Hello, world").count(), 3)
-        e = LogEntry.objects.all().filter(object_id=obj.id).last()
+        e = LogEntry.objects.all().filter(object_id=obj.pk).last()
         self.assertIsNotNone(e)
         assert isinstance(e, LogEntry)
         self.assertEqual(e.change_message, "Hello, world")
-        self.assertEqual(admin_obj_url(obj, "admin:auth_user_change"), "/admin/auth/user/{}/change/".format(obj.id))
+        self.assertEqual(admin_obj_url(obj, "admin:auth_user_change"), "/admin/auth/user/{}/change/".format(obj.pk))
         self.assertEqual(admin_obj_url(None, "admin:auth_user_change"), "")
         self.assertEqual(admin_obj_link(None, "admin:auth_user_change"), "")
-        self.assertEqual(admin_obj_url(obj), "/admin/auth/user/{}/change/".format(obj.id))
-        self.assertEqual(admin_obj_url(e), "/admin/admin/logentry/{}/change/".format(e.id))
+        self.assertEqual(admin_obj_url(obj), "/admin/auth/user/{}/change/".format(obj.pk))
+        self.assertEqual(admin_obj_url(e), "/admin/admin/logentry/{}/change/".format(e.pk))
         link = admin_obj_link(obj, "User", "admin:auth_user_change")
-        self.assertEqual(link, "<a href='/admin/auth/user/{}/change/'>User</a>".format(obj.id))
+        self.assertEqual(link, "<a href='/admin/auth/user/{}/change/'>User</a>".format(obj.pk))
 
     def test_cmd_parser(self):
         parser = CommandParser()
@@ -872,8 +872,8 @@ class Tests(TestCase, TestSetupMixin):
         label, val = get_model_field_label_and_value(obj, "action_time")
         self.assertEqual(label, _("action time"))
         self.assertEqual(str(obj.action_time), val)
-        obj_b = get_object_or_none(obj.__class__, id=obj.id)
-        self.assertEqual(obj_b.id, obj.id)
+        obj_b = get_object_or_none(obj.__class__, id=obj.pk)
+        self.assertEqual(obj_b.pk, obj.pk)
         obj_b = get_object_or_none(obj.__class__, id=-1)
         self.assertIsNone(obj_b)
 
@@ -1094,13 +1094,13 @@ class Tests(TestCase, TestSetupMixin):
 
         # create 10 LogEntry for test user, 5 with text "VisibleLogMessage" and 5 "InvisibleLogMessage"
         # then check that "VisibleLogMessage" log entries are not visible since max_history_length = 5
-        LogEntry.objects.filter(object_id=user.id).delete()
+        LogEntry.objects.filter(object_id=user.pk).delete()
         for n in range(5):
             admin_log([user], "InvisibleLogMessage")
         for n in range(5):
             admin_log([user], "VisibleLogMessage")
-        self.assertEqual(LogEntry.objects.filter(object_id=user.id).count(), 10)
-        history_url = "/admin/auth/user/{}/history/".format(user.id)
+        self.assertEqual(LogEntry.objects.filter(object_id=user.pk).count(), 10)
+        history_url = "/admin/auth/user/{}/history/".format(user.pk)
         c = self.client
         c.get(history_url, follow=True)
         c.post("/admin/login/", {"username": "test@example.com", "password": "test1234"})
@@ -1203,12 +1203,12 @@ class Tests(TestCase, TestSetupMixin):
 
     def test_wait_object_or_none(self):
         admin_log([self.user], "Hello, world")
-        e = LogEntry.objects.all().filter(object_id=self.user.id).last()
+        e = LogEntry.objects.all().filter(object_id=self.user.pk).last()
         assert isinstance(e, LogEntry)
-        e_id = e.id
+        e_id = e.pk
         obj = wait_object_or_none(LogEntry, id=e_id)
         self.assertIsNotNone(obj)
-        self.assertEqual(obj.id, e_id)
+        self.assertEqual(obj.pk, e_id)
         t0 = now()
         obj = wait_object_or_none(LogEntry, timeout=1.0, sleep_interval=0.1, id=e_id + 1)
         t1 = now()
