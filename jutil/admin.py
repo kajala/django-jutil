@@ -340,7 +340,7 @@ def admin_obj_url(obj: Optional[object], route: str = "", base_url: str = "") ->
     if not route:
         route = "admin:{}_{}_change".format(obj._meta.app_label, obj._meta.model_name)  # type: ignore
     path = reverse(route, args=[obj.id])  # type: ignore
-    return base_url + path
+    return base_url.rstrip("/") + path
 
 
 def admin_obj_link(obj: Optional[object], label: str = "", route: str = "", base_url: str = "") -> str:
